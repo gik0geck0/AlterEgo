@@ -1,4 +1,4 @@
-package org.buland.quidditch_scoring;
+package edu.mines.alterego;
 
 import android.content.Context;
 import android.content.ContentValues;
@@ -23,12 +23,12 @@ import java.util.ArrayList;
  *
  *  @author: Matt Buland
  */
-public class StatisticsDBHelper extends SQLiteOpenHelper {
+public class CharacterDBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "";
     private static final int DB_VERSION = 1;
 
-    public StatisticsDBHelper(Context context) {
+    public CharacterDBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
@@ -51,12 +51,15 @@ public class StatisticsDBHelper extends SQLiteOpenHelper {
                 ")");
 
 
-        database.execSQL("CREATE TABLE IF NOT EXISTS character (" +
+        database.execSQL("CREATE TABLE IF NOT EXISTS character ( " +
                 "character_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "game_id INTEGER," +
                 "name TEXT," +
                 "description TEXT," +
                 "FOREIGN KEY(game_id) REFERECES game(game_id)" +
+                ")");
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                 ")");
 
         /*
