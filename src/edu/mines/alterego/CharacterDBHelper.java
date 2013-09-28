@@ -60,10 +60,45 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
+                "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "character_id INTEGER," +
+                "FOREIGN KEY(character_id) REFERECES character(character_id)" +
                 ")");
 
-        /*
-         */
+        database.execSQL("CREATE TABLE IF NOT EXISTS character_stat ( " +
+                "character_stat_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "character_id INTEGER," +
+                "stat_value INTEGER," +
+                "stat_name INTEGER," +
+                "description/usage/etc INTEGER," +
+                "category_id INTEGER," +
+                "FOREIGN KEY(character_id) REFERECES character(character_id)" +
+                "FOREIGN KEY(category_id) REFERECES category(category_id)" +
+                ")");
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS item_stat ( " +
+                "item_stat_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "entity_id INTEGER," +
+                "stat_value INTEGER," +
+                "stat_name INTEGER," +
+                "description/usage/etc INTEGER," +
+                "category_id INTEGER," +
+                "FOREIGN KEY(category_id) REFERECES category(category_id)" +
+                "FOREIGN KEY(inventory_item_id) REFERECES inventory_item(inventory_item_id)" +
+                ")");
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS category ( " +
+                "category_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "category_name TEXT" +
+                ")");
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS note ( " +
+                "note_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "game_id INTEGER," +
+                "note TEXT" +
+                "FOREIGN KEY(game_id) REFERECES game(game_id)" +
+                ")");
+        /* Example DDL from Matt's Quidditch scoring app
         database.execSQL("CREATE TABLE IF NOT EXISTS score ( " +
                 "score_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "score_datetime INTEGER, " +
@@ -72,6 +107,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "snitch INTEGER, " +
                 "game_id INTEGER, " +
                 "FOREIGN KEY(game_id) REFERENCES game(game_id) )");
+         */
     }
 
     @Override
