@@ -42,8 +42,19 @@ public class StatisticsDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase database) {
 
         /*
+         * Game table: Base unifying game_id construct
+         * The game is used to reference 
          */
-        database.execSQL("");
+        database.execSQL("CREATE TABLE IF NOT EXISTS game ( " +
+                "game_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT," +
+                ")");
+
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS character (" +
+                "character_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "game_id INTEGER, " +
+                ")");
 
         /*
          */
