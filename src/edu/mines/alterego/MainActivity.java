@@ -4,6 +4,9 @@ import java.util.Locale;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import android.util.Pair;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +19,10 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+        CharacterDBHelper dbhelper = new CharacterDBHelper(this);
+
+        ArrayList<Pair<Integer, String>> game_list = dbhelper.get_games(db);
 	}
 
 	@Override
