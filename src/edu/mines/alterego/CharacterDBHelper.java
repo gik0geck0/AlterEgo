@@ -78,7 +78,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         database.execSQL("CREATE TABLE IF NOT EXISTS item_stat ( " +
                 "item_stat_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "entity_id INTEGER," +
+                "inventory_item_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name INTEGER," +
                 "description/usage/etc INTEGER," +
