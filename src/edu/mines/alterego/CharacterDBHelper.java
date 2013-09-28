@@ -114,5 +114,19 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         // Do nothing.
     }
+    
+    public ArrayList< Pair <Integer, String> > getGames() {
+    	
+    	Cursor dbGames = getWritableDatabase().rawQuery("SELECT * from game", null);
+    	dbGames.moveToFirst();
+    	ArrayList<Pair<Integer, String>> games = new ArrayList<Pair<Integer, String>>();
+    	while( !dbGames.isAfterLast()) {
+    		games.add(new Pair<Integer, String> (dbGames.getInt(0), dbGames.getString(1) ) );
+    		dbGames.moveToNext();
+    	}
+    	dbGames.close();
+    	return games;
+    	
+    }
 
 }
