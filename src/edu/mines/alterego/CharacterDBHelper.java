@@ -53,7 +53,10 @@ public class StatisticsDBHelper extends SQLiteOpenHelper {
 
         database.execSQL("CREATE TABLE IF NOT EXISTS character (" +
                 "character_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "game_id INTEGER, " +
+                "game_id INTEGER," +
+                "name TEXT," +
+                "description TEXT," +
+                "FOREIGN KEY(game_id) REFERECES game(game_id)" +
                 ")");
 
         /*
