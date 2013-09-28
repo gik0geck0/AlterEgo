@@ -1,5 +1,6 @@
 package edu.mines.alterego;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -22,7 +23,7 @@ public class MainActivity extends Activity {
 
         CharacterDBHelper dbhelper = new CharacterDBHelper(this);
 
-        ArrayList<Pair<Integer, String>> game_list = dbhelper.get_games(db);
+        ArrayList<Pair<Integer, String>> game_list = dbhelper.getGames();
 	}
 
 	@Override
