@@ -114,19 +114,30 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         // Do nothing.
     }
-    
+
     public ArrayList< Pair <Integer, String> > getGames() {
-    	
-    	Cursor dbGames = getWritableDatabase().rawQuery("SELECT * from game", null);
-    	dbGames.moveToFirst();
-    	ArrayList<Pair<Integer, String>> games = new ArrayList<Pair<Integer, String>>();
-    	while( !dbGames.isAfterLast()) {
-    		games.add(new Pair<Integer, String> (dbGames.getInt(0), dbGames.getString(1) ) );
-    		dbGames.moveToNext();
-    	}
-    	dbGames.close();
-    	return games;
-    	
+        Cursor dbGames = getWritableDatabase().rawQuery("SELECT * from game", null);
+        dbGames.moveToFirst();
+        ArrayList<Pair<Integer, String>> games = new ArrayList<Pair<Integer, String>>();
+        while( !dbGames.isAfterLast()) {
+            games.add(new Pair<Integer, String> (dbGames.getInt(0), dbGames.getString(1) ) );
+            dbGames.moveToNext();
+        }
+        dbGames.close();
+        return games;
     }
 
+    public Pair<Integer, String> addGame(String name) {
+        SQLiteDatabase database = getWritableDatabase();
+
+        ContentValues gamevals = new ContentValues();
+        gamevals.put("name", name);
+
+        long rowid = database.insert("game", null, gamevals);
+
+        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", rowid);
+        c.moveToFirst();
+
+        return new Pair<Integer, String>(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
+    }
 }
