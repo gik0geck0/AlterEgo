@@ -25,7 +25,7 @@ import java.util.ArrayList;
  */
 public class CharacterDBHelper extends SQLiteOpenHelper {
 
-    private static final String DB_NAME = "";
+    private static final String DB_NAME = "alterego";
     private static final int DB_VERSION = 1;
 
     public CharacterDBHelper(Context context) {
@@ -47,22 +47,16 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
          */
         database.execSQL("CREATE TABLE IF NOT EXISTS game ( " +
                 "game_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "name TEXT," +
+                "name TEXT" +
                 ")");
 
 
-        database.execSQL("CREATE TABLE IF NOT EXISTS character ( " +
-                "character_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "game_id INTEGER," +
-                "name TEXT," +
-                "description TEXT," +
-                "FOREIGN KEY(game_id) REFERECES game(game_id)" +
-                ")");
+        database.execSQL("CREATE TABLE IF NOT EXISTS character ( character_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, FOREIGN KEY(game_id) REFERENCES game(game_id) )");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                 "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "character_id INTEGER," +
-                "FOREIGN KEY(character_id) REFERECES character(character_id)" +
+                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS character_stat ( " +
@@ -72,8 +66,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "stat_name INTEGER," +
                 "description/usage/etc INTEGER," +
                 "category_id INTEGER," +
-                "FOREIGN KEY(character_id) REFERECES character(character_id)" +
-                "FOREIGN KEY(category_id) REFERECES category(category_id)" +
+                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS item_stat ( " +
@@ -83,8 +77,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "stat_name INTEGER," +
                 "description/usage/etc INTEGER," +
                 "category_id INTEGER," +
-                "FOREIGN KEY(category_id) REFERECES category(category_id)" +
-                "FOREIGN KEY(inventory_item_id) REFERECES inventory_item(inventory_item_id)" +
+                "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
+                "FOREIGN KEY(inventory_item_id) REFERENCES inventory_item(inventory_item_id)" +
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS category ( " +
@@ -96,7 +90,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "note_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "game_id INTEGER," +
                 "note TEXT" +
-                "FOREIGN KEY(game_id) REFERECES game(game_id)" +
+                "FOREIGN KEY(game_id) REFERENCES game(game_id)" +
                 ")");
         /* Example DDL from Matt's Quidditch scoring app
         database.execSQL("CREATE TABLE IF NOT EXISTS score ( " +
