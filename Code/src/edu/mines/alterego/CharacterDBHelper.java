@@ -51,7 +51,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 ")");
 
 
-        database.execSQL("CREATE TABLE IF NOT EXISTS character ( character_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, FOREIGN KEY(game_id) REFERENCES game(game_id) )");
+        database.execSQL("CREATE TABLE IF NOT EXISTS character ( character_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, game_id INTEGER ,FOREIGN KEY(game_id) REFERENCES game(game_id) )");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                 "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -64,7 +64,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "character_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name INTEGER," +
-                "description/usage/etc INTEGER," +
+                "description_usage_etc INTEGER," +
                 "category_id INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
@@ -75,7 +75,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "inventory_item_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name INTEGER," +
-                "description/usage/etc INTEGER," +
+                "description_usage_etc INTEGER," +
                 "category_id INTEGER," +
                 "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
                 "FOREIGN KEY(inventory_item_id) REFERENCES inventory_item(inventory_item_id)" +
@@ -89,7 +89,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         database.execSQL("CREATE TABLE IF NOT EXISTS note ( " +
                 "note_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "game_id INTEGER," +
-                "note TEXT" +
+                "note TEXT," +
                 "FOREIGN KEY(game_id) REFERENCES game(game_id)" +
                 ")");
         /* Example DDL from Matt's Quidditch scoring app
