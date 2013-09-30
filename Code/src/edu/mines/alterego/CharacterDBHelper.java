@@ -140,4 +140,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         return new Pair<Integer, String>(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
+
+    public ArrayList<String> getCharacters(int gameID) {
+        ArrayList<String> characters = new ArrayList<String>();
+    }
 }
