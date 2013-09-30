@@ -1,5 +1,6 @@
 package edu.mines.alterego;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import android.os.Bundle;
@@ -7,14 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class GameActivity extends FragmentActivity {
@@ -33,6 +34,7 @@ public class GameActivity extends FragmentActivity {
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+	ArrayAdapter gameDbAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,16 @@ public class GameActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+		
+		ArrayList<String> gameList = new ArrayList<String>();
+		CharacterDBHelper db = new CharacterDBHelper(this);
+		ArrayList< Pair<Integer, String> > gamePairList = db.getGames();
+		for( Pair<Integer, String> game : gamePairList) {
+			gameList.add(game.second);
+		}
+		gameDbAdapter = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, gameList);
+		ListView gameListView = (ListView) findViewById(R.id.game_list_view);
+		gameListView.setAdapter(gameDbAdapter);
 
 	}
 
