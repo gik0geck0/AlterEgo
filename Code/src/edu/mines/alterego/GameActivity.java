@@ -49,17 +49,6 @@ public class GameActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
-		ArrayList<String> gameList = new ArrayList<String>();
-		CharacterDBHelper db = new CharacterDBHelper(this);
-		ArrayList< Pair<Integer, String> > gamePairList = db.getGames();
-		for( Pair<Integer, String> game : gamePairList) {
-			gameList.add(game.second);
-		}
-		gameDbAdapter = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, gameList);
-		ListView gameListView = (ListView) findViewById(R.id.game_list_view);
-		gameListView.setAdapter(gameDbAdapter);
-
 	}
 
 	@Override
