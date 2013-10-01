@@ -6,10 +6,10 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.util.Log;
-//import android.util.Pair;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,14 +18,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import edu.mines.alterego.CharacterDBHelper;
 import edu.mines.alterego.GameData;
+import edu.mines.alterego.GameActivity;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener, ListView.OnItemClickListener {
 
     ArrayAdapter<GameData> mGameDbAdapter;
     CharacterDBHelper mDbHelper;
@@ -47,6 +49,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		mGameDbAdapter = new ArrayAdapter<GameData>( this, android.R.layout.simple_list_item_1, gamePairList);
 		ListView gameListView = (ListView) findViewById(R.id.game_list_view);
 		gameListView.setAdapter(mGameDbAdapter);
+        gameListView.setOnItemClickListener(this);
 
         Button newGameB = (Button) findViewById(R.id.new_game);
         newGameB.setOnClickListener(this);
@@ -92,5 +95,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
             });
 
         newGameDialog.create().show();
+    }
+
+    @Override
+    public void onItemClick(AdapterView parent, View view, int position, long id) {
+        GameData selectedGame = mGameDbAdapter.getItem(position);
+
+        Log.i("AlterEgos::MainAct::SelectGame", "The game with an id " + selectedGame.first + " and a name of " + selectedGame.second + " was selected.");
+
+        Intent launchGame = new Intent(view.getContext(), GameActivity.class);
+        launchGame.putExtra((String) getResources().getText(R.string.gameid), selectedGame.first);
+
+        MainActivity.this.startActivity(launchGame);
     }
 }
