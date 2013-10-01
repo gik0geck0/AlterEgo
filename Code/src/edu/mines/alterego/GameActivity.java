@@ -3,6 +3,7 @@ package edu.mines.alterego;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Pair;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GameActivity extends FragmentActivity {
 
@@ -36,6 +39,9 @@ public class GameActivity extends FragmentActivity {
 	ViewPager mViewPager;
 	ArrayAdapter gameDbAdapter;
 
+    int mGameId = -1;
+    int mCharId = -1;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,6 +55,20 @@ public class GameActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+        mGameId = extras.getInt((String) getResources().getText(R.string.gameid), -1);
+
+        if (mGameId == -1) {
+            // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
+            Toast.makeText(this, "GameID not valid", 400).show();
+            Log.e("AlterEgo::CharacterFragment", "Game ID is not valid!!!!!");
+        }
+
+        CharacterDBHelper dbhelper = new CharacterDBHelper(this);
+        mCharId = dbhelper.getCharacterIdForGame(mGameId);
+
 	}
 
 	@Override
@@ -76,9 +96,14 @@ public class GameActivity extends FragmentActivity {
             Fragment fragment;
             Bundle args = new Bundle();
             switch(position) {
+                case 0:
+                    fragment = new CharacterFragment();
+                    args.putInt((String) getResources().getText(R.string.charid), mCharId);
+                    fragment.setArguments(args);
+                    break;
                 case 1:
                     fragment = new InventoryFragment();
-                    args.putInt((String) getResources().getText(R.string.charid), 0);
+                    args.putInt((String) getResources().getText(R.string.charid), mCharId);
                     fragment.setArguments(args);
                     break;
                 default:

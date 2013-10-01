@@ -23,19 +23,10 @@ public class CharacterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        int gameId = getArguments().getInt((String) getResources().getText(R.string.gameid), -1);
-
-        if (gameId == -1) {
-            // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
-            Toast.makeText(getActivity(), "GameID not valid", 400).show();
-            Log.e("AlterEgo::CharacterFragment", "Game ID is not valid!!!!!");
-        }
+        mCharId = getArguments().getInt((String) getResources().getText(R.string.charid), -1);
 
         // Inflate the layout for this fragment
         View character_view = inflater.inflate(R.layout.character_view, container, false);
-
-        CharacterDBHelper dbhelper = new CharacterDBHelper(getActivity());
-        mCharId = dbhelper.getCharacterIdForGame(gameId);
 
         if (mCharId < 0) {
             // Make the no-char layout visible
