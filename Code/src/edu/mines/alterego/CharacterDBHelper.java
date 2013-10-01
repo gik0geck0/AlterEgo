@@ -8,11 +8,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
 
 import android.util.Log;
-import android.util.Pair;
+//import android.util.Pair;
 import android.widget.ListView;
 
 import java.util.Date;
 import java.util.ArrayList;
+
+import edu.mines.alterego.GameData;
 
 /**
  *  <h1>SQLite Database Adapter (helper as Google/Android calls it)</h1>
@@ -138,19 +140,19 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList< Pair <Integer, String> > getGames() {
+    public ArrayList<GameData> getGames() {
         Cursor dbGames = getWritableDatabase().rawQuery("SELECT * from game", null);
         dbGames.moveToFirst();
-        ArrayList<Pair<Integer, String>> games = new ArrayList<Pair<Integer, String>>();
+        ArrayList<GameData> games = new ArrayList<GameData>();
         while( !dbGames.isAfterLast()) {
-            games.add(new Pair<Integer, String> (dbGames.getInt(0), dbGames.getString(1) ) );
+            games.add(new GameData( dbGames.getInt(0), dbGames.getString(1) ));
             dbGames.moveToNext();
         }
         dbGames.close();
         return games;
     }
 
-    public Pair<Integer, String> addGame(String name) {
+    public GameData addGame(String name) {
         SQLiteDatabase database = getWritableDatabase();
 
         ContentValues gamevals = new ContentValues();
@@ -162,7 +164,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", args);
         c.moveToFirst();
 
-        return new Pair<Integer, String>(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
+        return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
 
     public ArrayList<String> getCharacters(int gameID) {

@@ -9,7 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import android.util.Log;
-import android.util.Pair;
+//import android.util.Pair;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,10 +23,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import edu.mines.alterego.CharacterDBHelper;
+import edu.mines.alterego.GameData;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    ArrayAdapter<Pair<Integer, String>> mGameDbAdapter;
+    ArrayAdapter<GameData> mGameDbAdapter;
     CharacterDBHelper mDbHelper;
 
 	@Override
@@ -36,14 +37,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 		//ArrayList<String> gameList = new ArrayList<String>();
 		mDbHelper = new CharacterDBHelper(this);
-		ArrayList< Pair<Integer, String> > gamePairList = mDbHelper.getGames();
+		ArrayList<GameData> gamePairList = mDbHelper.getGames();
         /*
 		for( Pair<Integer, String> game : gamePairList) {
 			gameList.add(game.second);
 		}
         */
 
-		mGameDbAdapter = new ArrayAdapter<Pair<Integer, String>>( this, android.R.layout.simple_list_item_1, gamePairList);
+		mGameDbAdapter = new ArrayAdapter<GameData>( this, android.R.layout.simple_list_item_1, gamePairList);
 		ListView gameListView = (ListView) findViewById(R.id.game_list_view);
 		gameListView.setAdapter(mGameDbAdapter);
 
@@ -78,7 +79,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     // Create a new game
                     Log.i("AlterEgos::MainAct::NewGame", "Creating a game with the name " + gameName);
                     //CharacterDBHelper mDbHelper = new CharacterDBHelper(this);
-                    Pair<Integer, String> newGame = mDbHelper.addGame(gameName);
+                    GameData newGame = mDbHelper.addGame(gameName);
+                    mGameDbAdapter.add(newGame);
                 }
             })
             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
