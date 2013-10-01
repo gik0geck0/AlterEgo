@@ -60,8 +60,6 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                 "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "name TEXT," +
-                "description TEXT," +
                 "character_id INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 ")");
@@ -114,6 +112,30 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         // Do nothing.
+        if (newVersion > 1) {
+            // Add the name and description columns
+            database.execSQL("ALTER TABLE inventory_item ADD COLUMN"+
+                    "name TEXT");
+            database.execSQL("ALTER TABLE inventory_item ADD COLUMN"+
+                    "description TEXT");
+        }
+
+        if (oldVersion == 2) {
+            // Verify that the name and description columns exist
+            Cursor cursor = database.rawQuery("SELECT * FROM inventory_item LIMIT 0", null);
+            if (cursor.getColumnIndex("name") < 0 || cursor.getColumnIndex("description") < 0) {
+                Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
+                database.execSQL("DROP TABLE inventory_item");
+                database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
+                        "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "name TEXT, " +
+                        "description TEXT, " +
+                        "character_id INTEGER," +
+                        "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                        ")");
+            }
+
+        }
     }
 
     public ArrayList< Pair <Integer, String> > getGames() {
@@ -149,6 +171,23 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<InventoryItem> getInventoryItems(int characterId) {
+
+        // Verify that the name and description columns exist
+        // This is done here because
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM inventory_item LIMIT 0", null);
+        if (cursor.getColumnIndex("name") < 0 || cursor.getColumnIndex("description") < 0) {
+            Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
+            SQLiteDatabase database = getWritableDatabase();
+            database.execSQL("DROP TABLE inventory_item");
+            database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
+                    "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "name TEXT, " +
+                    "description TEXT, " +
+                    "character_id INTEGER," +
+                    "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                    ")");
+        }
+
         Cursor invCursor = getReadableDatabase().rawQuery(
                 "SELECT "+
                     "character.character_id," +
