@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class CharacterDBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "alterego";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public CharacterDBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -51,10 +51,17 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 ")");
 
 
-        database.execSQL("CREATE TABLE IF NOT EXISTS character ( character_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, game_id INTEGER ,FOREIGN KEY(game_id) REFERENCES game(game_id) )");
+        database.execSQL("CREATE TABLE IF NOT EXISTS character ( " +
+                "character_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, " +
+                "description TEXT, " +
+                "game_id INTEGER, " +
+                "FOREIGN KEY(game_id) REFERENCES game(game_id) )");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                 "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT," +
+                "description TEXT," +
                 "character_id INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 ")");
@@ -144,8 +151,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     public ArrayList<InventoryItem> getInventoryItems(int characterId) {
         Cursor invCursor = getReadableDatabase().rawQuery(
                 "SELECT "+
-                    "character_id," +
-                    "inventory_item_id," +
+                    "character.character_id," +
+                    "inventory_item.inventory_item_id," +
                     "inventory_item.name AS 'item_name'," +
                     "inventory_item.description AS 'item_description'" +
                 "FROM character " +

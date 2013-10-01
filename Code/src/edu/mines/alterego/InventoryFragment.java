@@ -1,6 +1,6 @@
 package edu.mines.alterego;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +33,7 @@ class InventoryFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View inventory_view = inflater.inflate(R.layout.inventory_view, container, false);
-        ListView invView = (ListView) getView().findViewById(R.id.inventory_list);
+        ListView invView = (ListView) inventory_view.findViewById(R.id.inventory_list);
 
         CharacterDBHelper dbhelper = new CharacterDBHelper(getActivity());
         ArrayList<InventoryItem> invItems = dbhelper.getInventoryItems(mGameId);

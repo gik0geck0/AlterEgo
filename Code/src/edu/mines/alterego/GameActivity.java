@@ -73,10 +73,20 @@ public class GameActivity extends FragmentActivity {
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
+            Fragment fragment;
+            Bundle args = new Bundle();
+            switch(position) {
+                case 1:
+                    fragment = new InventoryFragment();
+                    args.putInt((String) getResources().getText(R.string.charid), 0);
+                    fragment.setArguments(args);
+                    break;
+                default:
+                    fragment = new DummySectionFragment();
+                    args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+                    fragment.setArguments(args);
+            }
+
 			return fragment;
 		}
 
@@ -93,7 +103,7 @@ public class GameActivity extends FragmentActivity {
 			case 0:
 				return getString(R.string.title_section1).toUpperCase(l);
 			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
+				return getString(R.string.title_inventory).toUpperCase(l);
 			case 2:
 				return getString(R.string.title_section3).toUpperCase(l);
 			}
