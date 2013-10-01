@@ -128,24 +128,25 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         gamevals.put("name", name);
 
         long rowid = database.insert("game", null, gamevals);
+        String[] args = new String[]{ ""+rowid };
 
-        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", rowid);
+        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", args);
         c.moveToFirst();
 
         return new Pair<Integer, String>(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
 
-    public ArrayList<InventoryItem> getInventoryItems(int gameId) {
+    public ArrayList<InventoryItem> getInventoryItems(int characterId) {
         Cursor invCursor = getReadableDatabase().rawQuery(
                 "SELECT "+
-                    "game_id," +
                     "character_id," +
                     "inventory_item_id," +
                     "inventory_item.name AS 'item_name'," +
                     "inventory_item.description AS 'item_description'" +
-                "FROM game " +
-                    "INNER JOIN character ON character.game_id = game.game_id " +
-                    "INNER JOIN inventory_item ON inventory_item.character_id = character.character_id");
+                "FROM character " +
+                    "INNER JOIN inventory_item ON inventory_item.character_id = character.character_id " +
+                "WHERE character.character_id = ?",
+                new String[]{""+characterId});
         ArrayList<InventoryItem> invList = new ArrayList<InventoryItem>();
         invCursor.moveToFirst();
 
