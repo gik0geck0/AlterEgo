@@ -25,7 +25,7 @@ import java.util.ArrayList;
  */
 public class CharacterDBHelper extends SQLiteOpenHelper {
 
-    private static final String DB_NAME = "";
+    private static final String DB_NAME = "alterego";
     private static final int DB_VERSION = 1;
 
     public CharacterDBHelper(Context context) {
@@ -47,22 +47,16 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
          */
         database.execSQL("CREATE TABLE IF NOT EXISTS game ( " +
                 "game_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "name TEXT," +
+                "name TEXT" +
                 ")");
 
 
-        database.execSQL("CREATE TABLE IF NOT EXISTS character ( " +
-                "character_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "game_id INTEGER," +
-                "name TEXT," +
-                "description TEXT," +
-                "FOREIGN KEY(game_id) REFERECES game(game_id)" +
-                ")");
+        database.execSQL("CREATE TABLE IF NOT EXISTS character ( character_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, game_id INTEGER ,FOREIGN KEY(game_id) REFERENCES game(game_id) )");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                 "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "character_id INTEGER," +
-                "FOREIGN KEY(character_id) REFERECES character(character_id)" +
+                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS character_stat ( " +
@@ -70,10 +64,10 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "character_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name INTEGER," +
-                "description/usage/etc INTEGER," +
+                "description_usage_etc INTEGER," +
                 "category_id INTEGER," +
-                "FOREIGN KEY(character_id) REFERECES character(character_id)" +
-                "FOREIGN KEY(category_id) REFERECES category(category_id)" +
+                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS item_stat ( " +
@@ -81,10 +75,10 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "inventory_item_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name INTEGER," +
-                "description/usage/etc INTEGER," +
+                "description_usage_etc INTEGER," +
                 "category_id INTEGER," +
-                "FOREIGN KEY(category_id) REFERECES category(category_id)" +
-                "FOREIGN KEY(inventory_item_id) REFERECES inventory_item(inventory_item_id)" +
+                "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
+                "FOREIGN KEY(inventory_item_id) REFERENCES inventory_item(inventory_item_id)" +
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS category ( " +
@@ -95,8 +89,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         database.execSQL("CREATE TABLE IF NOT EXISTS note ( " +
                 "note_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "game_id INTEGER," +
-                "note TEXT" +
-                "FOREIGN KEY(game_id) REFERECES game(game_id)" +
+                "note TEXT," +
+                "FOREIGN KEY(game_id) REFERENCES game(game_id)" +
                 ")");
         /* Example DDL from Matt's Quidditch scoring app
         database.execSQL("CREATE TABLE IF NOT EXISTS score ( " +
@@ -134,8 +128,9 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         gamevals.put("name", name);
 
         long rowid = database.insert("game", null, gamevals);
+        String[] args = new String[]{ ""+rowid };
 
-        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", rowid);
+        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", args);
         c.moveToFirst();
 
         return new Pair<Integer, String>(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
@@ -143,5 +138,32 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
     public ArrayList<String> getCharacters(int gameID) {
         ArrayList<String> characters = new ArrayList<String>();
+    }
+
+    public ArrayList<InventoryItem> getInventoryItems(int characterId) {
+        Cursor invCursor = getReadableDatabase().rawQuery(
+                "SELECT "+
+                    "character_id," +
+                    "inventory_item_id," +
+                    "inventory_item.name AS 'item_name'," +
+                    "inventory_item.description AS 'item_description'" +
+                "FROM character " +
+                    "INNER JOIN inventory_item ON inventory_item.character_id = character.character_id " +
+                "WHERE character.character_id = ?",
+                new String[]{""+characterId});
+        ArrayList<InventoryItem> invList = new ArrayList<InventoryItem>();
+        invCursor.moveToFirst();
+
+        int iidCol = invCursor.getColumnIndex("inventory_item_id");
+        int iNameCol = invCursor.getColumnIndex("item_name");
+        int iDescCol = invCursor.getColumnIndex("item_description");
+        while (!invCursor.isAfterLast()) {
+            invList.add(new InventoryItem(
+                        invCursor.getInt(iidCol),
+                        invCursor.getString(iNameCol),
+                        invCursor.getString(iDescCol)));
+            invCursor.moveToNext();
+        }
+        return invList;
     }
 }
