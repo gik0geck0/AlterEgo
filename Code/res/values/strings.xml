@@ -8,5 +8,7 @@
     <string name="charid">CHARID</string>
     <string name="title_inventory">Inventory</string>
     <string name="title_character">Character</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
 
 </resources>
