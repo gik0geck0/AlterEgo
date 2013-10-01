@@ -138,6 +138,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
     public ArrayList<String> getCharacters(int gameID) {
         ArrayList<String> characters = new ArrayList<String>();
+        return characters;
     }
 
     public ArrayList<InventoryItem> getInventoryItems(int characterId) {
