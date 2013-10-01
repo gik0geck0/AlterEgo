@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.util.Pair;
 
 import android.view.LayoutInflater;
@@ -18,11 +19,15 @@ import android.view.ViewGroup;
 
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+
+import edu.mines.alterego.CharacterDBHelper;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
     ArrayAdapter<Pair<Integer, String>> mGameDbAdapter;
+    CharacterDBHelper mDbHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +35,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		setContentView(R.layout.activity_main);
 
 		//ArrayList<String> gameList = new ArrayList<String>();
-		CharacterDBHelper db = new CharacterDBHelper(this);
-		ArrayList< Pair<Integer, String> > gamePairList = db.getGames();
+		mDbHelper = new CharacterDBHelper(this);
+		ArrayList< Pair<Integer, String> > gamePairList = mDbHelper.getGames();
         /*
 		for( Pair<Integer, String> game : gamePairList) {
 			gameList.add(game.second);
@@ -65,9 +70,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
             .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
+                    // Perceive this dialog as an AlertDialog
+                    AlertDialog thisDialog = (AlertDialog) dialog;
+
+                    EditText nameInput = (EditText) thisDialog.findViewById(R.id.game_name);
+                    String gameName = nameInput.getText().toString();
                     // Create a new game
-                    //CharacterDBHelper db = new CharacterDBHelper(this);
-                    //Pair<Integer, String> newGame = addGame(name);
+                    Log.i("AlterEgos::MainAct::NewGame", "Creating a game with the name " + gameName);
+                    //CharacterDBHelper mDbHelper = new CharacterDBHelper(this);
+                    Pair<Integer, String> newGame = mDbHelper.addGame(gameName);
                 }
             })
             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
