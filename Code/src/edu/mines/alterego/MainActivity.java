@@ -14,16 +14,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
+
 public class MainActivity extends Activity {
+
+    ArrayAdapter<Pair<Integer, String>> mGameDbAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-        CharacterDBHelper dbhelper = new CharacterDBHelper(this);
+		//ArrayList<String> gameList = new ArrayList<String>();
+		CharacterDBHelper db = new CharacterDBHelper(this);
+		ArrayList< Pair<Integer, String> > gamePairList = db.getGames();
+        /*
+		for( Pair<Integer, String> game : gamePairList) {
+			gameList.add(game.second);
+		}
+        */
 
-        ArrayList<Pair<Integer, String>> game_list = dbhelper.getGames();
+		mGameDbAdapter = new ArrayAdapter<Pair<Integer, String>>( this, android.R.layout.simple_list_item_1, gamePairList);
+		ListView gameListView = (ListView) findViewById(R.id.game_list_view);
+		gameListView.setAdapter(mGameDbAdapter);
+
 	}
 
 	@Override
