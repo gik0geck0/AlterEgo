@@ -135,7 +135,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return new Pair<Integer, String>(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
 
-    public ArrayList<> getInventoryItems(int gameId) {
+    public ArrayList<InventoryItem> getInventoryItems(int gameId) {
         Cursor invCursor = getReadableDatabase().rawQuery(
                 "SELECT "+
                     "game_id," +
@@ -146,10 +146,19 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "FROM game " +
                     "INNER JOIN character ON character.game_id = game.game_id " +
                     "INNER JOIN inventory_item ON inventory_item.character_id = character.character_id");
-        ArrayList<> invList = new ArrayList<>();
+        ArrayList<InventoryItem> invList = new ArrayList<InventoryItem>();
         invCursor.moveToFirst();
+
+        int iidCol = invCursor.getColumnIndex("inventory_item_id");
+        int iNameCol = invCursor.getColumnIndex("item_name");
+        int iDescCol = invCursor.getColumnIndex("item_description");
         while (!invCursor.isAfterLast()) {
-            invList.add();
+            invList.add(new InventoryItem(
+                        invCursor.getInt(iidCol),
+                        invCursor.getString(iNameCol),
+                        invCursor.getString(iDescCol)));
+            invCursor.moveToNext();
         }
+        return invList;
     }
 }
