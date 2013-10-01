@@ -213,4 +213,9 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         }
         return invList;
     }
+
+    public int getCharacterIdForGame(int gameId) {
+        // TODO: Implement this: Try to get a character id linked to the passed in game
+        return -1;
+    }
 }
