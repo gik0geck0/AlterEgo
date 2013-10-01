@@ -58,7 +58,11 @@ public class GameActivity extends FragmentActivity {
 
         Intent i = getIntent();
         Bundle extras = i.getExtras();
-        mGameId = extras.getInt((String) getResources().getText(R.string.gameid), -1);
+        if (extras != null) {
+            mGameId = extras.getInt((String) getResources().getText(R.string.gameid), -1);
+        } else {
+            mGameId = -1;
+        }
 
         if (mGameId == -1) {
             // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
