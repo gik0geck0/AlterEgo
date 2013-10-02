@@ -98,7 +98,7 @@ public class MainActivity extends Activity implements View.OnClickListener, List
     }
 
     @Override
-    public void onItemClick(AdapterView parent, View view, int position, long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         GameData selectedGame = mGameDbAdapter.getItem(position);
 
         Log.i("AlterEgos::MainAct::SelectGame", "The game with an id " + selectedGame.first + " and a name of " + selectedGame.second + " was selected.");

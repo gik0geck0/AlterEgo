@@ -8,10 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
 
 import android.util.Log;
-//import android.util.Pair;
-import android.widget.ListView;
 
-import java.util.Date;
 import java.util.ArrayList;
 
 import edu.mines.alterego.GameData;
