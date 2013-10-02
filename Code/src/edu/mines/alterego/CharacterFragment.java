@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 //import java.util.ArrayList;
@@ -21,7 +22,8 @@ import edu.mines.alterego.CharacterDBHelper;
 
 public class CharacterFragment extends Fragment {
 
-    int mCharId = -1;
+    //int mCharId = -1;
+    CharacterData mChar;
     int mGameId = -1;
     View mainView;
 
@@ -30,13 +32,15 @@ public class CharacterFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         mGameId = getArguments().getInt((String) getResources().getText(R.string.gameid), -1);
-        mCharId = getArguments().getInt((String) getResources().getText(R.string.charid), -1);
+        int mCharId = getArguments().getInt((String) getResources().getText(R.string.charid), -1);
 
         // Inflate the layout for this fragment
         View character_view = inflater.inflate(R.layout.character_view, container, false);
         mainView = character_view;
 
         if (mCharId >= 0) {
+            CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+            mChar = dbHelper.getCharacter(mCharId);
             showCharacter();
         } else {
             // Make the no-char layout visible
@@ -67,9 +71,10 @@ public class CharacterFragment extends Fragment {
                                 String desc = descInput.getText().toString();
 
                                 CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                                CharacterData nChar = dbHelper.addCharacter(mGameId, name, desc);
+                                CharacterData newChar = dbHelper.addCharacter(mGameId, name, desc);
 
-                                mCharId = nChar.id;
+                                mChar = newChar;
+                                //mCharId = nChar.id;
 
                                 showCharacter();
                             }
@@ -88,8 +93,22 @@ public class CharacterFragment extends Fragment {
     }
 
     public void showCharacter() {
+        // Make the no-char layout invisible
+        LinearLayout nochar_ll = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
+        nochar_ll.setVisibility(View.GONE);
+
+        // Make the character-viewing area visible
         LinearLayout char_layout = (LinearLayout) mainView.findViewById(R.id.haschar_layout);
         char_layout.setVisibility(View.VISIBLE);
+
+        // Show the character name and description
+        TextView cName = (TextView) mainView.findViewById(R.id.char_name);
+        TextView cDesc = (TextView) mainView.findViewById(R.id.char_desc);
+
+        cName.setText(mChar.name);
+        cDesc.setText(mChar.description);
+
+        // Show all the character's attributes/skills/complications
     }
 
 }

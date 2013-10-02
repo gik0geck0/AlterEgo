@@ -198,7 +198,18 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         Cursor c = database.rawQuery("SELECT * FROM character WHERE character.ROWID =?", args);
         c.moveToFirst();
 
-        return new CharacterData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
+        return new CharacterData(c.getInt(c.getColumnIndex("character_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
+    }
+
+    public CharacterData getCharacter(int charId) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT * FROM character WHERE character.character_id = ? LIMIT 1", new String[]{""+charId});
+        c.moveToFirst();
+        if (c.getCount() < 1) {
+            // No character with that id available. That's probably bad.
+            return null;
+        } else {
+            return new CharacterData(c.getInt(c.getColumnIndex("character_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
+        }
     }
 
     public ArrayList<InventoryItem> getInventoryItems(int characterId) {
