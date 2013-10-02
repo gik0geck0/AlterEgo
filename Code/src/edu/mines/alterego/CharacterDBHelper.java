@@ -167,9 +167,38 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
 
+    public int getCharacterIdForGame(int gameId) {
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT character_id FROM character WHERE character.game_id = ? LIMIT 1", new String[]{""+gameId});
+        cursor.moveToFirst();
+        if (cursor.getCount() < 1) {
+            return -1;
+        } else {
+            return cursor.getInt(cursor.getColumnIndex("character_id"));
+        }
+    }
+
+    /* Is this useful?
     public ArrayList<String> getCharacters(int gameID) {
         ArrayList<String> characters = new ArrayList<String>();
         return characters;
+    }
+    */
+
+    public CharacterData addCharacter(int gameID, String name, String desc) {
+        SQLiteDatabase database = getWritableDatabase();
+
+        ContentValues gamevals = new ContentValues();
+        gamevals.put("name", name);
+        gamevals.put("description", desc);
+        gamevals.put("game_id", gameID);
+
+        long rowid = database.insert("character", null, gamevals);
+
+        String[] args = new String[]{ ""+rowid };
+        Cursor c = database.rawQuery("SELECT * FROM character WHERE character.ROWID =?", args);
+        c.moveToFirst();
+
+        return new CharacterData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
     }
 
     public ArrayList<InventoryItem> getInventoryItems(int characterId) {
@@ -214,10 +243,5 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
             invCursor.moveToNext();
         }
         return invList;
-    }
-
-    public int getCharacterIdForGame(int gameId) {
-        // TODO: Implement this: Try to get a character id linked to the passed in game
-        return -1;
     }
 }

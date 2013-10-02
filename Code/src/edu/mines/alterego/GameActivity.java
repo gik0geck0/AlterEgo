@@ -73,6 +73,9 @@ public class GameActivity extends FragmentActivity {
         CharacterDBHelper dbhelper = new CharacterDBHelper(this);
         mCharId = dbhelper.getCharacterIdForGame(mGameId);
 
+
+        Log.i("AlterEgo::CharFrag", "Found the character. The id was " + mCharId);
+
 	}
 
 	@Override
@@ -99,15 +102,15 @@ public class GameActivity extends FragmentActivity {
 			// below) with the page number as its lone argument.
             Fragment fragment;
             Bundle args = new Bundle();
+            args.putInt((String) getResources().getText(R.string.charid), mCharId);
+            args.putInt((String) getResources().getText(R.string.gameid), mGameId);
             switch(position) {
                 case 0:
                     fragment = new CharacterFragment();
-                    args.putInt((String) getResources().getText(R.string.charid), mCharId);
                     fragment.setArguments(args);
                     break;
                 case 1:
                     fragment = new InventoryFragment();
-                    args.putInt((String) getResources().getText(R.string.charid), mCharId);
                     fragment.setArguments(args);
                     break;
                 default:
