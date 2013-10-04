@@ -138,7 +138,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<GameData> getGames() {
-        Cursor dbGames = getWritableDatabase().rawQuery("SELECT * from game", null);
+        Cursor dbGames = getReadableDatabase().rawQuery("SELECT * from game", null);
         dbGames.moveToFirst();
         ArrayList<GameData> games = new ArrayList<GameData>();
         while( !dbGames.isAfterLast()) {

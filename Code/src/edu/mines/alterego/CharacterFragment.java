@@ -18,13 +18,20 @@ import android.widget.TextView;
 //import java.util.ArrayList;
 
 import edu.mines.alterego.CharacterDBHelper;
+import edu.mines.alterego.RefreshInterface;
 
 public class CharacterFragment extends Fragment {
 
     //int mCharId = -1;
     CharacterData mChar;
     int mGameId = -1;
+    RefreshInterface mActRefresher;
     View mainView;
+
+    CharacterFragment(RefreshInterface refresher) {
+        super();
+        mActRefresher = refresher;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,13 +39,18 @@ public class CharacterFragment extends Fragment {
 
         mGameId = getArguments().getInt((String) getResources().getText(R.string.gameid), -1);
         int mCharId = getArguments().getInt((String) getResources().getText(R.string.charid), -1);
+        Log.i("AlterEgo::CharFrag::Init", "Running onCreateView. Got the GameID: " + mGameId + " and the mCharId: " + mCharId);
+
+        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+        if (mCharId < 0) {
+            mCharId = dbHelper.getCharacterIdForGame(mGameId);
+        }
 
         // Inflate the layout for this fragment
         View character_view = inflater.inflate(R.layout.character_view, container, false);
         mainView = character_view;
 
         if (mCharId >= 0) {
-            CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
             mChar = dbHelper.getCharacter(mCharId);
             showCharacter();
         } else {
@@ -76,6 +88,8 @@ public class CharacterFragment extends Fragment {
                                 //mCharId = nChar.id;
 
                                 showCharacter();
+
+                                mActRefresher.refresh();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
