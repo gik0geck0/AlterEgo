@@ -161,7 +161,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<GameData> getGames() {
-        Cursor dbGames = getWritableDatabase().rawQuery("SELECT * from game", null);
+        Cursor dbGames = getReadableDatabase().rawQuery("SELECT * from game", null);
         dbGames.moveToFirst();
         ArrayList<GameData> games = new ArrayList<GameData>();
         while( !dbGames.isAfterLast()) {
@@ -291,7 +291,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         }
         return invList;
     }
-    
+
     public ArrayList<NotesData> getNotesData(int characterId) {
     	Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId " + characterId);
         // Verify that the name and description columns exist
@@ -320,5 +320,22 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
             notesCursor.moveToNext();
         }
         return notesList;
+    }
+
+    public InventoryItem addInventoryItem(int charId, String name, String desc) {
+        SQLiteDatabase database = getWritableDatabase();
+
+        ContentValues gamevals = new ContentValues();
+        gamevals.put("name", name);
+        gamevals.put("description", desc);
+        gamevals.put("character_id", charId);
+
+        long rowid = database.insert("inventory_item", null, gamevals);
+
+        String[] args = new String[]{ ""+rowid };
+        Cursor c = database.rawQuery("SELECT * FROM inventory_item WHERE inventory_item.ROWID =?", args);
+        c.moveToFirst();
+
+        return new InventoryItem(c.getInt(c.getColumnIndex("inventory_item_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
     }
 }

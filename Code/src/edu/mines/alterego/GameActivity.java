@@ -17,7 +17,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GameActivity extends FragmentActivity {
+import edu.mines.alterego.RefreshInterface;
+
+public class GameActivity extends FragmentActivity implements RefreshInterface {
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -97,11 +99,14 @@ public class GameActivity extends FragmentActivity {
 			// below) with the page number as its lone argument.
             Fragment fragment;
             Bundle args = new Bundle();
+            Log.i("AlterEgo::GameAct::Pager", "Placing the character ID into the arg-bundle for a fragment: " + mCharId);
+            Log.i("AlterEgo::GameAct::Pager", "Creating the game in the fragment number " + position);
             args.putInt((String) getResources().getText(R.string.charid), mCharId);
             args.putInt((String) getResources().getText(R.string.gameid), mGameId);
             switch(position) {
                 case 0:
-                    fragment = new CharacterFragment();
+                    // CharacterFragment needs a call-back to the refresh button (in case a character is added)
+                    fragment = new CharacterFragment(GameActivity.this);
                     fragment.setArguments(args);
                     break;
                 case 1:
@@ -168,5 +173,12 @@ public class GameActivity extends FragmentActivity {
 			return rootView;
 		}
 	}
+
+    @Override
+    public void refresh() {
+        CharacterDBHelper dbhelper = new CharacterDBHelper(this);
+        mCharId = dbhelper.getCharacterIdForGame(mGameId);
+        Log.i("AlterEgo::GameAct::Refresh", "Re-stating the character-ID. It was " + mCharId);
+    }
 
 }
