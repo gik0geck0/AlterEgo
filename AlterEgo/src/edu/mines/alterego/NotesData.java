@@ -14,9 +14,5 @@ class NotesData {
     public int getNoteId() { return mNoteId; }
     public String getSubject() { return mSubject; }
     public String getDescription() { return mDescription; }
-    
-    @Override
-    public String toString() {
-    	return "mNoteId " + mNoteId + " " + "mSubject " + mSubject + " " + "mDescription " + mDescription;
-    }
+   
 }
