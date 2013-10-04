@@ -101,6 +101,7 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
             Fragment fragment;
             Bundle args = new Bundle();
             Log.i("AlterEgo::GameAct::Pager", "Placing the character ID into the arg-bundle for a fragment: " + mCharId);
+            Log.i("AlterEgo::GameAct::Pager", "Creating the game in the fragment number " + position);
             args.putInt((String) getResources().getText(R.string.charid), mCharId);
             args.putInt((String) getResources().getText(R.string.gameid), mGameId);
             switch(position) {
