@@ -1,5 +1,0 @@
-package edu.mines.alterego;
-
-public class Settings extends Activity implements OnClickListener {
-
-}
