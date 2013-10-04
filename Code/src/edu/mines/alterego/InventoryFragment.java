@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import edu.mines.alterego.CharacterDBHelper;
 
-class InventoryFragment extends Fragment {
+public class InventoryFragment extends Fragment {
     int mCharId;
     ArrayAdapter<InventoryItem> mInvAdapter;
 
@@ -27,7 +27,7 @@ class InventoryFragment extends Fragment {
 
         if (mCharId == -1) {
             // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
-            Toast.makeText(getActivity(), "GameID not valid", 400).show();
+            Toast.makeText(getActivity(), "GameID not valid", Toast.LENGTH_LONG).show();
             Log.e("QuidditchScoring:ScoringScreen", "GAME ID IS NOT VALID!!!!!");
         }
 

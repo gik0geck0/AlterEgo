@@ -8,7 +8,7 @@
     <EditText
         android:id="@+id/char_name"
         android:inputType="text"
-        android:hint="Character Name"
+        android:hint="@string/char_name_dial"
         android:layout_margin="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -16,7 +16,7 @@
     <EditText
         android:id="@+id/char_desc"
         android:inputType="text"
-        android:hint="Character Description"
+        android:hint="@string/char_desc_dial"
         android:minLines="5"
         android:maxLines="7"
         android:layout_margin="4dp"
