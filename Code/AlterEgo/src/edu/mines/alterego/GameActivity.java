@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,6 +108,10 @@ public class GameActivity extends FragmentActivity {
                     fragment = new InventoryFragment();
                     fragment.setArguments(args);
                     break;
+                case 2:
+                	fragment = new NotesFragment();
+                	fragment.setArguments(args);
+                	break;
                 default:
                     fragment = new DummySectionFragment();
                     args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
@@ -133,7 +136,7 @@ public class GameActivity extends FragmentActivity {
 			case 1:
 				return getString(R.string.title_inventory).toUpperCase(l);
 			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
+				return getString(R.string.title_notes).toUpperCase(l);
 			}
 			return null;
 		}

@@ -44,4 +44,5 @@ class NotesFragment extends Fragment {
 
         return notes_view;
     }
+    
 }

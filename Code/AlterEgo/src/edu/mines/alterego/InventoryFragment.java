@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import edu.mines.alterego.CharacterDBHelper;
 
-class InventoryFragment extends Fragment {
+ class InventoryFragment extends Fragment {
     int mCharId;
     ArrayAdapter<InventoryItem> mInvAdapter;
 
