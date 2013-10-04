@@ -1,22 +1,22 @@
 package edu.mines.alterego;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Pair;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GameActivity extends FragmentActivity {
 
@@ -34,12 +34,14 @@ public class GameActivity extends FragmentActivity {
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-	ArrayAdapter gameDbAdapter;
+
+    int mGameId = -1;
+    int mCharId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.game_activity);
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -49,16 +51,26 @@ public class GameActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
-		ArrayList<String> gameList = new ArrayList<String>();
-		CharacterDBHelper db = new CharacterDBHelper(this);
-		ArrayList< Pair<Integer, String> > gamePairList = db.getGames();
-		for( Pair<Integer, String> game : gamePairList) {
-			gameList.add(game.second);
-		}
-		gameDbAdapter = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, gameList);
-		ListView gameListView = (ListView) findViewById(R.id.game_list_view);
-		gameListView.setAdapter(gameDbAdapter);
+
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+        if (extras != null) {
+            mGameId = extras.getInt((String) getResources().getText(R.string.gameid), -1);
+        } else {
+            mGameId = -1;
+        }
+
+        if (mGameId == -1) {
+            // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
+            Toast.makeText(this, "GameID not valid", 400).show();
+            Log.e("AlterEgo::CharacterFragment", "Game ID is not valid!!!!!");
+        }
+
+        CharacterDBHelper dbhelper = new CharacterDBHelper(this);
+        mCharId = dbhelper.getCharacterIdForGame(mGameId);
+
+
+        Log.i("AlterEgo::CharFrag", "Found the character. The id was " + mCharId);
 
 	}
 
@@ -84,10 +96,25 @@ public class GameActivity extends FragmentActivity {
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
+            Fragment fragment;
+            Bundle args = new Bundle();
+            args.putInt((String) getResources().getText(R.string.charid), mCharId);
+            args.putInt((String) getResources().getText(R.string.gameid), mGameId);
+            switch(position) {
+                case 0:
+                    fragment = new CharacterFragment();
+                    fragment.setArguments(args);
+                    break;
+                case 1:
+                    fragment = new InventoryFragment();
+                    fragment.setArguments(args);
+                    break;
+                default:
+                    fragment = new DummySectionFragment();
+                    args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+                    fragment.setArguments(args);
+            }
+
 			return fragment;
 		}
 
@@ -102,9 +129,9 @@ public class GameActivity extends FragmentActivity {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
+				return getString(R.string.title_character).toUpperCase(l);
 			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
+				return getString(R.string.title_inventory).toUpperCase(l);
 			case 2:
 				return getString(R.string.title_section3).toUpperCase(l);
 			}

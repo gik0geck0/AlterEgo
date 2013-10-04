@@ -8,11 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
 
 import android.util.Log;
-import android.util.Pair;
-import android.widget.ListView;
 
-import java.util.Date;
 import java.util.ArrayList;
+
+import edu.mines.alterego.GameData;
 
 /**
  *  <h1>SQLite Database Adapter (helper as Google/Android calls it)</h1>
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 public class CharacterDBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "alterego";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public CharacterDBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -51,7 +50,12 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 ")");
 
 
-        database.execSQL("CREATE TABLE IF NOT EXISTS character ( character_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, game_id INTEGER ,FOREIGN KEY(game_id) REFERENCES game(game_id) )");
+        database.execSQL("CREATE TABLE IF NOT EXISTS character ( " +
+                "character_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, " +
+                "description TEXT, " +
+                "game_id INTEGER, " +
+                "FOREIGN KEY(game_id) REFERENCES game(game_id) )");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                 "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -107,31 +111,145 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         // Do nothing.
+        if (newVersion > 1) {
+            // Add the name and description columns
+            database.execSQL("ALTER TABLE inventory_item ADD COLUMN"+
+                    "name TEXT");
+            database.execSQL("ALTER TABLE inventory_item ADD COLUMN"+
+                    "description TEXT");
+        }
+
+        if (oldVersion == 2) {
+            // Verify that the name and description columns exist
+            Cursor cursor = database.rawQuery("SELECT * FROM inventory_item LIMIT 0", null);
+            if (cursor.getColumnIndex("name") < 0 || cursor.getColumnIndex("description") < 0) {
+                Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
+                database.execSQL("DROP TABLE inventory_item");
+                database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
+                        "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "name TEXT, " +
+                        "description TEXT, " +
+                        "character_id INTEGER," +
+                        "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                        ")");
+            }
+
+        }
     }
 
-    public ArrayList< Pair <Integer, String> > getGames() {
+    public ArrayList<GameData> getGames() {
         Cursor dbGames = getWritableDatabase().rawQuery("SELECT * from game", null);
         dbGames.moveToFirst();
-        ArrayList<Pair<Integer, String>> games = new ArrayList<Pair<Integer, String>>();
+        ArrayList<GameData> games = new ArrayList<GameData>();
         while( !dbGames.isAfterLast()) {
-            games.add(new Pair<Integer, String> (dbGames.getInt(0), dbGames.getString(1) ) );
+            games.add(new GameData( dbGames.getInt(0), dbGames.getString(1) ));
             dbGames.moveToNext();
         }
         dbGames.close();
         return games;
     }
 
-    public Pair<Integer, String> addGame(String name) {
+    public GameData addGame(String name) {
         SQLiteDatabase database = getWritableDatabase();
 
         ContentValues gamevals = new ContentValues();
         gamevals.put("name", name);
 
         long rowid = database.insert("game", null, gamevals);
+        String[] args = new String[]{ ""+rowid };
 
-        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", rowid);
+        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", args);
         c.moveToFirst();
 
-        return new Pair<Integer, String>(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
+        return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
+    }
+
+    public int getCharacterIdForGame(int gameId) {
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT character_id FROM character WHERE character.game_id = ? LIMIT 1", new String[]{""+gameId});
+        cursor.moveToFirst();
+        if (cursor.getCount() < 1) {
+            return -1;
+        } else {
+            return cursor.getInt(cursor.getColumnIndex("character_id"));
+        }
+    }
+
+    /* Is this useful?
+    public ArrayList<String> getCharacters(int gameID) {
+        ArrayList<String> characters = new ArrayList<String>();
+        return characters;
+    }
+    */
+
+    public CharacterData addCharacter(int gameID, String name, String desc) {
+        SQLiteDatabase database = getWritableDatabase();
+
+        ContentValues gamevals = new ContentValues();
+        gamevals.put("name", name);
+        gamevals.put("description", desc);
+        gamevals.put("game_id", gameID);
+
+        long rowid = database.insert("character", null, gamevals);
+
+        String[] args = new String[]{ ""+rowid };
+        Cursor c = database.rawQuery("SELECT * FROM character WHERE character.ROWID =?", args);
+        c.moveToFirst();
+
+        return new CharacterData(c.getInt(c.getColumnIndex("character_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
+    }
+
+    public CharacterData getCharacter(int charId) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT * FROM character WHERE character.character_id = ? LIMIT 1", new String[]{""+charId});
+        c.moveToFirst();
+        if (c.getCount() < 1) {
+            // No character with that id available. That's probably bad.
+            return null;
+        } else {
+            return new CharacterData(c.getInt(c.getColumnIndex("character_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
+        }
+    }
+
+    public ArrayList<InventoryItem> getInventoryItems(int characterId) {
+
+        // Verify that the name and description columns exist
+        // This is done here because
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM inventory_item LIMIT 0", null);
+        if (cursor.getColumnIndex("name") < 0 || cursor.getColumnIndex("description") < 0) {
+            Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
+            SQLiteDatabase database = getWritableDatabase();
+            database.execSQL("DROP TABLE inventory_item");
+            database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
+                    "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "name TEXT, " +
+                    "description TEXT, " +
+                    "character_id INTEGER," +
+                    "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                    ")");
+        }
+
+        Cursor invCursor = getReadableDatabase().rawQuery(
+                "SELECT "+
+                    "character.character_id," +
+                    "inventory_item.inventory_item_id," +
+                    "inventory_item.name AS 'item_name'," +
+                    "inventory_item.description AS 'item_description'" +
+                "FROM character " +
+                    "INNER JOIN inventory_item ON inventory_item.character_id = character.character_id " +
+                "WHERE character.character_id = ?",
+                new String[]{""+characterId});
+        ArrayList<InventoryItem> invList = new ArrayList<InventoryItem>();
+        invCursor.moveToFirst();
+
+        int iidCol = invCursor.getColumnIndex("inventory_item_id");
+        int iNameCol = invCursor.getColumnIndex("item_name");
+        int iDescCol = invCursor.getColumnIndex("item_description");
+        while (!invCursor.isAfterLast()) {
+            invList.add(new InventoryItem(
+                        invCursor.getInt(iidCol),
+                        invCursor.getString(iNameCol),
+                        invCursor.getString(iDescCol)));
+            invCursor.moveToNext();
+        }
+        return invList;
     }
 }
