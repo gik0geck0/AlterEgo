@@ -1,0 +1,8 @@
+package edu.mines.alterego;
+
+import android.app.Activity;
+import android.view.View.OnClickListener;
+
+public class Settings extends Activity implements OnClickListener {
+
+}
