@@ -4,9 +4,24 @@
     <string name="app_name">AlterEgo</string>
     
     <!-- Flip Pages Title -->
-    <string name="title_section3">Section 3</string>
-    <string name="title_inventory">Inventory</string>
     <string name="title_character">Character</string>
+    <string name="title_inventory">Inventory</string>
+    <string name="title_section3">Notes</string>
+    
+    
+    <!-- Character -->
+    <string name="nochar_tv">No Existing Character</string>
+    <string name="nochar_button">Make New Character</string>
+    <string name="char_name">Character Name</string>
+    <string name="char_desc">Character Description</string>
+    <string name="char_attributes">Character Attributes</string>
+    
+    <!-- Inventory -->
+    <string name="inventory_list">View Inventory</string>
+    
+    <!-- Notes -->
+    <string name="notes_list">View Notes</string>
+    
     
     <!-- Database -->
     <string name="gameid">GAMEID</string>
@@ -32,4 +47,5 @@
     
     <!-- Game Activity Menu -->
     <string name="action_new_character">Create New Character</string>
+    
 </resources>

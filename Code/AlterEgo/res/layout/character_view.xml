@@ -14,14 +14,14 @@
 
         <TextView
             android:id="@+id/nochar_tv"
-            android:text="No Existing Character"
+            android:text="@string/nochar_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="30dp" />
 
         <Button
             android:id="@+id/nochar_button"
-            android:text="Make New Character"
+            android:text="@string/nochar_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="30dp" />
@@ -39,20 +39,20 @@
             android:id="@+id/char_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Character Name" />
+            android:text="@string/char_name" />
 
         <TextView
             android:id="@+id/char_desc"
             android:lines="5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Character\nDesc-\nription" />
+            android:text="@string/char_desc" />
 
         <ListView
             android:id="@+id/char_attributes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Character Attributes" />
+            android:text="@char_attributes" />
 
     </LinearLayout>
 

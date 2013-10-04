@@ -252,4 +252,48 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         }
         return invList;
     }
+    
+    public ArrayList<NotesData> getNotesData(int characterId) {
+
+        // Verify that the name and description columns exist
+        // This is done here because
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM inventory_item LIMIT 0", null);
+        if (cursor.getColumnIndex("name") < 0 || cursor.getColumnIndex("description") < 0) {
+            Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
+            SQLiteDatabase database = getWritableDatabase();
+            database.execSQL("DROP TABLE inventory_item");
+            database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
+                    "notes_data_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "subject TEXT, " +
+                    "description TEXT, " +
+                    "character_id INTEGER," +
+                    "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                    ")");
+        }
+
+        Cursor notesCursor = getReadableDatabase().rawQuery(
+                "SELECT "+
+                    "character.character_id," +
+                    "notes_data.notes_data_id," +
+                    "notes_data.subject AS 'notes_subject'," +
+                    "inventory_item.description AS 'notes_description'" +
+                "FROM character " +
+                    "INNER JOIN inventory_item ON notes_data.character_id = character.character_id " +
+                "WHERE character.character_id = ?",
+                new String[]{""+characterId});
+        ArrayList<NotesData> notesList = new ArrayList<NotesData>();
+        notesCursor.moveToFirst();
+
+        int nidCol = notesCursor.getColumnIndex("notes_data_id");
+        int nNameCol = notesCursor.getColumnIndex("notes_subject");
+        int nDescCol = notesCursor.getColumnIndex("notes_description");
+        while (!notesCursor.isAfterLast()) {
+            notesList.add(new NotesData(
+                        notesCursor.getInt(nidCol),
+                        notesCursor.getString(nNameCol),
+                        notesCursor.getString(nDescCol)));
+            notesCursor.moveToNext();
+        }
+        return notesList;
+    }
 }

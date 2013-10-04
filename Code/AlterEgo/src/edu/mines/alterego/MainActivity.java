@@ -89,9 +89,13 @@ public class MainActivity extends Activity implements View.OnClickListener, List
 		ListView gameListView = (ListView) findViewById(R.id.main_game_list_view);
 		gameListView.setAdapter(mGameDbAdapter);
         gameListView.setOnItemClickListener(this);
-
+        
+        // Create New Game Button
         newGameB = (Button) findViewById(R.id.main_new_game);
+        
+        // Set On Click Listener for Create New Game Button
         newGameB.setOnClickListener(this);
+        
 	}
 
 	@Override
@@ -107,6 +111,8 @@ public class MainActivity extends Activity implements View.OnClickListener, List
 		switch (item.getItemId()) {
 			case R.id.action_new_game:
 				newGameDialogue();
+			case R.id.action_settings:
+				startActivity(new Intent(this, Settings.class));
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -136,7 +142,7 @@ public class MainActivity extends Activity implements View.OnClickListener, List
     public void newGameDialogue() {
         AlertDialog.Builder newGameDialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-
+ 
         // Inflate the view
         newGameDialog.setView(inflater.inflate(R.layout.new_game_dialog, null))
             .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
@@ -152,6 +158,7 @@ public class MainActivity extends Activity implements View.OnClickListener, List
                     //CharacterDBHelper mDbHelper = new CharacterDBHelper(this);
                     GameData newGame = mDbHelper.addGame(gameName);
                     mGameDbAdapter.add(newGame);
+                    hideCreateNewGameButton();
                 }
             })
             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -163,5 +170,9 @@ public class MainActivity extends Activity implements View.OnClickListener, List
             });
 
         newGameDialog.create().show();
+    }
+    
+    public void hideCreateNewGameButton() {
+    		newGameB.setVisibility(View.GONE);
     }
 }
