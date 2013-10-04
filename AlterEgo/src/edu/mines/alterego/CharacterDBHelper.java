@@ -187,13 +187,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
 
-    public NotesData addNote(String subject, int char_id) {
+    public NotesData addNote(int char_id, String subject, String desc) {
         SQLiteDatabase database = getWritableDatabase();
 
         ContentValues notevals = new ContentValues();
         notevals.put("character_id", char_id);
         notevals.put("subject", subject);
-
+        notevals.put("description", desc);
+        
         long rowid = database.insert("notes_data", null, notevals);
         String[] args = new String[]{ ""+rowid };
 
