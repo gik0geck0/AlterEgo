@@ -14,4 +14,12 @@ class InventoryItem {
     public int getItemId() { return mItemId; }
     public String getName() { return mName; }
     public String getDescription() { return mDescription; }
+
+    public static int showableDescLength = 25;
+    public String toString() {
+        int cutIndex = showableDescLength;
+        if (mDescription.length() <= cutIndex)
+            cutIndex = mDescription.length();
+        return mName + ": " + mDescription.substring(0,cutIndex);
+    }
 }
