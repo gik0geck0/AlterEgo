@@ -61,7 +61,7 @@ public class GameActivity extends FragmentActivity {
 
         if (mGameId == -1) {
             // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
-            Toast.makeText(this, "GameID not valid", 400).show();
+            Toast.makeText(this, "GameID not valid", Toast.LENGTH_LONG).show();
             Log.e("AlterEgo::CharacterFragment", "Game ID is not valid!!!!!");
         }
 

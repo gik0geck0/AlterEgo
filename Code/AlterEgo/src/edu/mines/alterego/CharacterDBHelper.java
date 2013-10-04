@@ -89,12 +89,19 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "category_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "category_name TEXT" +
                 ")");
-
-        database.execSQL("CREATE TABLE IF NOT EXISTS note ( " +
-                "note_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "game_id INTEGER," +
-                "note TEXT," +
-                "FOREIGN KEY(game_id) REFERENCES game(game_id)" +
+//
+//        database.execSQL("CREATE TABLE IF NOT EXISTS note ( " +
+//                "note_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+//                "game_id INTEGER," +
+//                "note TEXT," +
+//                "FOREIGN KEY(game_id) REFERENCES game(game_id)" +
+//                ")");
+        database.execSQL("CREATE TABLE IF NOT EXISTS notes_data ( "+
+                "notes_data_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "subject TEXT, " +
+                "description TEXT, " +
+                "character_id INTEGER," +
+                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 ")");
         /* Example DDL from Matt's Quidditch scoring app
         database.execSQL("CREATE TABLE IF NOT EXISTS score ( " +
@@ -117,6 +124,10 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                     "name TEXT");
             database.execSQL("ALTER TABLE inventory_item ADD COLUMN"+
                     "description TEXT");
+            database.execSQL("ALTER TABLE notes_data ADD COLUMN"+
+                    "subject TEXT");
+            database.execSQL("ALTER TABLE  ADD COLUMN"+
+                    "description TEXT");
         }
 
         if (oldVersion == 2) {
@@ -128,6 +139,18 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
                         "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "name TEXT, " +
+                        "description TEXT, " +
+                        "character_id INTEGER," +
+                        "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                        ")");
+            }
+            Cursor cursor2 = database.rawQuery("SELECT * FROM notes_data LIMIT 0", null);
+            if (cursor2.getColumnIndex("subject") < 0 || cursor2.getColumnIndex("description") < 0) {
+                Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
+                database.execSQL("DROP TABLE notes_data");
+                database.execSQL("CREATE TABLE IF NOT EXISTS notes_data ( "+
+                        "notes_data_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "subject TEXT, " +
                         "description TEXT, " +
                         "character_id INTEGER," +
                         "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
@@ -164,6 +187,22 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
 
+    public NotesData addNote(String subject, int char_id) {
+        SQLiteDatabase database = getWritableDatabase();
+
+        ContentValues notevals = new ContentValues();
+        notevals.put("character_id", char_id);
+        notevals.put("subject", subject);
+
+        long rowid = database.insert("notes_data", null, notevals);
+        String[] args = new String[]{ ""+rowid };
+
+        Cursor c = database.rawQuery("SELECT * FROM notes_data WHERE notes_data.ROWID =?", args);
+        c.moveToFirst();
+
+        return new NotesData(c.getInt(c.getColumnIndex("notes_data_id")), c.getString(c.getColumnIndex("subject")), c.getString(c.getColumnIndex("description")));
+    }
+    
     public int getCharacterIdForGame(int gameId) {
         Cursor cursor = getReadableDatabase().rawQuery("SELECT character_id FROM character WHERE character.game_id = ? LIMIT 1", new String[]{""+gameId});
         cursor.moveToFirst();
@@ -254,36 +293,22 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     }
     
     public ArrayList<NotesData> getNotesData(int characterId) {
-
+    	Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId " + characterId);
         // Verify that the name and description columns exist
         // This is done here because
-        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM inventory_item LIMIT 0", null);
-        if (cursor.getColumnIndex("name") < 0 || cursor.getColumnIndex("description") < 0) {
-            Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
-            SQLiteDatabase database = getWritableDatabase();
-            database.execSQL("DROP TABLE inventory_item");
-            database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
-                    "notes_data_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "subject TEXT, " +
-                    "description TEXT, " +
-                    "character_id INTEGER," +
-                    "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
-                    ")");
-        }
-
         Cursor notesCursor = getReadableDatabase().rawQuery(
                 "SELECT "+
                     "character.character_id," +
                     "notes_data.notes_data_id," +
                     "notes_data.subject AS 'notes_subject'," +
-                    "inventory_item.description AS 'notes_description'" +
+                    "notes_data.description AS 'notes_description'" +
                 "FROM character " +
-                    "INNER JOIN inventory_item ON notes_data.character_id = character.character_id " +
+                    "INNER JOIN notes_data ON notes_data.character_id = character.character_id " +
                 "WHERE character.character_id = ?",
                 new String[]{""+characterId});
         ArrayList<NotesData> notesList = new ArrayList<NotesData>();
         notesCursor.moveToFirst();
-
+        Log.i("AlterEgos::characterDBHelper::notesCursor", "notesCursor " + notesCursor.getCount());
         int nidCol = notesCursor.getColumnIndex("notes_data_id");
         int nNameCol = notesCursor.getColumnIndex("notes_subject");
         int nDescCol = notesCursor.getColumnIndex("notes_description");

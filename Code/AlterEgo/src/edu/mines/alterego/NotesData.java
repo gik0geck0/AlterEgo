@@ -5,13 +5,18 @@ class NotesData {
     String mSubject;
     String mDescription;
 
-    NotesData(int item_id, String name, String description) {
-        mNoteId = item_id;
-        mSubject = name;
+    NotesData(int notes_id, String subject, String description) {
+        mNoteId = notes_id;
+        mSubject = subject;
         mDescription = description;
     }
 
-    public int getItemId() { return mNoteId; }
-    public String getName() { return mSubject; }
+    public int getNoteId() { return mNoteId; }
+    public String getSubject() { return mSubject; }
     public String getDescription() { return mDescription; }
+    
+    @Override
+    public String toString() {
+    	return "mNoteId " + mNoteId + " " + "mSubject " + mSubject + " " + "mDescription " + mDescription;
+    }
 }
