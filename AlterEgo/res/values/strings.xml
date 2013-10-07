@@ -29,7 +29,7 @@
     
     <!-- Notes Dialogue -->
     <string name="notes_subject">Subject</string>
-    <string name="notes_details">Details</string>
+    <string name="notes_desc">Details</string>
     
     <!-- Database -->
     <string name="gameid">GAMEID</string>
@@ -56,4 +56,9 @@
     
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
+    
+    <!-- Settings Activity -->
+    <string name="pref_sms_theme_title">Theme</string>
+    <string name="pref_theme">Change Theme</string>
+    <string name="pref_theme_sum">Toggle between Dark and Light Android Theme</string>
 </resources>
