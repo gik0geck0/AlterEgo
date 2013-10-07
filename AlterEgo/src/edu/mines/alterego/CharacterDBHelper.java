@@ -355,7 +355,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         ContentValues statVals = new ContentValues();
         statVals.put("character_id", charID);
         statVals.put("stat_value", statVal);
-        statVals.put("stat_name", stat_name);
+        statVals.put("stat_name", statName);
         statVals.put("category_id", category);
 
         db.insert("character_stat", null, statVals);
