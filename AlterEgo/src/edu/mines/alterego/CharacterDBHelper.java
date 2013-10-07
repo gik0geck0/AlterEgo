@@ -67,7 +67,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "character_stat_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "character_id INTEGER," +
                 "stat_value INTEGER," +
-                "stat_name INTEGER," +
+                "stat_name TEXT," +
                 "description_usage_etc INTEGER," +
                 "category_id INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
@@ -337,5 +337,27 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         c.moveToFirst();
 
         return new InventoryItem(c.getInt(c.getColumnIndex("inventory_item_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
+    }
+
+/*            database.execSQL("CREATE TABLE IF NOT EXISTS character_stat ( " +
+                "character_stat_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "character_id INTEGER," +
+                "stat_value INTEGER," +
+                "stat_name TEXT," +
+                "description_usage_etc INTEGER," +
+                "category_id INTEGER," +
+                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
+                ")");
+*/
+    public void insertCharStat(int charID, int statVal, String statName, int category) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues statVals = new ContentValues();
+        statVals.put("character_id", charID);
+        statVals.put("stat_value", statVal);
+        statVals.put("stat_name", stat_name);
+        statVals.put("category_id", category);
+
+        db.insert("character_stat", null, statVals);
     }
 }
