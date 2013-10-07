@@ -54,6 +54,11 @@
             android:layout_height="wrap_content"
             android:text="@string/char_attributes" />
 
+        <ListView
+            android:id="@+id/char_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </LinearLayout>
