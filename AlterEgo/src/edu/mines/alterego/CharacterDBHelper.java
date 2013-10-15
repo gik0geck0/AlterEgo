@@ -68,7 +68,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "character_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name TEXT," +
-                "description_usage_etc INTEGER," +
+                "description_usage_etc TEXT," +
                 "category_id INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
@@ -344,7 +344,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "character_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name TEXT," +
-                "description_usage_etc INTEGER," +
+                "description_usage_etc TEXT," +
                 "category_id INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
