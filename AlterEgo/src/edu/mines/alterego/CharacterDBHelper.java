@@ -360,4 +360,20 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         db.insert("character_stat", null, statVals);
     }
+    
+    public ArrayList<CharacterStat> getStatsForCharacter(int charID) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	String[] whereArgs = new String[1];
+    	whereArgs[0] = Integer.toString(charID);
+        Cursor statCursor = db.rawQuery("SELECT stat_name, stat_value FROM character_stat WHERE character_id=?", whereArgs);
+        statCursor.moveToFirst();
+        ArrayList<CharacterStat> stats = new ArrayList<CharacterStat>();
+        while(!statCursor.isAfterLast()) {
+        	String statName = statCursor.getString(0);
+        	int statVal = statCursor.getInt(1);
+        	CharacterStat stat = new CharacterStat(charID, statVal, statName, 0);
+        	stats.add(stat);
+        }
+        return stats;
+    }
 }
