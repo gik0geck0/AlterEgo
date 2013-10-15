@@ -59,6 +59,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <Button
+            android:id="@+id/new_stat_button"
+            android:text="@string/new_stat_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30dp" />
     </LinearLayout>
 
 </LinearLayout>
