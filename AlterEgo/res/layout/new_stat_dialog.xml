@@ -15,7 +15,7 @@
 
     <EditText
         android:id="@+id/char_stat_val"
-        android:inputType="text"
+        android:inputType="number"
         android:hint="@string/char_stat_val_hint"
         android:minLines="5"
         android:maxLines="7"
