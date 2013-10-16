@@ -30,6 +30,7 @@ public class CharacterFragment extends Fragment {
     //private ArrayAdapter<CharacterStat> mCharStatAdapter;
     private SimpleCursorAdapter mCharStatAdapterC;
     private Cursor statsCursor;
+    private int charID;
 
     CharacterFragment(RefreshInterface refresher) {
         super();
@@ -47,6 +48,7 @@ public class CharacterFragment extends Fragment {
         CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
         if (mCharId < 0) {
             mCharId = dbHelper.getCharacterIdForGame(mGameId);
+            charID = mGameId;
         }
 
         // Inflate the layout for this fragment
@@ -54,52 +56,12 @@ public class CharacterFragment extends Fragment {
         mainView = character_view;
         
         //mCharStatAdapter = new ArrayAdapter<CharacterStat>();
-        int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
-        statsCursor = dbHelper.getStatsForCharCursor(mCharId);
-        mCharStatAdapterC = new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-        ListView statView = (ListView) character_view.findViewById(R.id.char_stats);
-        statView.setAdapter(mCharStatAdapterC);
-
 
         if (mCharId >= 0) {
             mChar = dbHelper.getCharacter(mCharId);
             showCharacter();
 
-            Button new_stat = (Button) character_view.findViewById(R.id.new_stat_button);
-            new_stat.setOnClickListener( new Button.OnClickListener() {
-
-             @Override
-                public void onClick(View v) {
-                    // Spawn the create-character dialog
-
-                    AlertDialog.Builder statBuilder = new AlertDialog.Builder(v.getContext());
-                    LayoutInflater inflater = getActivity().getLayoutInflater();
-
-                    statBuilder.setView(inflater.inflate(R.layout.new_stat_dialog, null))
-                        .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                AlertDialog thisDialog = (AlertDialog) dialog;
-
-                                EditText nameInput = (EditText) thisDialog.findViewById(R.id.char_stat_name);
-                                EditText descInput = (EditText) thisDialog.findViewById(R.id.char_stat_val);
-
-                                String name = nameInput.getText().toString();
-                                String val = descInput.getText().toString();
-
-                                CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                                dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
-                                statsCursor.requery();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            // Negative button just closes the dialog
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) { dialog.dismiss(); }
-                        });
-                    statBuilder.create().show();
-                }
-            });
+           
 
         } else {
             // Make the no-char layout visible
@@ -133,6 +95,7 @@ public class CharacterFragment extends Fragment {
                                 CharacterData newChar = dbHelper.addCharacter(mGameId, name, desc);
 
                                 mChar = newChar;
+                                charID = mChar.id;
                                 //mCharId = nChar.id;
 
                                 showCharacter();
@@ -170,6 +133,50 @@ public class CharacterFragment extends Fragment {
         cDesc.setText(mChar.description);
 
         // Show all the character's attributes/skills/complications
+        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+        int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
+        statsCursor = dbHelper.getStatsForCharCursor(charID);
+        mCharStatAdapterC = new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+        ListView statView = (ListView) mainView.findViewById(R.id.char_stats);
+        statView.setAdapter(mCharStatAdapterC);
+
+        
+        Button new_stat = (Button) mainView.findViewById(R.id.new_stat_button);
+        new_stat.setOnClickListener( new Button.OnClickListener() {
+
+         @Override
+            public void onClick(View v) {
+                // Spawn the create-character dialog
+
+                AlertDialog.Builder statBuilder = new AlertDialog.Builder(v.getContext());
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+
+                statBuilder.setView(inflater.inflate(R.layout.new_stat_dialog, null))
+                    .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            AlertDialog thisDialog = (AlertDialog) dialog;
+
+                            EditText nameInput = (EditText) thisDialog.findViewById(R.id.char_stat_name);
+                            EditText descInput = (EditText) thisDialog.findViewById(R.id.char_stat_val);
+
+                            String name = nameInput.getText().toString();
+                            String val = descInput.getText().toString();
+
+                            CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+                            dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
+                            statsCursor.requery();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        // Negative button just closes the dialog
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) { dialog.dismiss(); }
+                    });
+                statBuilder.create().show();
+            }
+        });
     }
 
 }
