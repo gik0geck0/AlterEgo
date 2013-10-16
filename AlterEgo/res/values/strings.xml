@@ -57,4 +57,8 @@
     
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
+
+    <!-- Character Stats Dialog-->
+    <string name="char_stat_name_hint"> Stat Name </string>
+    <string name="char_stat_val_hint"> Stat Value </string>
 </resources>

@@ -53,6 +53,42 @@ public class CharacterFragment extends Fragment {
         if (mCharId >= 0) {
             mChar = dbHelper.getCharacter(mCharId);
             showCharacter();
+
+            Button new_stat = (Button) character_view.findViewById(R.id.new_stat_button);
+            new_stat.setOnClickListener( new Button.OnClickListener() {
+
+             @Override
+                public void onClick(View v) {
+                    // Spawn the create-character dialog
+
+                    AlertDialog.Builder statBuilder = new AlertDialog.Builder(v.getContext());
+                    LayoutInflater inflater = getActivity().getLayoutInflater();
+
+                    statBuilder.setView(inflater.inflate(R.layout.new_stat_dialog, null))
+                        .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                AlertDialog thisDialog = (AlertDialog) dialog;
+
+                                EditText nameInput = (EditText) thisDialog.findViewById(R.id.char_stat_name);
+                                EditText descInput = (EditText) thisDialog.findViewById(R.id.char_stat_val);
+
+                                String name = nameInput.getText().toString();
+                                String val = descInput.getText().toString();
+
+                                CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+                                dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            // Negative button just closes the dialog
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) { dialog.dismiss(); }
+                        });
+                    statBuilder.create().show();
+                }
+            });
+
         } else {
             // Make the no-char layout visible
             LinearLayout nochar_ll = (LinearLayout) character_view.findViewById(R.id.nochar_layout);
