@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+  <PreferenceCategory
+      android:title="@string/pref_sms_theme_title"
+      android:key="pref_key_theme_settings">
+    <CheckBoxPreference
+        android:id="@+id/pref_theme"
+        android:key="pref_theme"
+        android:title="@string/pref_theme"
+        android:summary="@string/pref_theme_sum"
+        android:defaultValue="true" />
+  </PreferenceCategory>
+
+</PreferenceScreen>

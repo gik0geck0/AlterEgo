@@ -14,9 +14,9 @@
         android:layout_height="wrap_content" />
 
     <EditText
-        android:id="@+id/notes_details"
+        android:id="@+id/notes_desc"
         android:inputType="text"
-        android:hint="@string/notes_details"
+        android:hint="@string/notes_desc"
         android:minLines="5"
         android:maxLines="7"
         android:layout_margin="4dp"

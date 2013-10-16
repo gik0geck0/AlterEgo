@@ -1,0 +1,30 @@
+package edu.mines.alterego;
+
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
+
+public class SettingsActivity extends Activity implements OnSharedPreferenceChangeListener {
+
+	public static final String KEY_PREF_SYNC_CONN="pref_syncConnectionType";
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		getFragmentManager().beginTransaction()
+			.replace(android.R.id.content, new SettingsFragment())
+			.commit();
+		
+		//Ensures that the app is properly initialized with default settings
+		PreferenceManager.setDefaultValues(this, R.layout.activity_settings, false);
+		
+		//Reading preferences
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		String syncConnPref = sharedPref.getString(SettingsActivity.KEY_PREF_SYNC_CONN, "");
+	}
+	
+}

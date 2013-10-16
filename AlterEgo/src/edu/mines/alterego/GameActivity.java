@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import edu.mines.alterego.RefreshInterface;
 
 public class GameActivity extends FragmentActivity implements RefreshInterface {
@@ -78,7 +77,6 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.game_menu, menu);
 		return true;
 	}
 
@@ -174,6 +172,11 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		}
 	}
 
+	//Opens up dialogue for user to input new game
+	public void newCharacterDialogue() {
+		
+	}
+	
     @Override
     public void refresh() {
         CharacterDBHelper dbhelper = new CharacterDBHelper(this);

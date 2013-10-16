@@ -10,7 +10,7 @@
     
     
     <!-- Character -->
-    <string name="nochar_tv">No Existing Character</string>
+    <string name="nochar_tv">Create Character</string>
     <string name="nochar_button">Make New Character</string>
     <string name="char_name">Character Name</string>
     <string name="char_desc">Character Description</string>
@@ -56,9 +56,8 @@
     
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
-    
-    <!-- Settings Activity -->
-    <string name="pref_sms_theme_title">Theme</string>
-    <string name="pref_theme">Change Theme</string>
-    <string name="pref_theme_sum">Toggle between Dark and Light Android Theme</string>
+  
+    <!-- LongClick -->
+    <string name="context_edit">Edit</string>
+    <string name="context_delete">Delete</string>
 </resources>

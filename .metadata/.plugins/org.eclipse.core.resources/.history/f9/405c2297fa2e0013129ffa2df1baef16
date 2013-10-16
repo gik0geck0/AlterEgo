@@ -1,0 +1,28 @@
+package edu.mines.alterego;
+
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+
+public class SettingsActivity extends Activity {
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		getFragmentManager().beginTransaction()
+			.replace(android.R.id.content, new SettingsFragment())
+			.commit();
+		
+		//Ensures that the app is properly initialized with default settings
+		PreferenceManager.setDefaultValues(this, R.layout.activity_settings, false);
+	
+	}
+	
+	public void onSharePreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		//Change the preference value of themes
+		
+	}
+	
+}

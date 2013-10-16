@@ -16,6 +16,7 @@ class InventoryItem {
     public String getDescription() { return mDescription; }
 
     public static int showableDescLength = 25;
+    
     public String toString() {
         int cutIndex = showableDescLength;
         if (mDescription.length() <= cutIndex)

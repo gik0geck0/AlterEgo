@@ -17,14 +17,16 @@
             android:text="@string/nochar_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="30dp" />
+            android:longClickable="true"
+            android:layout_weight="1"
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/nochar_button"
             android:text="@string/nochar_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="30dp" />
+            android:layout_weight="0"/>
 
     </LinearLayout>
 

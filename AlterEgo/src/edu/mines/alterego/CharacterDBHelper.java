@@ -186,6 +186,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
+    
+    public void deleteGame(int game_id) {
+    	SQLiteDatabase database = getWritableDatabase();
+    	
+    	String[] args = new String[]{Integer.toString(game_id)};
+    	database.delete("game", "game_id=?", args);
+    	
+    }
 
     public NotesData addNote(int char_id, String subject, String desc) {
         SQLiteDatabase database = getWritableDatabase();
