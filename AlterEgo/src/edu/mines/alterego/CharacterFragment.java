@@ -2,23 +2,23 @@ package edu.mines.alterego;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v4.app.Fragment;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-//import android.widget.ArrayAdapter;
-//import android.widget.ListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
-
+//import android.widget.ArrayAdapter;
+//import android.widget.ListView;
 //import java.util.ArrayList;
-
-import edu.mines.alterego.CharacterDBHelper;
-import edu.mines.alterego.RefreshInterface;
 
 public class CharacterFragment extends Fragment {
 
@@ -27,6 +27,9 @@ public class CharacterFragment extends Fragment {
     int mGameId = -1;
     RefreshInterface mActRefresher;
     View mainView;
+    //private ArrayAdapter<CharacterStat> mCharStatAdapter;
+    private SimpleCursorAdapter mCharStatAdapterC;
+    private Cursor statsCursor;
 
     CharacterFragment(RefreshInterface refresher) {
         super();
@@ -49,6 +52,14 @@ public class CharacterFragment extends Fragment {
         // Inflate the layout for this fragment
         View character_view = inflater.inflate(R.layout.character_view, container, false);
         mainView = character_view;
+        
+        //mCharStatAdapter = new ArrayAdapter<CharacterStat>();
+        int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
+        statsCursor = dbHelper.getStatsForCharCursor(mCharId);
+        mCharStatAdapterC = new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        ListView statView = (ListView) character_view.findViewById(R.id.char_stats);
+        statView.setAdapter(mCharStatAdapterC);
+
 
         if (mCharId >= 0) {
             mChar = dbHelper.getCharacter(mCharId);
@@ -78,6 +89,7 @@ public class CharacterFragment extends Fragment {
 
                                 CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
                                 dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
+                                statsCursor.requery();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

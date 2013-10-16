@@ -64,7 +64,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 ")");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS character_stat ( " +
-                "character_stat_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "character_id INTEGER," +
                 "stat_value INTEGER," +
                 "stat_name TEXT," +
@@ -375,5 +375,13 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         	stats.add(stat);
         }
         return stats;
+    }
+    
+    public Cursor getStatsForCharCursor( int charID) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	String[] whereArgs = new String[1];
+    	whereArgs[0] = Integer.toString(charID);
+        Cursor statCursor = db.rawQuery("SELECT _id, stat_name, stat_value FROM character_stat WHERE character_id=?", whereArgs);
+        return statCursor;
     }
 }
