@@ -4,5 +4,6 @@
 <fullyQualifiedTypeName name="edu.mines.alterego.R.layout"/>
 <fullyQualifiedTypeName name="android.R"/>
 <fullyQualifiedTypeName name="android.R.style"/>
+<fullyQualifiedTypeName name="android.widget.Toast"/>
 <fullyQualifiedTypeName name="edu.mines.alterego.R.id"/>
 </qualifiedTypeNameHistroy>

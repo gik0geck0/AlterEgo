@@ -192,7 +192,6 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     	
     	String[] args = new String[]{Integer.toString(game_id)};
     	database.delete("game", "game_id=?", args);
-    	
     }
 
     public NotesData addNote(int char_id, String subject, String desc) {
