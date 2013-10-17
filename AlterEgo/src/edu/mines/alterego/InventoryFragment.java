@@ -43,7 +43,7 @@ public class InventoryFragment extends Fragment {
 			// Yes, this is annoying, but it'll make an error VERY obvious. In
 			// testing, I have never seen this toast/error message. But ya never
 			// know
-			Toast.makeText(getActivity(), "No character. Please make one!", Toast.LENGTH_LONG)
+			Toast.makeText(getActivity(), "No character. Please make one!", Toast.LENGTH_SHORT)
 					.show();
 			Log.e("AlterEgo:InventoryFragment", "No valid character. The user needs to make one.");
 		}

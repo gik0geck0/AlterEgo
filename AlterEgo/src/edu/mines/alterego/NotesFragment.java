@@ -42,9 +42,10 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 			// Yes, this is annoying, but it'll make an error VERY obvious. In
 			// testing, I have never seen this toast/error message. But ya never
 			// know
-			Toast.makeText(getActivity(), "GameID not valid", Toast.LENGTH_LONG)
+			Toast.makeText(getActivity(), "No character. Please make one!", Toast.LENGTH_SHORT)
 					.show();
-			Log.e("AlterEgo::NotesFragment", "GAME ID IS NOT VALID!!!!!");
+			Log.e("AlterEgo:NotesFragment", "No valid character. The user needs to make one.");
+
 		}
 
 		// Inflate the layout for this fragment
