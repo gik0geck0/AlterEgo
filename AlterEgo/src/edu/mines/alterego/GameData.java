@@ -10,6 +10,6 @@ class GameData extends Pair<Integer, String> {
 
     @Override
     public String toString() {
-        return first + ": " + second;
+        return second;
     }
 }
