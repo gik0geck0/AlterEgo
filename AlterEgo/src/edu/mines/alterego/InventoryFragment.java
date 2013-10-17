@@ -18,6 +18,14 @@ import java.util.ArrayList;
 
 import edu.mines.alterego.CharacterDBHelper;
 
+
+/**
+ * Description: This class defines the functionality for the inventory fragment.
+ * It handles loading fragment data from the database and displaying it in the list view.
+ * @author Matt Buland, Maria Deslis, Eric Young
+ *
+ */
+
 public class InventoryFragment extends Fragment {
 	int mCharId;
 	ArrayAdapter<InventoryItem> mInvAdapter;
@@ -37,13 +45,13 @@ public class InventoryFragment extends Fragment {
 			// know
 			Toast.makeText(getActivity(), "GameID not valid", Toast.LENGTH_LONG)
 					.show();
-			Log.e("QuidditchScoring:ScoringScreen", "GAME ID IS NOT VALID!!!!!");
+			Log.e("AlterEgo:InventoryFragment", "GAME ID IS NOT VALID!!!!!");
 		}
 
 		// Inflate the layout for this fragment
-		View inventory_view = inflater.inflate(R.layout.inventory_view,
+		View inventoryView = inflater.inflate(R.layout.inventory_view,
 				container, false);
-		ListView invListView = (ListView) inventory_view
+		ListView invListView = (ListView) inventoryView
 				.findViewById(R.id.inventory_list);
 
 		CharacterDBHelper dbhelper = new CharacterDBHelper(getActivity());
@@ -53,12 +61,10 @@ public class InventoryFragment extends Fragment {
 				android.R.layout.simple_list_item_1, invItems);
 		invListView.setAdapter(mInvAdapter);
 
-		Log.i("AlterEgo::InvFrag::Init",
-				"Binding the click listener for create inventory item button");
 		// Bind the new-character button to it's appropriate action
-		Button new_inv = (Button) inventory_view
+		Button newInv = (Button) inventoryView
 				.findViewById(R.id.newinv_button);
-		new_inv.setOnClickListener(new Button.OnClickListener() {
+		newInv.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				// Spawn the create inventory item dialog
@@ -109,6 +115,6 @@ public class InventoryFragment extends Fragment {
 			}
 		});
 
-		return inventory_view;
+		return inventoryView;
 	}
 }
