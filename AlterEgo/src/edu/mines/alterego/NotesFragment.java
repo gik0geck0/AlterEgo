@@ -16,6 +16,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+/**
+ * Description: This class defines the functionality for the notes fragment.
+ * It handles loading fragment data from the database and displaying it in the list view.
+ * @author Matt Buland, Maria Deslis, Eric Young
+ *
+ */
+
 public class NotesFragment extends Fragment implements View.OnClickListener {
 	int mCharId;
 	ArrayAdapter<NotesData> mNotesAdapter;
@@ -37,7 +44,7 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 			// know
 			Toast.makeText(getActivity(), "GameID not valid", Toast.LENGTH_LONG)
 					.show();
-			Log.e("QuidditchScoring:ScoringScreen", "GAME ID IS NOT VALID!!!!!");
+			Log.e("AlterEgo::NotesFragment", "GAME ID IS NOT VALID!!!!!");
 		}
 
 		// Inflate the layout for this fragment
@@ -45,9 +52,9 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 				false);
 		ListView nView = (ListView) notes_view.findViewById(R.id.notes_list);
 
+        // Lookup the character in the database
 		mDbHelper = new CharacterDBHelper(getActivity());
 		ArrayList<NotesData> nItems = mDbHelper.getNotesData(mCharId);
-		Log.i("AlterEgos::NotesFragment::nItems", "nItems " + nItems);
 		mNotesAdapter = new ArrayAdapter<NotesData>(getActivity(),
 				android.R.layout.simple_list_item_1, nItems);
 		nView.setAdapter(mNotesAdapter);
@@ -66,6 +73,11 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 		}
 	}
 
+    /**
+     * <p>
+     * Spawns a dialog for creating a new note
+     * </p>
+     */
 	public void newNoteDialogue() {
 		AlertDialog.Builder newNotesDialog = new AlertDialog.Builder(
 				getActivity());
@@ -92,14 +104,6 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 										.getText().toString();
 
 								// Create a new note
-								Log.i("AlterEgos::NotesFragment::newNote",
-										"Creating a note with a subject "
-												+ noteSubject);
-								Log.i("AlterEgos::NotesFragment::newNote",
-										"Creating a note with a description "
-												+ noteDescription);
-								// CharacterDBHelper mDbHelper = new
-								// CharacterDBHelper(this);
 								NotesData newNote = mDbHelper.addNote(mCharId,
 										noteSubject, noteDescription);
 								mNotesAdapter.add(newNote);
