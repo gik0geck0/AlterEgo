@@ -16,18 +16,19 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-//import android.widget.ArrayAdapter;
-//import android.widget.ListView;
-//import java.util.ArrayList;
+
+/**
+ * Description: This file defines the fragment showing characters and stats
+ * @author Matt Buland, Maria Deslis, Eric Young
+ *
+ */
 
 public class CharacterFragment extends Fragment {
 
-    //int mCharId = -1;
     CharacterData mChar;
     int mGameId = -1;
     RefreshInterface mActRefresher;
     View mainView;
-    //private ArrayAdapter<CharacterStat> mCharStatAdapter;
     private SimpleCursorAdapter mCharStatAdapterC;
     private Cursor statsCursor;
     private int charID;
@@ -36,7 +37,12 @@ public class CharacterFragment extends Fragment {
         super();
         mActRefresher = refresher;
     }
-
+    
+    
+    /**
+     * This function creates the fragment view and decides if it needs to show new character creation
+     * or existing characters.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -116,6 +122,9 @@ public class CharacterFragment extends Fragment {
         return character_view;
     }
 
+    /**
+     * This method shows character the current, or newly created character and applicable stats.
+     */
     public void showCharacter() {
         // Make the no-char layout invisible
         LinearLayout nochar_ll = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
