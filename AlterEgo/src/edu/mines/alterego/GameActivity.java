@@ -41,8 +41,8 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 	 */
 	ViewPager mViewPager;
 
-    int mGameId = -1;
-    int mCharId = -1;
+    public static int mGameId = -1;
+    public static int mCharId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -101,9 +101,10 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 			// below) with the page number as its lone argument.
 
             // Create a bundle to hold the gameId and charId for the fragment
-            Bundle args = new Bundle();
-            args.putInt((String) getResources().getText(R.string.gameid), mGameId);
-            args.putInt((String) getResources().getText(R.string.charid), mCharId);
+            //Bundle args = new Bundle();
+            //args.putInt((String) getResources().getText(R.string.gameid), mGameId);
+            //args.putInt((String) getResources().getText(R.string.charid), mCharId);
+            Log.i("AlterEgo::GameActivity::getItem", "Spawning a new fragment with game=" + mGameId + " and char=" + mCharId);
 
             // Get a fragment to be used
             Fragment fragment;
@@ -111,20 +112,20 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
                 case 0:
                     // CharacterFragment needs a call-back to the refresh button (in case a character is added)
                     fragment = new CharacterFragment(GameActivity.this);
-                    fragment.setArguments(args);
+                    //fragment.setArguments(args);
                     break;
                 case 1:
                     fragment = new InventoryFragment();
-                    fragment.setArguments(args);
+                    //fragment.setArguments(args);
                     break;
                 case 2:
                 	fragment = new NotesFragment();
-                	fragment.setArguments(args);
+                	//fragment.setArguments(args);
                 	break;
                 default:
                     fragment = new DummySectionFragment();
-                    args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-                    fragment.setArguments(args);
+                    //args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+                    //fragment.setArguments(args);
             }
 
 			return fragment;
