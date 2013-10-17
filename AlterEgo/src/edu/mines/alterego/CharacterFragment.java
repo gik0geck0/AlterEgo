@@ -135,7 +135,7 @@ public class CharacterFragment extends Fragment {
         // Show all the character's attributes/skills/complications
         CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
         int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
-        statsCursor = dbHelper.getStatsForCharCursor(charID);
+        statsCursor = dbHelper.getStatsForCharCursor(mChar.id);
         mCharStatAdapterC = new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         ListView statView = (ListView) mainView.findViewById(R.id.char_stats);
@@ -166,7 +166,7 @@ public class CharacterFragment extends Fragment {
 
                             CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
                             dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
-                            statsCursor.requery();
+                            mCharStatAdapterC.changeCursor(dbHelper.getStatsForCharCursor(mChar.id));
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
