@@ -40,15 +40,10 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database) {
 
-        /*
-         * Game table: Base unifying game_id construct
-         * The game is used to reference 
-         */
         database.execSQL("CREATE TABLE IF NOT EXISTS game ( " +
                 "game_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "name TEXT" +
                 ")");
-
 
         database.execSQL("CREATE TABLE IF NOT EXISTS character ( " +
                 "character_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -89,13 +84,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "category_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "category_name TEXT" +
                 ")");
-//
-//        database.execSQL("CREATE TABLE IF NOT EXISTS note ( " +
-//                "note_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-//                "game_id INTEGER," +
-//                "note TEXT," +
-//                "FOREIGN KEY(game_id) REFERENCES game(game_id)" +
-//                ")");
+
         database.execSQL("CREATE TABLE IF NOT EXISTS notes_data ( "+
                 "notes_data_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "subject TEXT, " +
@@ -103,63 +92,22 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "character_id INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 ")");
-        /* Example DDL from Matt's Quidditch scoring app
-        database.execSQL("CREATE TABLE IF NOT EXISTS score ( " +
-                "score_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "score_datetime INTEGER, " +
-                "team_id INTEGER, " +   // team_id is a number identifying the team. In this first revision, it will be 0 or 1 for left and right
-                "amount INTEGER, " +
-                "snitch INTEGER, " +
-                "game_id INTEGER, " +
-                "FOREIGN KEY(game_id) REFERENCES game(game_id) )");
-         */
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        // Do nothing.
-        if (newVersion > 1) {
-            // Add the name and description columns
-            database.execSQL("ALTER TABLE inventory_item ADD COLUMN"+
-                    "name TEXT");
-            database.execSQL("ALTER TABLE inventory_item ADD COLUMN"+
-                    "description TEXT");
-            database.execSQL("ALTER TABLE notes_data ADD COLUMN"+
-                    "subject TEXT");
-            database.execSQL("ALTER TABLE  ADD COLUMN"+
-                    "description TEXT");
-        }
-
-        if (oldVersion == 2) {
-            // Verify that the name and description columns exist
-            Cursor cursor = database.rawQuery("SELECT * FROM inventory_item LIMIT 0", null);
-            if (cursor.getColumnIndex("name") < 0 || cursor.getColumnIndex("description") < 0) {
-                Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
-                database.execSQL("DROP TABLE inventory_item");
-                database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "+
-                        "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "name TEXT, " +
-                        "description TEXT, " +
-                        "character_id INTEGER," +
-                        "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
-                        ")");
-            }
-            Cursor cursor2 = database.rawQuery("SELECT * FROM notes_data LIMIT 0", null);
-            if (cursor2.getColumnIndex("subject") < 0 || cursor2.getColumnIndex("description") < 0) {
-                Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
-                database.execSQL("DROP TABLE notes_data");
-                database.execSQL("CREATE TABLE IF NOT EXISTS notes_data ( "+
-                        "notes_data_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "subject TEXT, " +
-                        "description TEXT, " +
-                        "character_id INTEGER," +
-                        "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
-                        ")");
-            }
-
-        }
+        // Do Nothing.
     }
 
+    /**
+     * <p>
+     * Queries the database for all the games. Will return a list of GameData
+     * objects which have an ID, and a description for the game.
+     * </p>
+     *
+     * @return  ArrayList of GameData objects that hold all the games
+     */
     public ArrayList<GameData> getGames() {
         Cursor dbGames = getReadableDatabase().rawQuery("SELECT * from game", null);
         dbGames.moveToFirst();
@@ -172,6 +120,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return games;
     }
 
+    /**
+     * <p>
+     * Add a new game to the database with a given description. The returned GameData object will contain the id that can be used to reference it.
+     * </p>
+     *
+     * @param name Description for the new game
+     * @return  GameData object representing the newly created Game.
+     */
     public GameData addGame(String name) {
         SQLiteDatabase database = getWritableDatabase();
 
@@ -186,30 +142,56 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
     }
-    
-    public void updateGame(int game_id, String game_name) {
+
+    /**
+     * <p>
+     * Modifies the game (identified by gameId) to have a new game name/description.
+     * </p>
+     *
+     * @param gameId GameID identifying the game to be changed.
+     * @param gameName New name for the game
+     */
+    public void updateGame(int gameId, String gameName) {
     	SQLiteDatabase database = getWritableDatabase();
     	ContentValues cvs = new ContentValues();
-    	cvs.put("name", game_name);
-    	String[] args = {Integer.toString(game_id)};
+    	cvs.put("name", gameName);
+    	String[] args = {Integer.toString(gameId)};
     	database.update("game", cvs, "game_id=?", args);
     }
-    
-    public void deleteGame(int game_id) {
+
+    /**
+     * <p>
+     * Delete a game from the database that's identified by its ID.
+     * </p>
+     *
+     * @param gameId ID for the game to be deleted
+     */
+    public void deleteGame(int gameId) {
     	SQLiteDatabase database = getWritableDatabase();
-    	
-    	String[] args = new String[]{Integer.toString(game_id)};
+
+    	String[] args = new String[]{Integer.toString(gameId)};
     	database.delete("game", "game_id=?", args);
     }
 
-    public NotesData addNote(int char_id, String subject, String desc) {
+    /**
+     * <p>
+     * Add a new note for a character to the database with a subject and
+     * description. The returned NotesData object will contain the
+     * object-representation of the newly created row.
+     * </p>
+     *
+     * @param subject   Brief name for the note
+     * @param desc      Full description/content of the note
+     * @return          NotesData object representing the newly created note
+     */
+    public NotesData addNote(int charId, String subject, String desc) {
         SQLiteDatabase database = getWritableDatabase();
 
         ContentValues notevals = new ContentValues();
-        notevals.put("character_id", char_id);
+        notevals.put("character_id", charId);
         notevals.put("subject", subject);
         notevals.put("description", desc);
-        
+
         long rowid = database.insert("notes_data", null, notevals);
         String[] args = new String[]{ ""+rowid };
 
@@ -218,7 +200,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         return new NotesData(c.getInt(c.getColumnIndex("notes_data_id")), c.getString(c.getColumnIndex("subject")), c.getString(c.getColumnIndex("description")));
     }
-    
+
+    /**
+     * <p>
+     * Looks up the character for a given game, and returns its ID. It's assumed that there's 1 character per game.
+     * </p>
+     *
+     * @return character Id for the given game.
+     */
     public int getCharacterIdForGame(int gameId) {
         Cursor cursor = getReadableDatabase().rawQuery("SELECT character_id FROM character WHERE character.game_id = ? LIMIT 1", new String[]{""+gameId});
         cursor.moveToFirst();
@@ -229,20 +218,24 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    /* Is this useful?
-    public ArrayList<String> getCharacters(int gameID) {
-        ArrayList<String> characters = new ArrayList<String>();
-        return characters;
-    }
-    */
-
-    public CharacterData addCharacter(int gameID, String name, String desc) {
+    /**
+     * <p>
+     * Add a new character to the database for a given game, the name of the
+     * character, and the character's description/backstory.
+     * </p>
+     *
+     * @param gameId    ID for the game the character should be added to
+     * @param name      The character's name
+     * @param desc      A description of the character
+     * @return          CharacterData object representing the newly created character
+     */
+    public CharacterData addCharacter(int gameId, String name, String desc) {
         SQLiteDatabase database = getWritableDatabase();
 
         ContentValues gamevals = new ContentValues();
         gamevals.put("name", name);
         gamevals.put("description", desc);
-        gamevals.put("game_id", gameID);
+        gamevals.put("game_id", gameId);
 
         long rowid = database.insert("character", null, gamevals);
 
@@ -253,6 +246,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return new CharacterData(c.getInt(c.getColumnIndex("character_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
     }
 
+    /**
+     * <p>
+     * Get a CharacterData object to represent the character row in the database.
+     * </p>
+     *
+     * @param charId    Character ID to lookup
+     * @return CharacterData object representing the character. Will return null if the character does not exist
+     */
     public CharacterData getCharacter(int charId) {
         Cursor c = getReadableDatabase().rawQuery("SELECT * FROM character WHERE character.character_id = ? LIMIT 1", new String[]{""+charId});
         c.moveToFirst();
@@ -264,6 +265,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * <p>
+     * Lookup all the inventory items that a character has.
+     * </p>
+     *
+     * @param characterId   The ID for the character to search
+     * @return              A list of InventoryItems representing the character's inventory
+     */
     public ArrayList<InventoryItem> getInventoryItems(int characterId) {
 
         // Verify that the name and description columns exist
@@ -308,6 +317,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return invList;
     }
 
+    /**
+     * <p>
+     * Lookup all the notes a character has taken.
+     * </p>
+     *
+     * @param characterId   The ID for the character to search
+     * @return              A list of NotesData representing the character's notebook
+     */
     public ArrayList<NotesData> getNotesData(int characterId) {
     	Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId " + characterId);
         // Verify that the name and description columns exist
@@ -338,6 +355,16 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return notesList;
     }
 
+    /**
+     * <p>
+     * Add a new invetory item to a character's inventory.
+     * </p>
+     *
+     * @param charId    ID for the character who will have this item in their inventory
+     * @param name      Name of the item
+     * @param desc      Description of the item. May include usage instructions
+     * @return          Model object representing the newly created inventory item
+     */
     public InventoryItem addInventoryItem(int charId, String name, String desc) {
         SQLiteDatabase database = getWritableDatabase();
 
@@ -355,48 +382,63 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         return new InventoryItem(c.getInt(c.getColumnIndex("inventory_item_id")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("description")));
     }
 
-/*            database.execSQL("CREATE TABLE IF NOT EXISTS character_stat ( " +
-                "character_stat_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "character_id INTEGER," +
-                "stat_value INTEGER," +
-                "stat_name TEXT," +
-                "description_usage_etc TEXT," +
-                "category_id INTEGER," +
-                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
-                "FOREIGN KEY(category_id) REFERENCES category(category_id)" +
-                ")");
-*/
-    public void insertCharStat(int charID, int statVal, String statName, int category) {
+    /**
+     * <p>
+     * Add a new statistic to a character.
+     * Ex: charId = 1, statVal = 9, statName = 'Charisma', category = 0
+     * This will at the Charisma value of 9 to the character
+     * </p>
+     *
+     * @param charID    ID for the character to be 'buffed'
+     * @param statVal   Numeric value for the stat
+     */
+    public void insertCharStat(int charId, int statVal, String statName, int category) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues statVals = new ContentValues();
-        statVals.put("character_id", charID);
+        statVals.put("character_id", charId);
         statVals.put("stat_value", statVal);
         statVals.put("stat_name", statName);
         statVals.put("category_id", category);
 
         db.insert("character_stat", null, statVals);
     }
-    
-    public ArrayList<CharacterStat> getStatsForCharacter(int charID) {
+
+    /**
+     * <p>
+     * Lookup all the stats for a given character
+     * </p>
+     *
+     * @param charId    ID for the character to be analyzed
+     * @return List of CharacterStats for the character
+     */
+    public ArrayList<CharacterStat> getStatsForCharacter(int charId) {
     	SQLiteDatabase db = getReadableDatabase();
     	String[] whereArgs = new String[1];
-    	whereArgs[0] = Integer.toString(charID);
+    	whereArgs[0] = Integer.toString(charId);
         Cursor statCursor = db.rawQuery("SELECT stat_name, stat_value FROM character_stat WHERE character_id=?", whereArgs);
         statCursor.moveToFirst();
         ArrayList<CharacterStat> stats = new ArrayList<CharacterStat>();
         while(!statCursor.isAfterLast()) {
         	String statName = statCursor.getString(0);
         	int statVal = statCursor.getInt(1);
-        	CharacterStat stat = new CharacterStat(charID, statVal, statName, 0);
+        	CharacterStat stat = new CharacterStat(charId, statVal, statName, 0);
         	stats.add(stat);
         }
         return stats;
     }
-    
-    public Cursor getStatsForCharCursor( int charID) {
+
+    /**
+     * <p>
+     * Cursor-version of getStatsForCharacter: Lookup all the stats for a given character, and return a Cursor for the results
+     * </p>
+     *
+     * @param charId    ID for the character to be analyzed
+     * @return Cursor to the character's stats
+     */
+    public Cursor getStatsForCharCursor( int charId) {
     	SQLiteDatabase db = getReadableDatabase();
     	String[] whereArgs = new String[1];
-    	whereArgs[0] = Integer.toString(charID);
+    	whereArgs[0] = Integer.toString(charId);
         Cursor statCursor = db.rawQuery("SELECT _id, stat_name, stat_value FROM character_stat WHERE character_id=?", whereArgs);
         return statCursor;
     }
