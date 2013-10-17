@@ -1,6 +1,7 @@
 package edu.mines.alterego;
 
 import java.util.ArrayList;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -77,7 +78,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// ArrayList<String> gameList = new ArrayList<String>();
 		mDbHelper = new CharacterDBHelper(this);
 		ArrayList<GameData> gamePairList = mDbHelper.getGames();
 		/*
@@ -99,7 +99,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
-		registerForContextMenu(listView);
+		registerForContextMenu(listView);		
 	}
 
 	@Override
@@ -186,6 +186,40 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		newGameDialog.create().show();
 	}
+	
+	public void editGameDialogue(final int game_id) {
+		AlertDialog.Builder editGameDialog = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+
+		// Inflate the view
+		editGameDialog
+				.setView(inflater.inflate(R.layout.edit_game_dialog, null))
+				.setPositiveButton(R.string.new_edit,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								// Perceive this dialog as an AlertDialog
+								AlertDialog thisDialog = (AlertDialog) dialog;
+								 
+								EditText nameInput = (EditText) thisDialog.findViewById(R.id.new_game_name);
+								String name = nameInput.getText().toString();
+								
+								mDbHelper.updateGame(game_id, name);
+								mGameDbAdapter.clear();
+								mGameDbAdapter.addAll( mDbHelper.getGames() );
+							}
+						})
+				.setNegativeButton(R.string.new_cancel,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								// Cancel: Just close the dialog
+								dialog.dismiss();
+							}
+						});
+
+		editGameDialog.create().show();	
+	}
 
 	public void hideCreateNewGameButton() {
 		newGameB.setVisibility(View.GONE);
@@ -207,19 +241,18 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		switch (item.getItemId()) {
-		case R.id.context_edit:
-			mDbHelper.updateGame(mGameDbAdapter.getItem(info.position).first, "I changed");
-			mGameDbAdapter.getItem(info.position);
-			showToast("Game Edited");
-			// add stuff here
+			case R.id.context_edit:
+				editGameDialogue(mGameDbAdapter.getItem(info.position).first);
+				
+				showToast("Game Edited");
 			return true;
-		case R.id.context_delete:
-			mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position).first);
-			mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
-			showToast("Game Deleted");
-			return true;
-		default:
-			return super.onContextItemSelected(item);
+			case R.id.context_delete:
+				mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position).first);
+				mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
+				showToast("Game Deleted");
+				return true;
+			default:
+				return super.onContextItemSelected(item);
 		}
 	}
 

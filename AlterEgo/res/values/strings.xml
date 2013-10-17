@@ -60,4 +60,12 @@
     <!-- LongClick -->
     <string name="context_edit">Edit</string>
     <string name="context_delete">Delete</string>
+    
+    <!-- Edit Dialogue -->
+    
+    <!-- Dialogue Default Options -->
+    <string name="new_game_name">Edit Game</string>
+    <string name="new_cancel">Cancel</string>
+    <string name="new_edit">Edit</string>
+    
 </resources>
