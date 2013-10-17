@@ -56,8 +56,11 @@ public class InventoryFragment extends Fragment {
 		invListView.setAdapter(mInvAdapter);
 
 		// Bind the new-character button to it's appropriate action
-		Button newInv = (Button) inventoryView
-				.findViewById(R.id.newinv_button);
+		Button newInv = (Button) inventoryView.findViewById(R.id.newinv_button);
+
+		if (GameActivity.mCharId == -1)
+            newInv.setEnabled(false);
+
 		newInv.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View v) {

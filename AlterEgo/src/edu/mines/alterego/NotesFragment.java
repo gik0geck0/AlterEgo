@@ -55,6 +55,9 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 		addNoteB = (Button) notes_view.findViewById(R.id.notes_add_notes);
 		addNoteB.setOnClickListener(this);
 
+		if (GameActivity.mCharId == -1)
+            addNoteB.setEnabled(false);
+
 		return notes_view;
 	}
 
