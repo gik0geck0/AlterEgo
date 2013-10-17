@@ -58,8 +58,8 @@ public class CharacterFragment extends Fragment {
         }
 
         // Inflate the layout for this fragment
-        View character_view = inflater.inflate(R.layout.character_view, container, false);
-        mainView = character_view;
+        View characterView = inflater.inflate(R.layout.character_view, container, false);
+        mainView = characterView;
         
         //mCharStatAdapter = new ArrayAdapter<CharacterStat>();
 
@@ -71,13 +71,13 @@ public class CharacterFragment extends Fragment {
 
         } else {
             // Make the no-char layout visible
-            LinearLayout nochar_ll = (LinearLayout) character_view.findViewById(R.id.nochar_layout);
-            nochar_ll.setVisibility(0);
+            LinearLayout nochar11 = (LinearLayout) characterView.findViewById(R.id.nochar_layout);
+            nochar11.setVisibility(0);
 
             Log.i("AlterEgo::CharFrag::Init", "Binding the click listener for create-character button");
             // Bind the new-character button to it's appropriate action
-            Button new_char = (Button) character_view.findViewById(R.id.nochar_button);
-            new_char.setOnClickListener( new Button.OnClickListener() {
+            Button newChar = (Button) characterView.findViewById(R.id.nochar_button);
+            newChar.setOnClickListener( new Button.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Spawn the create-character dialog
@@ -119,7 +119,7 @@ public class CharacterFragment extends Fragment {
             });
         }
 
-        return character_view;
+        return characterView;
     }
 
     /**
@@ -127,12 +127,12 @@ public class CharacterFragment extends Fragment {
      */
     public void showCharacter() {
         // Make the no-char layout invisible
-        LinearLayout nochar_ll = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
-        nochar_ll.setVisibility(View.GONE);
+        LinearLayout nochar11 = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
+        nochar11.setVisibility(View.GONE);
 
         // Make the character-viewing area visible
-        LinearLayout char_layout = (LinearLayout) mainView.findViewById(R.id.haschar_layout);
-        char_layout.setVisibility(View.VISIBLE);
+        LinearLayout charLayout = (LinearLayout) mainView.findViewById(R.id.haschar_layout);
+        charLayout.setVisibility(View.VISIBLE);
 
         // Show the character name and description
         TextView cName = (TextView) mainView.findViewById(R.id.char_name);
@@ -151,8 +151,8 @@ public class CharacterFragment extends Fragment {
         statView.setAdapter(mCharStatAdapterC);
 
         
-        Button new_stat = (Button) mainView.findViewById(R.id.new_stat_button);
-        new_stat.setOnClickListener( new Button.OnClickListener() {
+        Button newStat = (Button) mainView.findViewById(R.id.new_stat_button);
+        newStat.setOnClickListener( new Button.OnClickListener() {
 
          @Override
             public void onClick(View v) {
