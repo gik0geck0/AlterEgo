@@ -68,7 +68,8 @@
             android:text="@string/new_stat_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="30dp" />
+            android:layout_weight="0"
+            android:textSize="25sp" />
     </LinearLayout>
 
 </LinearLayout>
