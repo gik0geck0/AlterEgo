@@ -209,7 +209,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		switch (item.getItemId()) {
 		case R.id.context_edit:
 			mDbHelper.updateGame(mGameDbAdapter.getItem(info.position).first, "I changed");
-			mGameDbAdapter.getItem(info.position);
+			mGameDbAdapter.getItem(mGameDbAdapter.getItem(info.position).second);
 			showToast("Game Edited");
 			// add stuff here
 			return true;

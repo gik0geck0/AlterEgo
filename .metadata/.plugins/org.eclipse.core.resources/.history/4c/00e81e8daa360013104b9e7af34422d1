@@ -191,7 +191,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     	SQLiteDatabase database = getWritableDatabase();
     	ContentValues args = new ContentValues();
     	args.put("name", game_name);
-    	database.update("game", args, "game_id=?", null);
+    	database.update("game", args);
     }
     
     public void deleteGame(int game_id) {

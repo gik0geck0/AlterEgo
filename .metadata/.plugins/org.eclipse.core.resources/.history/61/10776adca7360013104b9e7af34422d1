@@ -1,7 +1,7 @@
 package edu.mines.alterego;
 
 import java.util.ArrayList;
-import android.annotation.SuppressLint;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	CharacterDBHelper mDbHelper;
 	Button newGameB;
 	
-	@SuppressLint("CutPasteId") @Override
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -208,15 +208,15 @@ public class MainActivity extends Activity implements View.OnClickListener,
 				.getMenuInfo();
 		switch (item.getItemId()) {
 		case R.id.context_edit:
-			mDbHelper.updateGame(mGameDbAdapter.getItem(info.position).first, "I changed");
-			mGameDbAdapter.getItem(info.position);
-			showToast("Game Edited");
+			showToast("Edit Game");
 			// add stuff here
 			return true;
 		case R.id.context_delete:
 			mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position).first);
+//			mGameDbAdapter.notifyDataSetChanged();
 			mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
 			showToast("Game Deleted");
+			// add stuff heres
 			return true;
 		default:
 			return super.onContextItemSelected(item);
