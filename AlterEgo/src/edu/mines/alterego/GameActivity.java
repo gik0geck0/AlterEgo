@@ -17,16 +17,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.mines.alterego.RefreshInterface;
-
+/**
+ * This activity holds a view-flipper to each of the different components of a
+ * game. Right now, there are only 3 parts (staticly defined): Character,
+ * Inventory, and Notes. The GameActivity also serves as a unifying data-instructor
+ * for the fragments. This activity instructs the fragments which game and character
+ * id to use.
+ *
+ * @author: Matt Buland, Maria Deslis, Eric Young
+ */
 public class GameActivity extends FragmentActivity implements RefreshInterface {
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
 	 * fragments for each of the sections. We use a
 	 * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which
-	 * will keep every loaded fragment in memory. If this becomes too memory
-	 * intensive, it may be best to switch to a
-	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+	 * will keep every loaded fragment in memory.
 	 */
 	SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -45,13 +51,13 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        // Grab the gameId from the starting activity (should be MainActivity)
         Intent i = getIntent();
         Bundle extras = i.getExtras();
         if (extras != null) {
@@ -66,11 +72,9 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
             Log.e("AlterEgo::CharacterFragment", "Game ID is not valid!!!!!");
         }
 
+        // Try to find a character for this game
         CharacterDBHelper dbhelper = new CharacterDBHelper(this);
         mCharId = dbhelper.getCharacterIdForGame(mGameId);
-
-
-        Log.i("AlterEgo::CharFrag", "Found the character. The id was " + mCharId);
 
 	}
 
@@ -95,12 +99,14 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-            Fragment fragment;
+
+            // Create a bundle to hold the gameId and charId for the fragment
             Bundle args = new Bundle();
-            Log.i("AlterEgo::GameAct::Pager", "Placing the character ID into the arg-bundle for a fragment: " + mCharId);
-            Log.i("AlterEgo::GameAct::Pager", "Creating the game in the fragment number " + position);
-            args.putInt((String) getResources().getText(R.string.charid), mCharId);
             args.putInt((String) getResources().getText(R.string.gameid), mGameId);
+            args.putInt((String) getResources().getText(R.string.charid), mCharId);
+
+            // Get a fragment to be used
+            Fragment fragment;
             switch(position) {
                 case 0:
                     // CharacterFragment needs a call-back to the refresh button (in case a character is added)
@@ -160,8 +166,7 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
 					container, false);
 			TextView dummyTextView = (TextView) rootView
@@ -172,11 +177,6 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		}
 	}
 
-	//Opens up dialogue for user to input new game
-	public void newCharacterDialogue() {
-		
-	}
-	
     @Override
     public void refresh() {
         CharacterDBHelper dbhelper = new CharacterDBHelper(this);
