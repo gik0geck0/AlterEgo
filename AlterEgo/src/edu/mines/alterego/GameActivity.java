@@ -62,14 +62,16 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
         Bundle extras = i.getExtras();
         if (extras != null) {
             mGameId = extras.getInt((String) getResources().getText(R.string.gameid), -1);
+            Log.i("AlterEgo::GameActivity::Init", "The gameid passed from the MainActivity was " + mGameId);
         } else {
             mGameId = -1;
+            Log.i("AlterEgo::GameActivity::Init", "There were no extras passed to the GameActivity. That could be bad.");
         }
 
         if (mGameId == -1) {
             // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
-            Toast.makeText(this, "GameID not valid", Toast.LENGTH_LONG).show();
-            Log.e("AlterEgo::CharacterFragment", "Game ID is not valid!!!!!");
+            Toast.makeText(this, "GameID not valid", Toast.LENGTH_SHORT).show();
+            Log.e("AlterEgo::CharacterFragment", "Game ID is not valid...?");
         }
 
         // Try to find a character for this game

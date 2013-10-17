@@ -153,8 +153,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 				+ " was selected.");
 
 		Intent launchGame = new Intent(view.getContext(), GameActivity.class);
-		launchGame.putExtra((String) getResources().getText(R.string.gameid),
-				selectedGame.first);
+		launchGame.putExtra((String) getResources().getText(R.string.gameid), selectedGame.first);
 
 		MainActivity.this.startActivity(launchGame);
 	}

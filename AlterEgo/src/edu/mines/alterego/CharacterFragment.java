@@ -48,7 +48,7 @@ public class CharacterFragment extends Fragment {
 
         CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
         if (GameActivity.mCharId < 0) {
-            GameActivity.mCharId = dbHelper.getCharacterIdForGame(mGameId);
+            GameActivity.mCharId = dbHelper.getCharacterIdForGame(GameActivity.mGameId);
         }
 
         // Inflate the layout for this fragment
@@ -57,7 +57,7 @@ public class CharacterFragment extends Fragment {
 
 
         if (GameActivity.mCharId >= 0) {
-            mChar = dbHelper.getCharacter(mCharId);
+            mChar = dbHelper.getCharacter(GameActivity.mCharId);
             showCharacter();
         } else {
             // Make the no-char layout visible
@@ -87,10 +87,10 @@ public class CharacterFragment extends Fragment {
                                 String desc = descInput.getText().toString();
 
                                 CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                                CharacterData newChar = dbHelper.addCharacter(mGameId, name, desc);
+                                CharacterData newChar = dbHelper.addCharacter(GameActivity.mGameId, name, desc);
 
                                 mChar = newChar;
-                                GameActivity.mCharId = newChar.id
+                                GameActivity.mCharId = newChar.id;
 
                                 showCharacter();
 
