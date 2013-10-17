@@ -42,7 +42,9 @@
             android:id="@+id/char_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/char_name" />
+            android:text="@string/char_name" 
+            android:textSize="30sp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/char_desc"
