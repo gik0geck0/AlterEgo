@@ -56,6 +56,18 @@
             android:layout_height="wrap_content"
             android:text="@string/char_attributes" />
 
+        <ListView
+            android:id="@+id/char_stats"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/new_stat_button"
+            android:text="@string/new_stat_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30dp" />
     </LinearLayout>
 
 </LinearLayout>

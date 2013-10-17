@@ -2,37 +2,47 @@ package edu.mines.alterego;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v4.app.Fragment;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-//import android.widget.ArrayAdapter;
-//import android.widget.ListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
-//import java.util.ArrayList;
-
-import edu.mines.alterego.CharacterDBHelper;
-import edu.mines.alterego.RefreshInterface;
+/**
+ * Description: This file defines the fragment showing characters and stats
+ * @author Matt Buland, Maria Deslis, Eric Young
+ *
+ */
 
 public class CharacterFragment extends Fragment {
 
-    //int mCharId = -1;
     CharacterData mChar;
     int mGameId = -1;
     RefreshInterface mActRefresher;
     View mainView;
+    private SimpleCursorAdapter mCharStatAdapterC;
+    private Cursor statsCursor;
+    private int charID;
 
     CharacterFragment(RefreshInterface refresher) {
         super();
         mActRefresher = refresher;
     }
-
+    
+    
+    /**
+     * This function creates the fragment view and decides if it needs to show new character creation
+     * or existing characters.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -44,24 +54,30 @@ public class CharacterFragment extends Fragment {
         CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
         if (mCharId < 0) {
             mCharId = dbHelper.getCharacterIdForGame(mGameId);
+            charID = mGameId;
         }
 
         // Inflate the layout for this fragment
-        View character_view = inflater.inflate(R.layout.character_view, container, false);
-        mainView = character_view;
+        View characterView = inflater.inflate(R.layout.character_view, container, false);
+        mainView = characterView;
+        
+        //mCharStatAdapter = new ArrayAdapter<CharacterStat>();
 
         if (mCharId >= 0) {
             mChar = dbHelper.getCharacter(mCharId);
             showCharacter();
+
+           
+
         } else {
             // Make the no-char layout visible
-            LinearLayout nochar_ll = (LinearLayout) character_view.findViewById(R.id.nochar_layout);
-            nochar_ll.setVisibility(0);
+            LinearLayout nochar11 = (LinearLayout) characterView.findViewById(R.id.nochar_layout);
+            nochar11.setVisibility(0);
 
             Log.i("AlterEgo::CharFrag::Init", "Binding the click listener for create-character button");
             // Bind the new-character button to it's appropriate action
-            Button new_char = (Button) character_view.findViewById(R.id.nochar_button);
-            new_char.setOnClickListener( new Button.OnClickListener() {
+            Button newChar = (Button) characterView.findViewById(R.id.nochar_button);
+            newChar.setOnClickListener( new Button.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Spawn the create-character dialog
@@ -85,6 +101,7 @@ public class CharacterFragment extends Fragment {
                                 CharacterData newChar = dbHelper.addCharacter(mGameId, name, desc);
 
                                 mChar = newChar;
+                                charID = mChar.id;
                                 //mCharId = nChar.id;
 
                                 showCharacter();
@@ -102,17 +119,20 @@ public class CharacterFragment extends Fragment {
             });
         }
 
-        return character_view;
+        return characterView;
     }
 
+    /**
+     * This method shows character the current, or newly created character and applicable stats.
+     */
     public void showCharacter() {
         // Make the no-char layout invisible
-        LinearLayout nochar_ll = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
-        nochar_ll.setVisibility(View.GONE);
+        LinearLayout nochar11 = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
+        nochar11.setVisibility(View.GONE);
 
         // Make the character-viewing area visible
-        LinearLayout char_layout = (LinearLayout) mainView.findViewById(R.id.haschar_layout);
-        char_layout.setVisibility(View.VISIBLE);
+        LinearLayout charLayout = (LinearLayout) mainView.findViewById(R.id.haschar_layout);
+        charLayout.setVisibility(View.VISIBLE);
 
         // Show the character name and description
         TextView cName = (TextView) mainView.findViewById(R.id.char_name);
@@ -122,6 +142,50 @@ public class CharacterFragment extends Fragment {
         cDesc.setText(mChar.description);
 
         // Show all the character's attributes/skills/complications
+        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+        int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
+        statsCursor = dbHelper.getStatsForCharCursor(mChar.id);
+        mCharStatAdapterC = new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+        ListView statView = (ListView) mainView.findViewById(R.id.char_stats);
+        statView.setAdapter(mCharStatAdapterC);
+
+        
+        Button newStat = (Button) mainView.findViewById(R.id.new_stat_button);
+        newStat.setOnClickListener( new Button.OnClickListener() {
+
+         @Override
+            public void onClick(View v) {
+                // Spawn the create-character dialog
+
+                AlertDialog.Builder statBuilder = new AlertDialog.Builder(v.getContext());
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+
+                statBuilder.setView(inflater.inflate(R.layout.new_stat_dialog, null))
+                    .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            AlertDialog thisDialog = (AlertDialog) dialog;
+
+                            EditText nameInput = (EditText) thisDialog.findViewById(R.id.char_stat_name);
+                            EditText descInput = (EditText) thisDialog.findViewById(R.id.char_stat_val);
+
+                            String name = nameInput.getText().toString();
+                            String val = descInput.getText().toString();
+
+                            CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+                            dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
+                            mCharStatAdapterC.changeCursor(dbHelper.getStatsForCharCursor(mChar.id));
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        // Negative button just closes the dialog
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) { dialog.dismiss(); }
+                    });
+                statBuilder.create().show();
+            }
+        });
     }
 
 }
