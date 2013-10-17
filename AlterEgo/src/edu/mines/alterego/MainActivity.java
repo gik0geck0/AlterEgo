@@ -65,6 +65,20 @@ import android.widget.Toast;
  *           same flow: have a display; click button to add things to "display"
  *           (from database); use a dialog to get input-parameters.
  */
+
+/**
+ * 
+ * @author mdeslis
+ * GROUP POINT DISTRIBUTION, as discussed and agreed upon by the group
+ *  
+ * Matt: 45%
+ * 	Proposal, Basic Skeleton (App version 0.1):Creating a Game, Creating a Char, Fragments, Dialogues; Helped with Debugging; Commenting
+ * Maria: 20%
+ * 	Inventory Add, Notes Add, Icon (all dpi sizes), General Code Clean up and Quality Assurance, Created Context Menus for Long Press and Implemented Long Press with Edit and Delete for Games, Dialogue for Edit, disabled Landscape, tested for Bugs
+ * Eric: 35%
+ * 	Database Helper, Created Stats Layout and Connector, Initial Load for Character Data, Commenting
+ * 
+ */
 public class MainActivity extends Activity implements View.OnClickListener,
 		ListView.OnItemClickListener {
 
