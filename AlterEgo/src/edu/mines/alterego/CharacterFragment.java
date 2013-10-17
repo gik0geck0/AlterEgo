@@ -16,18 +16,19 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-//import android.widget.ArrayAdapter;
-//import android.widget.ListView;
-//import java.util.ArrayList;
+
+/**
+ * Description: This file defines the fragment showing characters and stats
+ * @author Matt Buland, Maria Deslis, Eric Young
+ *
+ */
 
 public class CharacterFragment extends Fragment {
 
-    //int mCharId = -1;
     CharacterData mChar;
     int mGameId = -1;
     RefreshInterface mActRefresher;
     View mainView;
-    //private ArrayAdapter<CharacterStat> mCharStatAdapter;
     private SimpleCursorAdapter mCharStatAdapterC;
     private Cursor statsCursor;
     private int charID;
@@ -36,7 +37,12 @@ public class CharacterFragment extends Fragment {
         super();
         mActRefresher = refresher;
     }
-
+    
+    
+    /**
+     * This function creates the fragment view and decides if it needs to show new character creation
+     * or existing characters.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,8 +58,8 @@ public class CharacterFragment extends Fragment {
         }
 
         // Inflate the layout for this fragment
-        View character_view = inflater.inflate(R.layout.character_view, container, false);
-        mainView = character_view;
+        View characterView = inflater.inflate(R.layout.character_view, container, false);
+        mainView = characterView;
         
         //mCharStatAdapter = new ArrayAdapter<CharacterStat>();
 
@@ -65,13 +71,13 @@ public class CharacterFragment extends Fragment {
 
         } else {
             // Make the no-char layout visible
-            LinearLayout nochar_ll = (LinearLayout) character_view.findViewById(R.id.nochar_layout);
-            nochar_ll.setVisibility(0);
+            LinearLayout nochar11 = (LinearLayout) characterView.findViewById(R.id.nochar_layout);
+            nochar11.setVisibility(0);
 
             Log.i("AlterEgo::CharFrag::Init", "Binding the click listener for create-character button");
             // Bind the new-character button to it's appropriate action
-            Button new_char = (Button) character_view.findViewById(R.id.nochar_button);
-            new_char.setOnClickListener( new Button.OnClickListener() {
+            Button newChar = (Button) characterView.findViewById(R.id.nochar_button);
+            newChar.setOnClickListener( new Button.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Spawn the create-character dialog
@@ -113,17 +119,20 @@ public class CharacterFragment extends Fragment {
             });
         }
 
-        return character_view;
+        return characterView;
     }
 
+    /**
+     * This method shows character the current, or newly created character and applicable stats.
+     */
     public void showCharacter() {
         // Make the no-char layout invisible
-        LinearLayout nochar_ll = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
-        nochar_ll.setVisibility(View.GONE);
+        LinearLayout nochar11 = (LinearLayout) mainView.findViewById(R.id.nochar_layout);
+        nochar11.setVisibility(View.GONE);
 
         // Make the character-viewing area visible
-        LinearLayout char_layout = (LinearLayout) mainView.findViewById(R.id.haschar_layout);
-        char_layout.setVisibility(View.VISIBLE);
+        LinearLayout charLayout = (LinearLayout) mainView.findViewById(R.id.haschar_layout);
+        charLayout.setVisibility(View.VISIBLE);
 
         // Show the character name and description
         TextView cName = (TextView) mainView.findViewById(R.id.char_name);
@@ -142,8 +151,8 @@ public class CharacterFragment extends Fragment {
         statView.setAdapter(mCharStatAdapterC);
 
         
-        Button new_stat = (Button) mainView.findViewById(R.id.new_stat_button);
-        new_stat.setOnClickListener( new Button.OnClickListener() {
+        Button newStat = (Button) mainView.findViewById(R.id.new_stat_button);
+        newStat.setOnClickListener( new Button.OnClickListener() {
 
          @Override
             public void onClick(View v) {
