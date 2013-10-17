@@ -71,11 +71,11 @@ import android.widget.Toast;
  * @author mdeslis
  * GROUP POINT DISTRIBUTION, as discussed and agreed upon by the group
  *  
- * Matt: 45%
+ * Matt: 40%
  * 	Proposal, Basic Skeleton (App version 0.1):Creating a Game, Creating a Char, Fragments, Dialogues; Helped with Debugging; Commenting
- * Maria: 20%
+ * Maria: 30%
  * 	Inventory Add, Notes Add, Icon (all dpi sizes), General Code Clean up and Quality Assurance, Created Context Menus for Long Press and Implemented Long Press with Edit and Delete for Games, Dialogue for Edit, disabled Landscape, tested for Bugs
- * Eric: 35%
+ * Eric: 30%
  * 	Database Helper, Created Stats Layout and Connector, Initial Load for Character Data, Commenting
  * 
  */
