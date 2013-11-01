@@ -29,5 +29,5 @@
             android:screenOrientation="portrait" >
         </activity>
     </application>
-
+    <uses-library android:name="com.google.android.maps" />
 </manifest>
