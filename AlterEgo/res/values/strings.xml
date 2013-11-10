@@ -80,5 +80,6 @@
     <string name="settings_import_export">Import/Export</string>
     <string name="import_map">Import Map</string>
     <string name="export_map">Export Map</string>
+    <string name="context_test_settings">Test Settings</string>
 
 </resources>
