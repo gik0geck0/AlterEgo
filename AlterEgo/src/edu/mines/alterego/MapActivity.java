@@ -18,6 +18,7 @@ public class MapActivity extends Activity {
         setContentView(R.layout.mapactivity);
 
         GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        map.setMapType(GoogleMap.MAP_TYPE_NONE);
         TileOverlayOptions opts = new TileOverlayOptions();
         opts.tileProvider(new CustomMapTileProvider(getAssets()));
 
