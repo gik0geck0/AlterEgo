@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -85,7 +84,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	ArrayAdapter<GameData> mGameDbAdapter;
 	ListView listView;
 	CharacterDBHelper mDbHelper;
-	Button newGameB;
 	
 	@SuppressLint("CutPasteId") @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,12 +102,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		ListView gameListView = (ListView) findViewById(R.id.main_game_list_view);
 		gameListView.setAdapter(mGameDbAdapter);
 		gameListView.setOnItemClickListener(this);
-
-		// Create New Game Button
-		newGameB = (Button) findViewById(R.id.main_new_game);
-
-		// Set On Click Listener for Create New Game Button
-		newGameB.setOnClickListener(this);
 
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
@@ -138,9 +130,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public void onClick(View v) {
-		if (v == newGameB) {
-			newGameDialogue();
-		}
+		
 	}
 
 	@Override
@@ -185,7 +175,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 								// CharacterDBHelper(this);
 								GameData newGame = mDbHelper.addGame(gameName);
 								mGameDbAdapter.add(newGame);
-								hideCreateNewGameButton();
 							}
 						})
 				.setNegativeButton(R.string.cancel,
@@ -232,10 +221,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 						});
 
 		editGameDialog.create().show();	
-	}
-
-	public void hideCreateNewGameButton() {
-		newGameB.setVisibility(View.GONE);
 	}
 
 	// Long Press Menu
