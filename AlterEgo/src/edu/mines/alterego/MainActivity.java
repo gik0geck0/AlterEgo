@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -65,13 +64,26 @@ import android.widget.Toast;
  *           same flow: have a display; click button to add things to "display"
  *           (from database); use a dialog to get input-parameters.
  */
+
+/**
+ * 
+ * @author mdeslis
+ * GROUP POINT DISTRIBUTION, as discussed and agreed upon by the group
+ *  
+ * Matt: 40%
+ * 	Proposal, Basic Skeleton (App version 0.1):Creating a Game, Creating a Char, Fragments, Dialogues; Helped with Debugging; Commenting
+ * Maria: 30%
+ * 	Inventory Add, Notes Add, Icon (all dpi sizes), General Code Clean up and Quality Assurance, Created Context Menus for Long Press and Implemented Long Press with Edit and Delete for Games, Dialogue for Edit, disabled Landscape, tested for Bugs
+ * Eric: 30%
+ * 	Database Helper, Created Stats Layout and Connector, Initial Load for Character Data, Commenting
+ * 
+ */
 public class MainActivity extends Activity implements View.OnClickListener,
 		ListView.OnItemClickListener {
 
 	ArrayAdapter<GameData> mGameDbAdapter;
 	ListView listView;
 	CharacterDBHelper mDbHelper;
-	Button newGameB;
 	
 	@SuppressLint("CutPasteId") @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +102,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		ListView gameListView = (ListView) findViewById(R.id.main_game_list_view);
 		gameListView.setAdapter(mGameDbAdapter);
 		gameListView.setOnItemClickListener(this);
-
-		// Create New Game Button
-		newGameB = (Button) findViewById(R.id.main_new_game);
-
-		// Set On Click Listener for Create New Game Button
-		newGameB.setOnClickListener(this);
 
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
@@ -124,9 +130,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public void onClick(View v) {
-		if (v == newGameB) {
-			newGameDialogue();
-		}
+		
 	}
 
 	@Override
@@ -139,8 +143,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 				+ " was selected.");
 
 		Intent launchGame = new Intent(view.getContext(), GameActivity.class);
-		launchGame.putExtra((String) getResources().getText(R.string.gameid),
-				selectedGame.first);
+		launchGame.putExtra((String) getResources().getText(R.string.gameid), selectedGame.first);
 
 		MainActivity.this.startActivity(launchGame);
 	}
@@ -172,7 +175,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 								// CharacterDBHelper(this);
 								GameData newGame = mDbHelper.addGame(gameName);
 								mGameDbAdapter.add(newGame);
-								hideCreateNewGameButton();
 							}
 						})
 				.setNegativeButton(R.string.cancel,
@@ -219,10 +221,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 						});
 
 		editGameDialog.create().show();	
-	}
-
-	public void hideCreateNewGameButton() {
-		newGameB.setVisibility(View.GONE);
 	}
 
 	// Long Press Menu

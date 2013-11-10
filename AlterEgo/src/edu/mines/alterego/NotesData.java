@@ -27,7 +27,7 @@ class NotesData {
     public String getDescription() { return mDescription; }
 
     // Cutoff length for displaying the description
-    public static int showableDescLength = 25;
+    public static int showableDescLength = 200;
     public String toString() {
     	int cutIndex = showableDescLength;
     	if (mDescription.length() <= cutIndex) {

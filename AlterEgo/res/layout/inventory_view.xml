@@ -15,10 +15,14 @@
 
     <Button
         android:id="@+id/newinv_button"
+<<<<<<< HEAD
         android:text="Add Item"
+=======
+        android:text="@string/inv_button"
+>>>>>>> edge
         android:layout_weight="0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp" />
+        android:textSize="25sp" />
 
 </LinearLayout>

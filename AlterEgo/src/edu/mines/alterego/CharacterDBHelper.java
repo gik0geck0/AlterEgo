@@ -220,6 +220,24 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
     /**
      * <p>
+     * Finds associated game name with character and returns game name. This will be used as the action bar title for the game activity
+     * </p>
+     * 
+     * @return game name for the given gameid
+     */
+    public String getGameNameForCharacterId(int gameId) {
+    	Cursor cursor = getReadableDatabase().rawQuery("SELECT name FROM game WHERE game.game_id =? LIMIT 1", new String[]{""+gameId});
+    	cursor.moveToFirst();
+    	if (cursor.getCount() < 1) {
+    		return "Game Not Available";
+    	} else {
+    		return cursor.getString(cursor.getColumnIndex("name"));
+    	}
+    
+    }
+    
+    /**
+     * <p>
      * Add a new character to the database for a given game, the name of the
      * character, and the character's description/backstory.
      * </p>

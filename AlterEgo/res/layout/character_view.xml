@@ -16,20 +16,20 @@
             android:id="@+id/nochar_tv"
             android:text="@string/nochar_tv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:longClickable="true"
             android:layout_weight="1"
             android:textSize="30sp" />
-
+        
         <Button
             android:id="@+id/nochar_button"
             android:text="@string/nochar_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"/>
-
-    </LinearLayout>
-
+            android:layout_weight="0"
+            android:textSize="25sp" />
+        </LinearLayout>
+            
     <LinearLayout
         android:id="@+id/haschar_layout"
         android:orientation="vertical"
@@ -41,7 +41,9 @@
             android:id="@+id/char_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/char_name" />
+            android:text="@string/char_name" 
+            android:textSize="30sp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/char_desc"
@@ -67,7 +69,8 @@
             android:text="@string/new_stat_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="30dp" />
+            android:layout_weight="0"
+            android:textSize="25sp" />
     </LinearLayout>
 
 </LinearLayout>

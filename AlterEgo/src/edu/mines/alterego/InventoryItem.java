@@ -41,7 +41,7 @@ class InventoryItem {
      */
     public String getDescription() { return mDescription; }
 
-    public static int showableDescLength = 25;
+    public static int showableDescLength = 100;
     
     public String toString() {
         int cutIndex = showableDescLength;

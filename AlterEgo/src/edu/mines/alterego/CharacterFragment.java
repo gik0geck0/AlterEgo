@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,20 +24,19 @@ import android.widget.TextView;
 
 public class CharacterFragment extends Fragment {
 
+    // Local data object to hold the character name and description
     CharacterData mChar;
-    int mGameId = -1;
     RefreshInterface mActRefresher;
     View mainView;
     private SimpleCursorAdapter mCharStatAdapterC;
     private Cursor statsCursor;
-    private int charID;
 
     CharacterFragment(RefreshInterface refresher) {
         super();
         mActRefresher = refresher;
     }
-    
-    
+
+
     /**
      * This function creates the fragment view and decides if it needs to show new character creation
      * or existing characters.
@@ -47,34 +45,24 @@ public class CharacterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mGameId = getArguments().getInt((String) getResources().getText(R.string.gameid), -1);
-        int mCharId = getArguments().getInt((String) getResources().getText(R.string.charid), -1);
-        Log.i("AlterEgo::CharFrag::Init", "Running onCreateView. Got the GameID: " + mGameId + " and the mCharId: " + mCharId);
-
         CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-        if (mCharId < 0) {
-            mCharId = dbHelper.getCharacterIdForGame(mGameId);
-            charID = mGameId;
+        if (GameActivity.mCharId < 0) {
+            GameActivity.mCharId = dbHelper.getCharacterIdForGame(GameActivity.mGameId);
         }
 
         // Inflate the layout for this fragment
         View characterView = inflater.inflate(R.layout.character_view, container, false);
         mainView = characterView;
-        
-        //mCharStatAdapter = new ArrayAdapter<CharacterStat>();
 
-        if (mCharId >= 0) {
-            mChar = dbHelper.getCharacter(mCharId);
+
+        if (GameActivity.mCharId >= 0) {
+            mChar = dbHelper.getCharacter(GameActivity.mCharId);
             showCharacter();
-
-           
-
         } else {
             // Make the no-char layout visible
             LinearLayout nochar11 = (LinearLayout) characterView.findViewById(R.id.nochar_layout);
             nochar11.setVisibility(0);
 
-            Log.i("AlterEgo::CharFrag::Init", "Binding the click listener for create-character button");
             // Bind the new-character button to it's appropriate action
             Button newChar = (Button) characterView.findViewById(R.id.nochar_button);
             newChar.setOnClickListener( new Button.OnClickListener() {
@@ -98,11 +86,10 @@ public class CharacterFragment extends Fragment {
                                 String desc = descInput.getText().toString();
 
                                 CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                                CharacterData newChar = dbHelper.addCharacter(mGameId, name, desc);
+                                CharacterData newChar = dbHelper.addCharacter(GameActivity.mGameId, name, desc);
 
                                 mChar = newChar;
-                                charID = mChar.id;
-                                //mCharId = nChar.id;
+                                GameActivity.mCharId = newChar.id;
 
                                 showCharacter();
 
@@ -150,7 +137,7 @@ public class CharacterFragment extends Fragment {
         ListView statView = (ListView) mainView.findViewById(R.id.char_stats);
         statView.setAdapter(mCharStatAdapterC);
 
-        
+
         Button newStat = (Button) mainView.findViewById(R.id.new_stat_button);
         newStat.setOnClickListener( new Button.OnClickListener() {
 

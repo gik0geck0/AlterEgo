@@ -5,6 +5,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <LinearLayout
+        android:id="@+id/nogame_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" >
+        
+        <TextView
+            android:id="@+id/nogame_tv"
+            android:text="@string/nogame_tv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textSize="30sp" />
+        
+    </LinearLayout>
+    
     <ListView
         android:id="@+id/main_game_list_view"
         android:layout_width="match_parent"
@@ -12,11 +29,4 @@
         android:layout_weight="1"
         android:longClickable="true"
         android:text="@string/main_game_list_view" />
-
-    <Button
-        android:id="@+id/main_new_game"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/main_new_game" />
 </LinearLayout>

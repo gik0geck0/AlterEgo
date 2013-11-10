@@ -10,8 +10,8 @@
 
 
     <!-- Character -->
-    <string name="nochar_tv">Create Character</string>
-    <string name="nochar_button">Make New Character</string>
+    <string name="nochar_tv">No Character Currently</string>
+    <string name="nochar_button">Create New Character</string>
     <string name="char_name">Character Name</string>
     <string name="char_desc">Character Description</string>
     <string name="char_attributes">Character Attributes</string>
@@ -23,7 +23,7 @@
 
     <!-- Inventory -->
     <string name="inventory_list">View Inventory</string>
-
+	<string name="inv_button">Add Item</string>
     <!-- Notes -->
     <string name="notes_list">View Notes</string>
     <string name="notes_add_notes">Add Note</string>
@@ -44,9 +44,10 @@
     <string name="action_settings">Settings</string>
 
     <!-- Main Activity -->
-    <string name="main_new_game">Create New Game</string>
+    <string name="nogame_tv">Press Menu To Create New Game</string>
     <string name="main_game_list_view">View Inventory</string>
-
+	<string name="main_game_section_header">Games</string>
+	
     <!-- Main Activity Menu -->
     <string name="action_new_game">Create New Game</string>
 
@@ -57,6 +58,7 @@
 
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
+    <string name="new_game_host">Host?</string>
 
     <!-- Character Stats Dialog-->
     <string name="char_stat_name_hint"> Stat Name </string>
@@ -72,5 +74,11 @@
     <string name="new_game_name">Edit Game</string>
     <string name="new_cancel">Cancel</string>
     <string name="new_edit">Edit</string>
+    
+    <!-- Settings -->
+    <string name="settings_map_details">Map Details</string>
+    <string name="settings_import_export">Import/Export</string>
+    <string name="import_map">Import Map</string>
+    <string name="export_map">Export Map</string>
 
 </resources>
