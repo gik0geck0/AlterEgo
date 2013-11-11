@@ -31,7 +31,7 @@ public class MapFragment extends Fragment {
         }
 
         // Inflate the layout for this fragment
-        View mapView = inflater.inflate(R.layout.inventory_view,
+        View mapView = inflater.inflate(R.layout.map_fragment,
                 container, false);
         
 
