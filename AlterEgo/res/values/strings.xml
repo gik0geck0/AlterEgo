@@ -74,4 +74,7 @@
     <string name="new_cancel">Cancel</string>
     <string name="new_edit">Edit</string>
 
+    <!-- Map Fragment Stuff -->
+    <string name="start_map_button">Start Map</string>
+
 </resources>

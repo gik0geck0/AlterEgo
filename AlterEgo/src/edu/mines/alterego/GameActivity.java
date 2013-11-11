@@ -192,4 +192,9 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
         Log.i("AlterEgo::GameAct::Refresh", "Re-stating the character-ID. It was " + mCharId);
     }
 
+    public void startMap(View view) {
+        Intent mapIntent = new Intent( this, MapActivity.class);
+        startActivity(mapIntent);
+    }
+
 }
