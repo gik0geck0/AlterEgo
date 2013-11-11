@@ -124,6 +124,9 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
                 	fragment = new NotesFragment();
                 	//fragment.setArguments(args);
                 	break;
+                case 3:
+                    fragment = new MapFragment();
+                    break;
                 default:
                     fragment = new DummySectionFragment();
                     //args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
@@ -136,7 +139,7 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 3;
+			return 4;
 		}
 
 		@Override
@@ -149,6 +152,8 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 				return getString(R.string.title_inventory).toUpperCase(l);
 			case 2:
 				return getString(R.string.title_notes).toUpperCase(l);
+            case 3:
+                return getString(R.string.title_map).toUpperCase(l);
 			}
 			return null;
 		}
