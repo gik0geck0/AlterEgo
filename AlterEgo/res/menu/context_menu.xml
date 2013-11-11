@@ -9,5 +9,10 @@
         android:id="@+id/context_delete"
         android:orderInCategory="200"
         android:title="@string/context_delete"/>
+    
+    <item
+        android:id="@+id/context_test_settings"
+        android:orderInCategory="300"
+        android:title="@string/context_test_settings" />
 
 </menu>
