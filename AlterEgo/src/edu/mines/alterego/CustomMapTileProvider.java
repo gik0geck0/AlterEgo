@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.Tile;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.lang.Math;
 
 public class CustomMapTileProvider implements TileProvider {
     private static final int TILE_WIDTH = 256;
@@ -45,10 +46,10 @@ public class CustomMapTileProvider implements TileProvider {
 
             return buffer.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         } catch (OutOfMemoryError e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         } finally {
             if (in != null) try { in.close(); } catch (Exception ignored) {}
@@ -57,7 +58,10 @@ public class CustomMapTileProvider implements TileProvider {
     }
 
     private String getTileFilename(int x, int y, int zoom) {
-        //return "map/" + zoom + '/' + x + '/' + y + ".png";
-        return "kittens.png";
+        Log.d("AlterEgo::CustomMapTileProvider", "Getting tile at zoom=" + zoom + " x=" + x + " y=" + y);
+        //return "MapQuest/" + zoom + '/' + x + '/' + y + ".jpg";
+        return "MapMiddleEarth/" + zoom + '/' + x + '/' + ((int) Math.pow(2, zoom) - y) + ".png";
+        //return "kittens.png";
+        //return "MiddleEarth.jpg";
     }
 }
