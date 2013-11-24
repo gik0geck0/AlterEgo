@@ -80,5 +80,8 @@
     
     <!-- Marker Dialogue -->
     <string name="marker_hint">Player Name</string>
+    <string name="marker_red">Red</string>
+    <string name="marker_blue">Blue</string>
+    <string name="marker_green">Green</string>
     
 </resources>

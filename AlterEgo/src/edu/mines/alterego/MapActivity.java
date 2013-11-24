@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -38,6 +41,8 @@ public class MapActivity extends Activity {
 			
 			@Override
 			public void onMapLongClick(final LatLng position) {
+				final CharSequence[] colors = { "RED", "GREEN", "BLUE" };
+				
 				LayoutInflater li = LayoutInflater.from(context);
 				final View v = li.inflate(R.layout.new_marker_dialog, null);
 				AlertDialog.Builder addMarker = new AlertDialog.Builder(context);
@@ -45,7 +50,7 @@ public class MapActivity extends Activity {
 				addMarker.setTitle("Add Marker");
 				addMarker.setCancelable(false);
 				addMarker.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-					
+				
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						EditText mTitle = (EditText) v.findViewById(R.id.marker_title);
@@ -53,10 +58,9 @@ public class MapActivity extends Activity {
 								.title(mTitle.getText().toString())
 								.position(position)
 								.draggable(true)
-								);
-						
-						
+								);			
 					}
+				
 				});
 				
 				addMarker.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
