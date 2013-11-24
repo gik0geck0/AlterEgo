@@ -58,6 +58,7 @@
 
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
+    <string name="game_host">Host Game?</string>
 
     <!-- Character Stats Dialog-->
     <string name="char_stat_name_hint"> Stat Name </string>
@@ -69,12 +70,15 @@
 
     <!-- Edit Dialogue -->
 
-    <!-- Dialogue Default Options -->
+    <!-- Dialogue Default Optionmarker_enter_titles -->
     <string name="new_game_name">Edit Game</string>
     <string name="new_cancel">Cancel</string>
     <string name="new_edit">Edit</string>
 
     <!-- Map Fragment Stuff -->
     <string name="start_map_button">Start Map</string>
-
+    
+    <!-- Marker Dialogue -->
+    <string name="marker_hint">Player Name</string>
+    
 </resources>

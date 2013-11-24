@@ -165,6 +165,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		// Inflate the view
 		newGameDialog
+				.setTitle("Create New Game")
 				.setView(inflater.inflate(R.layout.new_game_dialog, null))
 				.setPositiveButton(R.string.create,
 						new DialogInterface.OnClickListener() {

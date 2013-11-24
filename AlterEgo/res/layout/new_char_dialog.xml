@@ -9,7 +9,6 @@
         android:id="@+id/char_name"
         android:inputType="text"
         android:hint="@string/char_name_dial"
-        android:layout_margin="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

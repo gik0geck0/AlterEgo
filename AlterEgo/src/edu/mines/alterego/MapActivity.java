@@ -39,16 +39,15 @@ public class MapActivity extends Activity {
 			@Override
 			public void onMapLongClick(final LatLng position) {
 				LayoutInflater li = LayoutInflater.from(context);
-				final View v = li.inflate(R.layout.create_new_marker_dialogue, null);
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setView(v);
-				builder.setCancelable(false);
-				builder.setPositiveButton("Add Player", new DialogInterface.OnClickListener() {
+				final View v = li.inflate(R.layout.new_marker_dialog, null);
+				AlertDialog.Builder addMarker = new AlertDialog.Builder(context);
+				addMarker.setView(v);
+				addMarker.setTitle("Add Marker");
+				addMarker.setCancelable(false);
+				addMarker.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-				
-						
 						EditText mTitle = (EditText) v.findViewById(R.id.marker_title);
 						map.addMarker(new MarkerOptions()
 								.title(mTitle.getText().toString())
@@ -60,7 +59,7 @@ public class MapActivity extends Activity {
 					}
 				});
 				
-				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				addMarker.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -69,7 +68,7 @@ public class MapActivity extends Activity {
 					}
 				});
 				
-				AlertDialog alert = builder.create();
+				AlertDialog alert = addMarker.create();
 				alert.show();
 				
 			}
