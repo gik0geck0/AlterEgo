@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Splash Screen -->
+    <string name="splash_screen_name">AlterEgo</string>
+    <string name="splash_screen_image">AlterEgo</string>
+    
     <!--  App Name -->
     <string name="app_name">AlterEgo</string>
 
