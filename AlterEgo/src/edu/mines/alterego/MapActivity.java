@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -62,33 +60,47 @@ public class MapActivity extends Activity {
 
 								float mColor;
 
-								if (count == 0) {
-									mColor = BitmapDescriptorFactory.HUE_RED;
-								} else if (count == 1) {
-									mColor = BitmapDescriptorFactory.HUE_ORANGE;
-								} else if (count == 2) {
-									mColor = BitmapDescriptorFactory.HUE_YELLOW;
-								} else if (count == 3) {
-									mColor = BitmapDescriptorFactory.HUE_GREEN;
-								} else if (count == 4) {
-									mColor = BitmapDescriptorFactory.HUE_BLUE;
-								} else if (count == 5) {
-									mColor = BitmapDescriptorFactory.HUE_VIOLET;
-								} else if (count == 6) {
-									mColor = BitmapDescriptorFactory.HUE_AZURE;
-								} else if (count == 7) {
-									mColor = BitmapDescriptorFactory.HUE_MAGENTA;
-								} else if (count == 8) {
-									mColor = BitmapDescriptorFactory.HUE_ROSE;
-								} else if (count == 9) {
-									mColor = BitmapDescriptorFactory.HUE_CYAN;
-									count = 0;
-								} else {
-									mColor = BitmapDescriptorFactory.HUE_YELLOW;
-								}
+								
+								switch(count) {
+									case 0:
+										mColor = BitmapDescriptorFactory.HUE_RED;
+										break;
+									case 1:
+										mColor = BitmapDescriptorFactory.HUE_ORANGE;
+										break;
+									case 2:
+										mColor = BitmapDescriptorFactory.HUE_YELLOW;
+										break;
+									case 3:
+										mColor = BitmapDescriptorFactory.HUE_GREEN;
+										break;
+									case 4:
+										mColor = BitmapDescriptorFactory.HUE_BLUE;
+										break;
+									case 5:
+										mColor = BitmapDescriptorFactory.HUE_CYAN;
+										break;
+									case 6:
+										mColor = BitmapDescriptorFactory.HUE_VIOLET;
+										break;
+									case 7:
+										mColor = BitmapDescriptorFactory.HUE_MAGENTA;
+										break;
+									case 8:
+										mColor = BitmapDescriptorFactory.HUE_AZURE;
+										break;
+									case 9:
+										mColor = BitmapDescriptorFactory.HUE_ROSE;
+										count = -1;
+										break;
+									default:
+										mColor = BitmapDescriptorFactory.HUE_RED;
+										break;
+								}		
+							
 
 								if (mTitle.getText().toString().equals("")) {
-									Toast name = Toast.makeText(MapActivity.this, "Please fill player name", Toast.LENGTH_SHORT);
+									Toast name = Toast.makeText(MapActivity.this, "Required: Name", Toast.LENGTH_SHORT);
 									name.show();
 								} else {
 									map.addMarker(new MarkerOptions()

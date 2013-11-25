@@ -13,11 +13,5 @@
         android:lines="5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    
-    <CheckBox 
-        android:id="@+id/game_host"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:text="@string/game_host"/>
-
+   
 </LinearLayout>
