@@ -15,7 +15,6 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 public class MapActivity extends Activity {
@@ -34,8 +33,6 @@ public class MapActivity extends Activity {
 		map.setMapType(GoogleMap.MAP_TYPE_NONE);
 		TileOverlayOptions opts = new TileOverlayOptions();
 		opts.tileProvider(new CustomMapTileProvider(getAssets()));
-
-		TileOverlay overlay = map.addTileOverlay(opts);
 
 		// Creating onLongClickListener for user to add marker to map
 		map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {

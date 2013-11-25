@@ -24,11 +24,20 @@ public class CharacterStat {
         characterId = charId;
         statValue = statVal;
         statName = statN;
-        category = cat;
     }
 
     @Override
     public String toString() {
         return statName + " " + Integer.toString(statValue);
     }
+
+	public int getCharacterId() {
+		return characterId;
+	}
+
+
+	public int getCategory() {
+		return category;
+	}
+
 }

@@ -1,6 +1,5 @@
 package edu.mines.alterego;
 
-import android.util.Pair;
 
 /**
  * Description: This class is an abstraction layer to represent game data
