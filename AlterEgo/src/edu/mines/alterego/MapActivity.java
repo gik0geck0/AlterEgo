@@ -131,7 +131,9 @@ public class MapActivity extends Activity {
 						// grab user input for marker name
 						EditText mTitle = (EditText) mV
 								.findViewById(R.id.marker_player_title);
-
+						EditText mSnippet = (EditText) mV
+								.findViewById(R.id.marker_player_snippet);
+						
 						float mColor;
 
 						
@@ -179,6 +181,7 @@ public class MapActivity extends Activity {
 						} else {
 							map.addMarker(new MarkerOptions()
 									.title(mTitle.getText().toString())
+									.snippet(mSnippet.getText().toString())
 									.position(position)
 									.icon(BitmapDescriptorFactory
 											.defaultMarker(mColor))
@@ -221,6 +224,8 @@ public class MapActivity extends Activity {
 						// grab user input for marker name
 						EditText mTitle = (EditText)tV
 								.findViewById(R.id.marker_treasure_title);
+						EditText mSnippet = (EditText) tV
+								.findViewById(R.id.marker_treasure_snippet);
 
 						if (mTitle.getText().toString().equals("")) {
 							Toast name = Toast.makeText(MapActivity.this, "Required: Treasure Title", Toast.LENGTH_SHORT);
@@ -228,6 +233,7 @@ public class MapActivity extends Activity {
 						} else {
 							map.addMarker(new MarkerOptions()
 									.title(mTitle.getText().toString())
+									.snippet(mSnippet.getText().toString())
 									.position(position)
 									.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_treasure))
 									.draggable(true));
@@ -267,6 +273,8 @@ public class MapActivity extends Activity {
 						// grab user input for marker name
 						EditText mTitle = (EditText)eV
 								.findViewById(R.id.marker_enemy_title);
+						EditText mSnippet = (EditText) eV
+								.findViewById(R.id.marker_enemy_snippet);
 
 						if (mTitle.getText().toString().equals("")) {
 							Toast name = Toast.makeText(MapActivity.this, "Required: Enemy Type/Name", Toast.LENGTH_SHORT);
@@ -274,6 +282,7 @@ public class MapActivity extends Activity {
 						} else {
 							map.addMarker(new MarkerOptions()
 									.title(mTitle.getText().toString())
+									.snippet(mSnippet.getText().toString())
 									.position(position)
 									.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_skull))
 									.draggable(true));

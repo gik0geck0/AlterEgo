@@ -10,5 +10,11 @@
 	    android:hint="@string/marker_treasure_hint"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content" />
+	
+	<EditText
+	    android:id="@+id/marker_treasure_snippet"
+	    android:hint="@string/marker_treasure_snippet_hint"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" />
 
 </LinearLayout>

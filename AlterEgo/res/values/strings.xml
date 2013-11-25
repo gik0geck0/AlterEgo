@@ -89,11 +89,14 @@
         
     <!-- Player Marker Dialogue -->
     <string name="marker_player_hint">Player Name</string>
+    <string name="marker_player_snippet_hint">Player Descriptions</string>
     
     <!-- Treasure Marker Dialogue -->
     <string name="marker_treasure_hint">Treasure Title</string>
+    <string name="marker_treasure_snippet_hint">Treasure Descriptions</string>
     
     <!-- Enemy Marker Dialogue -->
     <string name="marker_enemy_hint">Enemy Type/Name</string>
+    <string name="marker_enemy_snippet_hint">Enemy Description</string>
     
 </resources>
