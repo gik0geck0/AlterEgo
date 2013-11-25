@@ -187,11 +187,16 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 								// CharacterDBHelper mDbHelper = new
 								// CharacterDBHelper(this);
-								GameData newGame = mDbHelper.addGame(gameName,
-										hosting);
-								mGameDbAdapter.add(newGame);
-								hideCreateNewGameButton();
-								attentionDialogue();
+								if (gameName.equals("")) {
+									Toast createGame = Toast.makeText(MainActivity.this, "Required: Game Name", Toast.LENGTH_SHORT);
+									createGame.show();
+								} else {
+									GameData newGame = mDbHelper.addGame(gameName,
+											hosting);
+									mGameDbAdapter.add(newGame);
+									hideCreateNewGameButton();
+									attentionDialogue();
+								}
 							}
 						})
 				.setNegativeButton(R.string.cancel,
@@ -223,10 +228,16 @@ public class MainActivity extends Activity implements View.OnClickListener,
 								EditText nameInput = (EditText) thisDialog
 										.findViewById(R.id.new_game_name);
 								String name = nameInput.getText().toString();
-
-								mDbHelper.updateGame(game_id, name);
-								mGameDbAdapter.clear();
-								mGameDbAdapter.addAll(mDbHelper.getGames());
+								if (name.equals("")) {
+									Toast editGame = Toast.makeText(MainActivity.this, "Required: Game Name", Toast.LENGTH_SHORT);
+									editGame.show();
+								} else {
+									mDbHelper.updateGame(game_id, name);
+									mGameDbAdapter.clear();
+									mGameDbAdapter.addAll(mDbHelper.getGames());
+									Toast editGame = Toast.makeText(MainActivity.this, "Game Edited", Toast.LENGTH_SHORT);
+									editGame.show();
+								}
 							}
 						})
 				.setNegativeButton(R.string.new_cancel,
@@ -263,8 +274,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		switch (item.getItemId()) {
 		case R.id.context_edit:
 			editGameDialogue(mGameDbAdapter.getItem(info.position).getGameId());
-
-			showToast("Game Edited");
 			return true;
 		case R.id.context_delete:
 			mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position)
