@@ -60,7 +60,7 @@
 
     <!-- Game Activity Menu -->
     <string name="action_new_character">Create New Character</string>
-	<string name="settings_info">Now that you have created a game, you can make new ones using the settings button!</string>
+	<string name="settings_info">To make more games from now on, use the menu button!</string>
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
     <string name="hosting">Host Game?</string>
