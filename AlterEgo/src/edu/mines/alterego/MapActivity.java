@@ -26,8 +26,8 @@ public class MapActivity extends Activity {
 	Context context = this;
 	int count = 0;
 	
-	private RadioGroup markerGroup;
-	private RadioButton markerButton;
+	RadioGroup markerGroup;
+	RadioButton markerButton;
 	int markerId = -1;
 
 	@Override
