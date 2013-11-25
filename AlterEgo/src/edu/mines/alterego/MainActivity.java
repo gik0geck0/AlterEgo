@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -159,7 +160,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	public void newGameDialogue() {
 		AlertDialog.Builder newGameDialog = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
-
 		// Inflate the view
 		newGameDialog
 				.setTitle("Create New Game")
@@ -179,22 +179,18 @@ public class MainActivity extends Activity implements View.OnClickListener,
 								Log.i("AlterEgos::MainAct::NewGame",
 										"Creating a game with the name "
 												+ gameName);
+
+                                CheckBox hostingCheck = (CheckBox) thisDialog
+                                        .findViewById(R.id.hosting);
+                                int hosting = hostingCheck.isChecked() ? 1 : 0;
+
 								// CharacterDBHelper mDbHelper = new
 								// CharacterDBHelper(this);
-								GameData newGame = mDbHelper.addGame(gameName);
+								GameData newGame = mDbHelper.addGame(gameName, hosting);
 								mGameDbAdapter.add(newGame);
 								hideCreateNewGameButton();
 							}
 						})
-				.setSingleChoiceItems(host, -1, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-						Toast hostCheck = Toast.makeText(MainActivity.this, "Game Master", Toast.LENGTH_SHORT);
-						hostCheck.show();
-					}
-				})
 				.setNegativeButton(R.string.cancel,
 						new DialogInterface.OnClickListener() {
 							@Override

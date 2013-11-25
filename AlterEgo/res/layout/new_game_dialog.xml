@@ -13,5 +13,9 @@
         android:lines="5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-   
+    <CheckBox
+        android:id="@+id/hosting"
+        android:text="@string/hosting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

@@ -62,6 +62,7 @@
 
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
+    <string name="hosting">Host Game?</string>
 
     <!-- Character Stats Dialog-->
     <string name="char_stat_name_hint">Stat Name</string>

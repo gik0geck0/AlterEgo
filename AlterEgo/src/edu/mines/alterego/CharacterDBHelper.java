@@ -129,11 +129,12 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
      * @param name Description for the new game
      * @return  GameData object representing the newly created Game.
      */
-    public GameData addGame(String name) {
+    public GameData addGame(String name, int hosting) {
         SQLiteDatabase database = getWritableDatabase();
 
         ContentValues gamevals = new ContentValues();
         gamevals.put("name", name);
+        gamevals.put("hosting" , hosting);
 
         long rowid = database.insert("game", null, gamevals);
         String[] args = new String[]{ ""+rowid };

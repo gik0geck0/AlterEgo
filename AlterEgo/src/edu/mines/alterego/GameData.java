@@ -39,6 +39,6 @@ class GameData {
 
     @Override
     public String toString() {
-        return gameName + (hosting == 1 ? "(GM)" : "") ;
+        return gameName + (hosting == 1 ? " (GM)" : "") ;
     }
 }
