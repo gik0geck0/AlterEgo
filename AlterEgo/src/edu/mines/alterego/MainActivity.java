@@ -92,10 +92,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		mDbHelper = new CharacterDBHelper(this);
 		ArrayList<GameData> gamePairList = mDbHelper.getGames();
-		/*
-		 * for( Pair<Integer, String> game : gamePairList) {
-		 * gameList.add(game.second); }
-		 */
 
 		mGameDbAdapter = new ArrayAdapter<GameData>(this,
 				android.R.layout.simple_list_item_1, gamePairList);
@@ -111,7 +107,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
-		registerForContextMenu(listView);		
+		registerForContextMenu(listView);
 	}
 
 	@Override
@@ -147,11 +143,11 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		GameData selectedGame = mGameDbAdapter.getItem(position);
 
 		Log.i("AlterEgos::MainAct::SelectGame", "The game with an id "
-				+ selectedGame.first + " and a name of " + selectedGame.second
+				+ selectedGame.getGameId() + " and a name of " + selectedGame.getGameName()
 				+ " was selected.");
 
 		Intent launchGame = new Intent(view.getContext(), GameActivity.class);
-		launchGame.putExtra((String) getResources().getText(R.string.gameid), selectedGame.first);
+		launchGame.putExtra((String) getResources().getText(R.string.gameid), selectedGame.getGameId());
 
 		MainActivity.this.startActivity(launchGame);
 	}
@@ -254,12 +250,12 @@ public class MainActivity extends Activity implements View.OnClickListener,
 				.getMenuInfo();
 		switch (item.getItemId()) {
 			case R.id.context_edit:
-				editGameDialogue(mGameDbAdapter.getItem(info.position).first);
+				editGameDialogue(mGameDbAdapter.getItem(info.position).getGameId());
 				
 				showToast("Game Edited");
 			return true;
 			case R.id.context_delete:
-				mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position).first);
+				mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position).getGameId());
 				mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
 				showToast("Game Deleted");
 				return true;

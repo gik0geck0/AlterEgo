@@ -9,19 +9,36 @@ import android.util.Pair;
  */
 
 
-class GameData extends Pair<Integer, String> {
+class GameData {
+    int gameId;
+    String gameName;
+    int hosting;
 
 	/**
 	 * 
 	 * @param gameId database id for the game
 	 * @param gameName name of the game
 	 */
-    GameData(Integer gameId, String gameName) {
-        super(gameId, gameName);
+    GameData(Integer gameId, String gameName, int hosting) {
+        this.gameId = gameId;
+        this.gameName = gameName;
+        this.hosting = hosting;
+    }
+
+    String getGameName() {
+        return gameName;
+    }
+
+    int getGameId() {
+        return gameId;
+    }
+
+    boolean isHosting() {
+        return (hosting == 1);
     }
 
     @Override
     public String toString() {
-        return second;
+        return gameName + (hosting == 1 ? "(GM)" : "") ;
     }
 }

@@ -25,7 +25,7 @@ import edu.mines.alterego.GameData;
 public class CharacterDBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "alterego";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     public CharacterDBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -42,6 +42,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
         database.execSQL("CREATE TABLE IF NOT EXISTS game ( " +
                 "game_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "hosting INTEGER," +
                 "name TEXT" +
                 ")");
 
@@ -109,11 +110,11 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
      * @return  ArrayList of GameData objects that hold all the games
      */
     public ArrayList<GameData> getGames() {
-        Cursor dbGames = getReadableDatabase().rawQuery("SELECT * from game", null);
+        Cursor dbGames = getReadableDatabase().rawQuery("SELECT game_id, name, hosting from game", null);
         dbGames.moveToFirst();
         ArrayList<GameData> games = new ArrayList<GameData>();
         while( !dbGames.isAfterLast()) {
-            games.add(new GameData( dbGames.getInt(0), dbGames.getString(1) ));
+            games.add(new GameData( dbGames.getInt(0), dbGames.getString(1), dbGames.getInt(2)));
             dbGames.moveToNext();
         }
         dbGames.close();
@@ -137,10 +138,10 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
         long rowid = database.insert("game", null, gamevals);
         String[] args = new String[]{ ""+rowid };
 
-        Cursor c = database.rawQuery("SELECT * FROM game WHERE game.ROWID =?", args);
+        Cursor c = database.rawQuery("SELECT game_id, name, hosting FROM game WHERE game.ROWID =?", args);
         c.moveToFirst();
 
-        return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")));
+        return new GameData(c.getInt(c.getColumnIndex("game_id")), c.getString(c.getColumnIndex("name")), c.getInt(c.getColumnIndex("hosting")));
     }
 
     /**
