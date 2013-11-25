@@ -83,6 +83,17 @@
     <string name="start_map_button">Start Map</string>
     
     <!-- Marker Dialogue -->
-    <string name="marker_hint">Player Name</string>
+    <string name="add_marker_player">Player</string>
+    <string name="add_marker_treasure">Treasure</string>
+    <string name="add_marker_enemy">Enemy</string>
+        
+    <!-- Player Marker Dialogue -->
+    <string name="marker_player_hint">Player Name</string>
+    
+    <!-- Treasure Marker Dialogue -->
+    <string name="marker_treasure_hint">Treasure Title</string>
+    
+    <!-- Enemy Marker Dialogue -->
+    <string name="marker_enemy_hint">Enemy Type/Name</string>
     
 </resources>
