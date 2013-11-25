@@ -52,11 +52,11 @@ public class MapActivity extends Activity {
 				final View mapV = mapLayI.inflate(R.layout.new_marker_dialog, null);
 				AlertDialog.Builder addMarker = new AlertDialog.Builder(context);
 				
-				markerGroup = (RadioGroup) findViewById(R.id.add_marker_group);
+				markerGroup = (RadioGroup) MapActivity.this.findViewById(R.id.add_marker_group);
 				
 				addMarker.setView(mapV);
 				addMarker.setTitle("Add Marker");
-				addMarker.setCancelable(true);
+				addMarker.setCancelable(false);
 				addMarker.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 					
 					@Override
@@ -71,6 +71,12 @@ public class MapActivity extends Activity {
 						// find the radio button by returned id
 					    markerButton = (RadioButton) findViewById(markerId);
 			 
+
+						Log.i("AlterEgos::MapAct::onMapLogClick::onClick::markerButton::", " " + markerButton);
+
+						Log.i("AlterEgos::MapAct::onMapLogClick::onClick::markerId::", " " + markerButton.getText());
+						
+					    
 						Toast.makeText(MapActivity.this,
 							markerButton.getText(), Toast.LENGTH_SHORT).show();
 						
@@ -118,7 +124,7 @@ public class MapActivity extends Activity {
 		AlertDialog.Builder addPlayer = new AlertDialog.Builder(context);
 		addPlayer.setView(mV);
 		addPlayer.setTitle("Create Player");
-		addPlayer.setCancelable(true);
+		addPlayer.setCancelable(false);
 		addPlayer.setPositiveButton("Create",
 				new DialogInterface.OnClickListener() {
 
@@ -171,7 +177,7 @@ public class MapActivity extends Activity {
 					
 
 						if (mTitle.getText().toString().equals("")) {
-							Toast name = Toast.makeText(MapActivity.this, "Required: Name", Toast.LENGTH_SHORT);
+							Toast name = Toast.makeText(MapActivity.this, "Required: Player Name", Toast.LENGTH_SHORT);
 							name.show();
 						} else {
 							map.addMarker(new MarkerOptions()
@@ -203,10 +209,94 @@ public class MapActivity extends Activity {
 	}
 	
 	public void addTreasure(final LatLng position) {
-		//TO DO
+		LayoutInflater tLayI = LayoutInflater.from(context);
+		final View tV = tLayI.inflate(R.layout.new_treasure_marker_dialog, null);
+		AlertDialog.Builder addTreasure = new AlertDialog.Builder(context);
+		addTreasure.setView(tV);
+		addTreasure.setTitle("Create Treasure");
+		addTreasure.setCancelable(false);
+		addTreasure.setPositiveButton("Create",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						// grab user input for marker name
+						EditText mTitle = (EditText)tV
+								.findViewById(R.id.marker_treasure_title);
+
+						if (mTitle.getText().toString().equals("")) {
+							Toast name = Toast.makeText(MapActivity.this, "Required: Treasure Title", Toast.LENGTH_SHORT);
+							name.show();
+						} else {
+							map.addMarker(new MarkerOptions()
+									.title(mTitle.getText().toString())
+									.position(position)
+									.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_treasure))
+									.draggable(true));
+						}
+					}
+
+				});
+
+		addTreasure.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						dialog.cancel();
+
+					}
+				});
+
+		AlertDialog alert = addTreasure.create();
+		alert.show();
 	}
 	
 	public void addEnemy(final LatLng position) {
-		//TO DO
+		LayoutInflater eLayI = LayoutInflater.from(context);
+		final View eV = eLayI.inflate(R.layout.new_enemy_marker_dialog, null);
+		AlertDialog.Builder addEnemy = new AlertDialog.Builder(context);
+		addEnemy.setView(eV);
+		addEnemy.setTitle("Create Enemy");
+		addEnemy.setCancelable(false);
+		addEnemy.setPositiveButton("Create",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						// grab user input for marker name
+						EditText mTitle = (EditText)eV
+								.findViewById(R.id.marker_enemy_title);
+
+						if (mTitle.getText().toString().equals("")) {
+							Toast name = Toast.makeText(MapActivity.this, "Required: Enemy Type/Name", Toast.LENGTH_SHORT);
+							name.show();
+						} else {
+							map.addMarker(new MarkerOptions()
+									.title(mTitle.getText().toString())
+									.position(position)
+									.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_skull))
+									.draggable(true));
+						}
+					}
+
+				});
+
+		addEnemy.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						dialog.cancel();
+
+					}
+				});
+
+		AlertDialog alert = addEnemy.create();
+		alert.show();
 	}
 }
