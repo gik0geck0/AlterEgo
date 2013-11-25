@@ -49,6 +49,7 @@
     <string name="action_settings">Settings</string>
 
     <!-- Main Activity -->
+    <string name="list_header">Games</string>
     <string name="main_new_game">Create New Game</string>
     <string name="main_game_list_view">View Inventory</string>
 

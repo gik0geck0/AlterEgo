@@ -111,7 +111,6 @@ public class MapActivity extends Activity {
 				
 			}
 		});
-
 	}
 	
 	public void addPlayer(final LatLng position) {

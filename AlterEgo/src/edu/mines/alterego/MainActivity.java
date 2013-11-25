@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
 		mDbHelper = new CharacterDBHelper(this);
 		ArrayList<GameData> gamePairList = mDbHelper.getGames();
 
@@ -112,6 +112,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
 		registerForContextMenu(listView);
+		
 	}
 
 	@Override
