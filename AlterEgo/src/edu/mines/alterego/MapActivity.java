@@ -28,7 +28,7 @@ public class MapActivity extends Activity {
 	
 	private RadioGroup markerGroup;
 	private RadioButton markerButton;
-	int markerId;
+	int markerId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +52,6 @@ public class MapActivity extends Activity {
 				final View mapV = mapLayI.inflate(R.layout.new_marker_dialog, null);
 				AlertDialog.Builder addMarker = new AlertDialog.Builder(context);
 				
-				markerGroup = (RadioGroup) MapActivity.this.findViewById(R.id.add_marker_group);
-				
 				addMarker.setView(mapV);
 				addMarker.setTitle("Add Marker");
 				addMarker.setCancelable(false);
@@ -61,39 +59,38 @@ public class MapActivity extends Activity {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Log.i("AlterEgos::MapAct::onMapLogClick::onClick", "AlertDialog Created");
+//						Log.i("AlterEgos::MapAct::onMapLongClick::onClick", "AlertDialog Created");
+						AlertDialog groupDialog = (AlertDialog) dialog;
 						
-					    // get selected radio button from radioGroup
-						markerId = markerGroup.getCheckedRadioButtonId();
-						
-						Log.i("AlterEgos::MapAct::onMapLogClick::onClick::markerId::", " " + markerId);
-						
-						// find the radio button by returned id
-					    markerButton = (RadioButton) findViewById(markerId);
-			 
-
-						Log.i("AlterEgos::MapAct::onMapLogClick::onClick::markerButton::", " " + markerButton);
-
-						Log.i("AlterEgos::MapAct::onMapLogClick::onClick::markerId::", " " + markerButton.getText());
+						markerGroup = (RadioGroup) groupDialog.findViewById(R.id.add_marker_group);
+//						Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerGroup", " markerGroup " + markerGroup);
+//						Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerId::BEFORE::", " markerId Before " + markerId);
+//						
+//					    // get selected radio button from radioGroup
+					    markerId = markerGroup.getCheckedRadioButtonId();
+//						Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerId::AFTER::", " markerId After " + markerId);
 						
 					    
-						Toast.makeText(MapActivity.this,
-							markerButton.getText(), Toast.LENGTH_SHORT).show();
+						// find the radio button by returned id
+					    markerButton = (RadioButton) groupDialog.findViewById(markerId);
+//					    Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerButton::", " markerButton " + markerButton);
+//						Toast.makeText(MapActivity.this,
+//							markerButton.getText(), Toast.LENGTH_SHORT).show();
 						
-//						switch (markerId) {
-//							case R.id.add_marker_player:
-//								addPlayer(position);
-//								break;
-//							case R.id.add_marker_treasure:
-//								addTreasure(position);
-//								break;
-//							case R.id.add_marker_enemy:
-//								addEnemy(position);
-//								break;
-//							default:
-//								Toast.makeText(MapActivity.this, "Nothing Selected", Toast.LENGTH_SHORT).show();
-//								break;
-//						}
+						switch (markerId) {
+							case R.id.add_marker_player:
+								addPlayer(position);
+								break;
+							case R.id.add_marker_treasure:
+								addTreasure(position);
+								break;
+							case R.id.add_marker_enemy:
+								addEnemy(position);
+								break;
+							default:
+								Toast.makeText(MapActivity.this, "Nothing Selected", Toast.LENGTH_SHORT).show();
+								break;
+						}
 					}
 				});
 				
