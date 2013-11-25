@@ -16,14 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import edu.mines.alterego.RefreshInterface;
+
 /**
  * This activity holds a view-flipper to each of the different components of a
  * game. Right now, there are only 3 parts (staticly defined): Character,
- * Inventory, and Notes. The GameActivity also serves as a unifying data-instructor
- * for the fragments. This activity instructs the fragments which game and character
- * id to use.
- *
+ * Inventory, and Notes. The GameActivity also serves as a unifying
+ * data-instructor for the fragments. This activity instructs the fragments
+ * which game and character id to use.
+ * 
  * @author: Matt Buland, Maria Deslis, Eric Young
  */
 public class GameActivity extends FragmentActivity implements RefreshInterface {
@@ -41,42 +41,54 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 	 */
 	ViewPager mViewPager;
 
-    public static int mGameId = -1;
-    public static int mCharId = -1;
+	public static int mGameId = -1;
+	public static int mCharId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.game_activity);
-		
+
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		mSectionsPagerAdapter = new SectionsPagerAdapter(
+				getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        // Grab the gameId from the starting activity (should be MainActivity)
-        Intent i = getIntent();
-        Bundle extras = i.getExtras();
-        if (extras != null) {
-            mGameId = extras.getInt((String) getResources().getText(R.string.gameid), -1);
-            Log.i("AlterEgo::GameActivity::Init", "The gameid passed from the MainActivity was " + mGameId);
-        } else {
-            mGameId = -1;
-            Log.i("AlterEgo::GameActivity::Init", "There were no extras passed to the GameActivity. That could be bad.");
-        }
+		// Grab the gameId from the starting activity (should be MainActivity)
+		Intent i = getIntent();
+		Bundle extras = i.getExtras();
+		if (extras != null) {
+			mGameId = extras.getInt(
+					(String) getResources().getText(R.string.gameid), -1);
+			Log.i("AlterEgo::GameActivity::Init",
+					"The gameid passed from the MainActivity was " + mGameId);
+		} else {
+			mGameId = -1;
+			Log.i("AlterEgo::GameActivity::Init",
+					"There were no extras passed to the GameActivity. That could be bad.");
+		}
 
-        if (mGameId == -1) {
-            // Yes, this is annoying, but it'll make an error VERY obvious. In testing, I have never seen this toast/error message. But ya never know
-            Toast.makeText(this, "GameID not valid", Toast.LENGTH_SHORT).show();
-            Log.e("AlterEgo::CharacterFragment", "Game ID is not valid...?");
-        }
+		if (mGameId == -1) {
+			// Yes, this is annoying, but it'll make an error VERY obvious. In
+			// testing, I have never seen this toast/error message. But ya never
+			// know
+			Toast.makeText(this, "GameID not valid", Toast.LENGTH_SHORT).show();
+			Log.e("AlterEgo::CharacterFragment", "Game ID is not valid...?");
+		}
 
-        // Try to find a character for this game
-        CharacterDBHelper dbhelper = new CharacterDBHelper(this);
-        mCharId = dbhelper.getCharacterIdForGame(mGameId);
+
+		// Grab game name for character
+		// Try to find a character for this game
+		CharacterDBHelper dbhelper = new CharacterDBHelper(this);
+		mCharId = dbhelper.getCharacterIdForGame(mGameId);
+		setTitle(dbhelper.getGameNameForCharacterId(mGameId));
+
+		// Try to find a character for this game
+		mCharId = dbhelper.getCharacterIdForGame(mGameId);
 
 	}
 
@@ -102,36 +114,42 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
 
-            // Create a bundle to hold the gameId and charId for the fragment
-            //Bundle args = new Bundle();
-            //args.putInt((String) getResources().getText(R.string.gameid), mGameId);
-            //args.putInt((String) getResources().getText(R.string.charid), mCharId);
-            Log.i("AlterEgo::GameActivity::getItem", "Spawning a new fragment with game=" + mGameId + " and char=" + mCharId);
+			// Create a bundle to hold the gameId and charId for the fragment
+			// Bundle args = new Bundle();
+			// args.putInt((String) getResources().getText(R.string.gameid),
+			// mGameId);
+			// args.putInt((String) getResources().getText(R.string.charid),
+			// mCharId);
+			Log.i("AlterEgo::GameActivity::getItem",
+					"Spawning a new fragment with game=" + mGameId
+							+ " and char=" + mCharId);
 
-            // Get a fragment to be used
-            Fragment fragment;
-            switch(position) {
-                case 0:
-                    // CharacterFragment needs a call-back to the refresh button (in case a character is added)
-                    fragment = new CharacterFragment(GameActivity.this);
-                    //fragment.setArguments(args);
-                    break;
-                case 1:
-                    fragment = new InventoryFragment();
-                    //fragment.setArguments(args);
-                    break;
-                case 2:
-                	fragment = new NotesFragment();
-                	//fragment.setArguments(args);
-                	break;
-                case 3:
-                    fragment = new MapFragment();
-                    break;
-                default:
-                    fragment = new DummySectionFragment();
-                    //args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-                    //fragment.setArguments(args);
-            }
+			// Get a fragment to be used
+			Fragment fragment;
+			switch (position) {
+			case 0:
+				// CharacterFragment needs a call-back to the refresh button (in
+				// case a character is added)
+				fragment = new CharacterFragment(GameActivity.this);
+				// fragment.setArguments(args);
+				break;
+			case 1:
+				fragment = new InventoryFragment();
+				// fragment.setArguments(args);
+				break;
+			case 2:
+				fragment = new NotesFragment();
+				// fragment.setArguments(args);
+				break;
+			case 3:
+				fragment = new MapFragment();
+				break;
+			default:
+				fragment = new DummySectionFragment();
+				// args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position
+				// + 1);
+				// fragment.setArguments(args);
+			}
 
 			return fragment;
 		}
@@ -152,8 +170,8 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 				return getString(R.string.title_inventory).toUpperCase(l);
 			case 2:
 				return getString(R.string.title_notes).toUpperCase(l);
-            case 3:
-                return getString(R.string.title_map).toUpperCase(l);
+			case 3:
+				return getString(R.string.title_map).toUpperCase(l);
 			}
 			return null;
 		}
@@ -174,7 +192,8 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
 					container, false);
 			TextView dummyTextView = (TextView) rootView
@@ -185,16 +204,17 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		}
 	}
 
-    @Override
-    public void refresh() {
-        CharacterDBHelper dbhelper = new CharacterDBHelper(this);
-        mCharId = dbhelper.getCharacterIdForGame(mGameId);
-        Log.i("AlterEgo::GameAct::Refresh", "Re-stating the character-ID. It was " + mCharId);
-    }
+	@Override
+	public void refresh() {
+		CharacterDBHelper dbhelper = new CharacterDBHelper(this);
+		mCharId = dbhelper.getCharacterIdForGame(mGameId);
+		Log.i("AlterEgo::GameAct::Refresh",
+				"Re-stating the character-ID. It was " + mCharId);
+	}
 
-    public void startMap(View view) {
-        Intent mapIntent = new Intent( this, MapActivity.class);
-        startActivity(mapIntent);
-    }
+	public void startMap(View view) {
+		Intent mapIntent = new Intent(this, MapActivity.class);
+		startActivity(mapIntent);
+	}
 
 }
