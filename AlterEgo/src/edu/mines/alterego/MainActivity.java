@@ -85,6 +85,9 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	CharacterDBHelper mDbHelper;
 	Button newGameB;
 	
+	// Host Game Checkbox
+	final CharSequence[] host = {"Host Game?"};
+			
 	@SuppressLint("CutPasteId") @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -187,6 +190,15 @@ public class MainActivity extends Activity implements View.OnClickListener,
 								hideCreateNewGameButton();
 							}
 						})
+				.setSingleChoiceItems(host, -1, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						Toast hostCheck = Toast.makeText(MainActivity.this, "Game Master", Toast.LENGTH_SHORT);
+						hostCheck.show();
+					}
+				})
 				.setNegativeButton(R.string.cancel,
 						new DialogInterface.OnClickListener() {
 							@Override
