@@ -273,17 +273,17 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		switch (item.getItemId()) {
-		case R.id.context_edit:
-			editGameDialogue(mGameDbAdapter.getItem(info.position).getGameId());
-			return true;
-		case R.id.context_delete:
-			mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position)
-					.getGameId());
-			mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
-			showToast("Game Deleted");
-			return true;
-		default:
-			return super.onContextItemSelected(item);
+			case R.id.context_edit:
+				editGameDialogue(mGameDbAdapter.getItem(info.position).getGameId());
+				return true;
+			case R.id.context_delete:
+				mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position)
+						.getGameId());
+				mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
+				showToast("Game Deleted");
+				return true;
+			default:
+				return super.onContextItemSelected(item);
 		}
 	}
 
@@ -292,9 +292,9 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		final View aV = attLI.inflate(R.layout.dialog_use_settings, null);
 		AlertDialog.Builder useSettings = new AlertDialog.Builder(this);
 		useSettings.setView(aV);
-		useSettings.setTitle("Remember!");
+		useSettings.setTitle("REMEMBER");
 		useSettings.setCancelable(false);
-		useSettings.setNegativeButton("Got it!",
+		useSettings.setNegativeButton("Got it, thanks!",
 				new DialogInterface.OnClickListener() {
 
 					@Override
