@@ -8,12 +8,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlay;
@@ -21,8 +19,10 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 
 public class MapActivity extends Activity {
 	
+	TileOverlay overlay;
 	GoogleMap map;
 	Context context = this ;
+	int count = 0;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,15 +34,13 @@ public class MapActivity extends Activity {
         TileOverlayOptions opts = new TileOverlayOptions();
         opts.tileProvider(new CustomMapTileProvider(getAssets()));
 
-        TileOverlay overlay = map.addTileOverlay(opts);
+        overlay = map.addTileOverlay(opts);
  
         // Creating onLongClickListener for user to add marker to map      
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 			
 			@Override
 			public void onMapLongClick(final LatLng position) {
-				final CharSequence[] colors = { "RED", "GREEN", "BLUE" };
-				
 				LayoutInflater li = LayoutInflater.from(context);
 				final View v = li.inflate(R.layout.new_marker_dialog, null);
 				AlertDialog.Builder addMarker = new AlertDialog.Builder(context);
@@ -53,12 +51,46 @@ public class MapActivity extends Activity {
 				
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+						//grab user input for marker name
 						EditText mTitle = (EditText) v.findViewById(R.id.marker_title);
+						float mColor;
+						
+						if (count == 0) {
+							mColor = BitmapDescriptorFactory.HUE_RED;
+						} else if (count == 1 ) {
+							mColor = BitmapDescriptorFactory.HUE_ORANGE;
+						} else if (count == 2) {
+							mColor = BitmapDescriptorFactory.HUE_YELLOW;
+						} else if (count == 3) {
+							mColor = BitmapDescriptorFactory.HUE_GREEN;
+						} else if (count == 4) {
+							mColor = BitmapDescriptorFactory.HUE_BLUE;
+						} else if (count == 5) {
+							mColor = BitmapDescriptorFactory.HUE_VIOLET;
+						} else if (count == 6) {
+							mColor = BitmapDescriptorFactory.HUE_AZURE;
+						} else if (count == 7) {
+							mColor = BitmapDescriptorFactory.HUE_MAGENTA;
+						} else if (count == 8) {
+							mColor = BitmapDescriptorFactory.HUE_ROSE;
+						} else if (count == 9) {
+							mColor = BitmapDescriptorFactory.HUE_CYAN;
+						} else {
+							mColor = BitmapDescriptorFactory.HUE_YELLOW;
+						}
+					
 						map.addMarker(new MarkerOptions()
 								.title(mTitle.getText().toString())
 								.position(position)
+								.icon(BitmapDescriptorFactory.defaultMarker(mColor))
 								.draggable(true)
-								);			
+								);
+						
+						if (mColor > 9) {
+							count = 0;
+						} else {
+							count++;
+						}
 					}
 				
 				});
@@ -77,7 +109,6 @@ public class MapActivity extends Activity {
 				
 			}
 		});
-    
     }
 }
 
