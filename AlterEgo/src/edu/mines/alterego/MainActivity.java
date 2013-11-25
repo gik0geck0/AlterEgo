@@ -2,6 +2,9 @@ package edu.mines.alterego;
 
 import java.util.ArrayList;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -69,14 +72,12 @@ import android.widget.Toast;
 
 /**
  * 
- * @author mdeslis
- * GROUP POINT DISTRIBUTION, as discussed and agreed upon by the group
- *  
- *
- * Matt: 1/3
- * Maria: 1/3
- * Eric: 1/3
- *
+ * @author mdeslis GROUP POINT DISTRIBUTION, as discussed and agreed upon by the
+ *         group
+ * 
+ * 
+ *         Matt: 1/3 Maria: 1/3 Eric: 1/3
+ * 
  */
 public class MainActivity extends Activity implements View.OnClickListener,
 		ListView.OnItemClickListener {
@@ -85,15 +86,16 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	ListView listView;
 	CharacterDBHelper mDbHelper;
 	Button newGameB;
-	
+
 	// Host Game Checkbox
-	final CharSequence[] host = {"Host Game?"};
-			
-	@SuppressLint("CutPasteId") @Override
+	final CharSequence[] host = { "Host Game?" };
+
+	@SuppressLint("CutPasteId")
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		mDbHelper = new CharacterDBHelper(this);
 		ArrayList<GameData> gamePairList = mDbHelper.getGames();
 
@@ -112,7 +114,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
 		registerForContextMenu(listView);
-		
 	}
 
 	@Override
@@ -147,12 +148,14 @@ public class MainActivity extends Activity implements View.OnClickListener,
 			long id) {
 		GameData selectedGame = mGameDbAdapter.getItem(position);
 
-		Log.i("AlterEgos::MainAct::SelectGame", "The game with an id "
-				+ selectedGame.getGameId() + " and a name of " + selectedGame.getGameName()
-				+ " was selected.");
+		Log.i("AlterEgos::MainAct::SelectGame",
+				"The game with an id " + selectedGame.getGameId()
+						+ " and a name of " + selectedGame.getGameName()
+						+ " was selected.");
 
 		Intent launchGame = new Intent(view.getContext(), GameActivity.class);
-		launchGame.putExtra((String) getResources().getText(R.string.gameid), selectedGame.getGameId());
+		launchGame.putExtra((String) getResources().getText(R.string.gameid),
+				selectedGame.getGameId());
 
 		MainActivity.this.startActivity(launchGame);
 	}
@@ -181,15 +184,17 @@ public class MainActivity extends Activity implements View.OnClickListener,
 										"Creating a game with the name "
 												+ gameName);
 
-                                CheckBox hostingCheck = (CheckBox) thisDialog
-                                        .findViewById(R.id.hosting);
-                                int hosting = hostingCheck.isChecked() ? 1 : 0;
+								CheckBox hostingCheck = (CheckBox) thisDialog
+										.findViewById(R.id.hosting);
+								int hosting = hostingCheck.isChecked() ? 1 : 0;
 
 								// CharacterDBHelper mDbHelper = new
 								// CharacterDBHelper(this);
-								GameData newGame = mDbHelper.addGame(gameName, hosting);
+								GameData newGame = mDbHelper.addGame(gameName,
+										hosting);
 								mGameDbAdapter.add(newGame);
 								hideCreateNewGameButton();
+								attentionDialogue();
 							}
 						})
 				.setNegativeButton(R.string.cancel,
@@ -203,7 +208,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		newGameDialog.create().show();
 	}
-	
+
 	public void editGameDialogue(final int game_id) {
 		AlertDialog.Builder editGameDialog = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
@@ -217,13 +222,14 @@ public class MainActivity extends Activity implements View.OnClickListener,
 							public void onClick(DialogInterface dialog, int id) {
 								// Perceive this dialog as an AlertDialog
 								AlertDialog thisDialog = (AlertDialog) dialog;
-								 
-								EditText nameInput = (EditText) thisDialog.findViewById(R.id.new_game_name);
+
+								EditText nameInput = (EditText) thisDialog
+										.findViewById(R.id.new_game_name);
 								String name = nameInput.getText().toString();
-								
+
 								mDbHelper.updateGame(game_id, name);
 								mGameDbAdapter.clear();
-								mGameDbAdapter.addAll( mDbHelper.getGames() );
+								mGameDbAdapter.addAll(mDbHelper.getGames());
 							}
 						})
 				.setNegativeButton(R.string.new_cancel,
@@ -235,7 +241,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 							}
 						});
 
-		editGameDialog.create().show();	
+		editGameDialog.create().show();
 	}
 
 	public void hideCreateNewGameButton() {
@@ -258,23 +264,46 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		switch (item.getItemId()) {
-			case R.id.context_edit:
-				editGameDialogue(mGameDbAdapter.getItem(info.position).getGameId());
-				
-				showToast("Game Edited");
+		case R.id.context_edit:
+			editGameDialogue(mGameDbAdapter.getItem(info.position).getGameId());
+
+			showToast("Game Edited");
 			return true;
-			case R.id.context_delete:
-				mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position).getGameId());
-				mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
-				showToast("Game Deleted");
-				return true;
-			default:
-				return super.onContextItemSelected(item);
+		case R.id.context_delete:
+			mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position)
+					.getGameId());
+			mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
+			showToast("Game Deleted");
+			return true;
+		default:
+			return super.onContextItemSelected(item);
 		}
 	}
 
+	public void attentionDialogue() {
+		LayoutInflater attLI = LayoutInflater.from(this);
+		final View aV = attLI.inflate(R.layout.dialog_use_settings, null);
+		AlertDialog.Builder useSettings = new AlertDialog.Builder(this);
+		useSettings.setView(aV);
+		useSettings.setTitle("Remember!");
+		useSettings.setCancelable(false);
+		useSettings.setNegativeButton("Got it!",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+
+					}
+				});
+
+		AlertDialog alert = useSettings.create();
+		alert.show();
+	}
+
 	public void showToast(String message) {
-		Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+		Toast toast = Toast.makeText(getApplicationContext(), message,
+				Toast.LENGTH_SHORT);
 		toast.show();
 	}
 }
