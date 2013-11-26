@@ -53,6 +53,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				+ "marker_name TEXT, " + "marker_description TEXT, "
 				+ "marker_type INTEGER, " + "marker_lat FLOAT, "
 				+ "marker_long FLOAT, " + "map_id INTEGER, "
+				+ "marker_color FLOAT, "
 				+ "FOREIGN KEY(map_id) REFERENCES map(map_id)" + ")");
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS game ( "
@@ -193,7 +194,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 */
 	public MarkerData addDBMarker(String marker_name,
 			String marker_description, double marker_lat, double marker_long,
-			MARKERTYPE marker_type, int map_id) {
+			MARKERTYPE marker_type, int map_id, float color) {
 		SQLiteDatabase database = getWritableDatabase();
 
 		ContentValues markerVals = new ContentValues();
@@ -203,13 +204,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		markerVals.put("marker_long", marker_long);
 		markerVals.put("marker_type", marker_type.getValue());
 		markerVals.put("map_id", map_id);
+		markerVals.put("marker_color", color);
 
 		long rowid = database.insert("marker", null, markerVals);
 		String[] args = new String[] { "" + rowid };
 
 		Cursor c = database
 				.rawQuery(
-						"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type"
+						"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type, marker_color"
 								+ " FROM marker" + " WHERE marker_id=?", args);
 		c.moveToFirst();
 
@@ -217,8 +219,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				c.getString(c.getColumnIndex("marker_name")), c.getString(c
 						.getColumnIndex("marker_description")),
 				MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
-				c.getDouble(c.getColumnIndex("marker_lat")), c.getDouble(c
-						.getColumnIndex("marker_long")));
+				c.getDouble(c.getColumnIndex("marker_lat")), c.getDouble(c.getColumnIndex("marker_long")), c.getFloat(c.getColumnIndex("marker_color")));
 	}
 
 	/**
@@ -260,7 +261,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 						.getColumnIndex("marker_description")),
 				MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
 				c.getDouble(c.getColumnIndex("marker_lat")), c.getDouble(c
-						.getColumnIndex("marker_long"))));
+						.getColumnIndex("marker_long")), c.getFloat(c.getColumnIndex("marker_color"))));
 			c.moveToNext();
 		}
 		return markers;

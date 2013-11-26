@@ -141,7 +141,7 @@ public class MapActivity extends Activity {
 		for (MarkerData m : markerList) {
 			BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
 			if(m.marker_type == MARKERTYPE.PLAYER) {
-				icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+				icon = BitmapDescriptorFactory.defaultMarker(m.marker_color);
 			} else if (m.marker_type == MARKERTYPE.TREASURE) {
 				icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_treasure);
 			} else {
@@ -234,7 +234,7 @@ public class MapActivity extends Activity {
 									.draggable(true));
 							mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
-									MARKERTYPE.PLAYER, gameID);
+									MARKERTYPE.PLAYER, gameID, mColor);
 							count++;
 						}
 					}
@@ -293,7 +293,7 @@ public class MapActivity extends Activity {
 									.draggable(true));
 							mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
-									MARKERTYPE.TREASURE, gameID);
+									MARKERTYPE.TREASURE, gameID, -1);
 
 						}
 					}
@@ -350,7 +350,7 @@ public class MapActivity extends Activity {
 									.draggable(true));
 							mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
-									MARKERTYPE.ENEMY, gameID);
+									MARKERTYPE.ENEMY, gameID, -1);
 						}
 					}
 

@@ -9,6 +9,7 @@ class MarkerData {
     public MARKERTYPE marker_type;
     public double marker_lat;
     public double marker_long;
+    public float marker_color;
 
     /**
      * <p>
@@ -25,13 +26,14 @@ class MarkerData {
      * @param long :: marker longitude
      * 
      */
-    MarkerData(int mapId, String name, String description, MARKERTYPE type, double latitude, double longitude) {
+    MarkerData(int mapId, String name, String description, MARKERTYPE type, double latitude, double longitude, float color) {
        map_id=mapId;
        marker_name=name;
        marker_description=description;
        marker_type=type;
        marker_lat=latitude;
        marker_long=longitude;
+       marker_color = color;
     }
 
     
