@@ -33,6 +33,7 @@ public class MapActivity extends Activity {
 	RadioGroup markerGroup;
 	RadioButton markerButton;
 	int markerId = -1;
+	private int gameID = -1;
 
 	// enum for marker types
 	public enum MARKERTYPE {
@@ -57,7 +58,7 @@ public class MapActivity extends Activity {
 		setContentView(R.layout.mapactivity);
 
 		Intent intent = getIntent();
-		int gameID = intent.getIntExtra(GameActivity.GAME_ID, -1);
+		gameID = intent.getIntExtra(GameActivity.GAME_ID, -1);
 
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
@@ -135,7 +136,7 @@ public class MapActivity extends Activity {
 		mDbHelper = new CharacterDBHelper(this);
 		Log.i("AlterEgo::MapAct::gameId", "gameId " + gameID);
 		ArrayList<MarkerData> markerList = mDbHelper.loadMarkers(gameID);
-		
+		Log.i("ALTEREGO::MAPACT::markerList", Integer.toString(markerList.size() ));
 		for (MarkerData m : markerList) {
 			BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
 			if(m.marker_type == MARKERTYPE.PLAYER) {
@@ -232,7 +233,7 @@ public class MapActivity extends Activity {
 									.draggable(true));
 							mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
-									MARKERTYPE.PLAYER);
+									MARKERTYPE.PLAYER, gameID);
 							count++;
 						}
 					}
@@ -291,7 +292,7 @@ public class MapActivity extends Activity {
 									.draggable(true));
 							mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
-									MARKERTYPE.TREASURE);
+									MARKERTYPE.TREASURE, gameID);
 
 						}
 					}
@@ -348,7 +349,7 @@ public class MapActivity extends Activity {
 									.draggable(true));
 							mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
-									MARKERTYPE.ENEMY);
+									MARKERTYPE.ENEMY, gameID);
 						}
 					}
 

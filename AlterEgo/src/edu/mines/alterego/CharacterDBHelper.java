@@ -193,7 +193,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 */
 	public MarkerData addDBMarker(String marker_name,
 			String marker_description, double marker_lat, double marker_long,
-			MARKERTYPE marker_type) {
+			MARKERTYPE marker_type, int map_id) {
 		SQLiteDatabase database = getWritableDatabase();
 
 		ContentValues markerVals = new ContentValues();
@@ -202,6 +202,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		markerVals.put("marker_lat", marker_lat);
 		markerVals.put("marker_long", marker_long);
 		markerVals.put("marker_type", marker_type.getValue());
+		markerVals.put("map_id", map_id);
 
 		long rowid = database.insert("marker", null, markerVals);
 		String[] args = new String[] { "" + rowid };
@@ -245,12 +246,15 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	public ArrayList<MarkerData> loadMarkers(int mapId) {
 		SQLiteDatabase database = getReadableDatabase();
 
-		Cursor c = database.rawQuery("SELECT * FROM marker WHERE marker.map_id=?", new String[] { "" + mapId });
+		String[] args = { Integer.toString(mapId) };
+		Cursor c = database.rawQuery("SELECT * FROM marker INNER JOIN map on map.map_id = marker.map_id WHERE game_id=?", args);
+		//Cursor c = database.rawQuery("SELECT * FROM marker", null);
 		c.moveToFirst();
-		
+		Log.i("AlterEgo::CharacterDBHelper", "loadMarkers: mapId: " + Integer.toString(mapId));
 		ArrayList<MarkerData> markers = new ArrayList<MarkerData>();
 		
 		while(!c.isAfterLast()) {
+			Log.i("AlterEgo::CharacterDBHelper", "Inside while loop");
 			markers.add(new MarkerData(c.getInt(c.getColumnIndex("marker_id")),
 				c.getString(c.getColumnIndex("marker_name")), c.getString(c
 						.getColumnIndex("marker_description")),
