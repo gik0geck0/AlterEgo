@@ -144,7 +144,7 @@ public class MapActivity extends Activity {
 			} else if (m.marker_type == MARKERTYPE.TREASURE) {
 				icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_treasure);
 			} else {
-				
+				icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_skull);
 			}
 			map.addMarker(new MarkerOptions()
 					.title(m.marker_name)
