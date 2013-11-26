@@ -38,8 +38,10 @@ public class MapActivity extends Activity {
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
 		map.setMapType(GoogleMap.MAP_TYPE_NONE);
+
 		TileOverlayOptions opts = new TileOverlayOptions();
 		opts.tileProvider(new CustomMapTileProvider(getAssets()));
+        map.addTileOverlay(opts);
 
 		// Creating onLongClickListener for user to add marker to map
 		map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {

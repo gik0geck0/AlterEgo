@@ -6,7 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import edu.mines.alterego.TCPClient;
 
 /**
  * Description: This class defines the functionality for the map fragment.
@@ -15,8 +19,8 @@ import android.widget.Toast;
  *
  */
 
-public class MapFragment extends Fragment {
-    
+public class MapFragment extends Fragment implements TCPClient.OnMessageReceived {
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -33,8 +37,24 @@ public class MapFragment extends Fragment {
         // Inflate the layout for this fragment
         View mapView = inflater.inflate(R.layout.map_fragment,
                 container, false);
-        
+
+        final EditText msgEdit = (EditText) mapView.findViewById(R.id.message_edit);
+        final Button sendMsg = (Button) mapView.findViewById(R.id.send_msg);
+
+        final TCPClient tcpClient = new TCPClient(this);
+
+        sendMsg.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                tcpClient.sendMessage(msgEdit.getText().toString());
+            }
+        });
 
         return mapView;
+    }
+
+    @Override
+    public void messageReceived(String message) {
+        Log.d("AlterEgo::MapFragment::Msging", "Message received: " + message);
     }
 }

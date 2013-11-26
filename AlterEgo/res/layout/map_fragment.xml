@@ -10,8 +10,20 @@
         android:text="@string/start_map_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:onClick="startMap" />
+        android:textSize="25sp" />
 
+    <EditText
+        android:id="@+id/message_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        />
+
+    <Button
+        android:id="@+id/send_msg"
+        android:text="Send Message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp" />
 
 </LinearLayout>
