@@ -43,8 +43,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		database.execSQL("CREATE TABLE IF NOT EXISTS map ("
 				+ "map_id INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ "game_id INTEGER, "
-				+ "FOREIGN KEY(game_id) REFERENCES game(game_id)"
-				+ ")");
+				+ "FOREIGN KEY(game_id) REFERENCES game(game_id)" + ")");
 
 		// marker_type 1 = player
 		// marker_type 2 = treasure
@@ -53,10 +52,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				+ "marker_id INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ "marker_name TEXT, " + "marker_description TEXT, "
 				+ "marker_type INTEGER, " + "marker_lat FLOAT, "
-				+ "marker_long FLOAT, "
-				+ "map_id INTEGER, "
-				+ "FOREIGN KEY(map_id) REFERENCES map(map_id)"
-				+ ")");
+				+ "marker_long FLOAT, " + "map_id INTEGER, "
+				+ "FOREIGN KEY(map_id) REFERENCES map(map_id)" + ")");
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS game ( "
 				+ "game_id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -194,34 +191,33 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 * </p>
 	 * 
 	 */
-	public MarkerData addDBMarker(String marker_name, String marker_description, double marker_lat,
-			double marker_long, MARKERTYPE marker_type) {
+	public MarkerData addDBMarker(String marker_name,
+			String marker_description, double marker_lat, double marker_long,
+			MARKERTYPE marker_type) {
 		SQLiteDatabase database = getWritableDatabase();
-		
+
 		ContentValues markerVals = new ContentValues();
 		markerVals.put("marker_name", marker_name);
 		markerVals.put("marker_description", marker_description);
 		markerVals.put("marker_lat", marker_lat);
 		markerVals.put("marker_long", marker_long);
 		markerVals.put("marker_type", marker_type.getValue());
-		
+
 		long rowid = database.insert("marker", null, markerVals);
 		String[] args = new String[] { "" + rowid };
-		
-		Cursor c = database.rawQuery(
-				"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type"
-				+ " FROM marker"
-				+ " WHERE marker_id=?",
-				args);
+
+		Cursor c = database
+				.rawQuery(
+						"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type"
+								+ " FROM marker" + " WHERE marker_id=?", args);
 		c.moveToFirst();
 
-		
 		return new MarkerData(c.getInt(c.getColumnIndex("marker_id")),
-				c.getString(c.getColumnIndex("marker_name")), 
-				c.getString(c.getColumnIndex("marker_description")),
+				c.getString(c.getColumnIndex("marker_name")), c.getString(c
+						.getColumnIndex("marker_description")),
 				MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
-				c.getDouble(c.getColumnIndex("marker_lat")),
-				c.getDouble(c.getColumnIndex("marker_long")));
+				c.getDouble(c.getColumnIndex("marker_lat")), c.getDouble(c
+						.getColumnIndex("marker_long")));
 	}
 
 	/**
@@ -241,6 +237,29 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		cvs.put("name", gameName);
 		String[] args = { Integer.toString(gameId) };
 		database.update("game", cvs, "game_id=?", args);
+	}
+
+	/**
+	 * 
+	 */
+	public ArrayList<MarkerData> loadMarkers(int mapId) {
+		SQLiteDatabase database = getReadableDatabase();
+
+		Cursor c = database.rawQuery("SELECT * FROM marker WHERE marker.map_id=?", new String[] { "" + mapId });
+		c.moveToFirst();
+		
+		ArrayList<MarkerData> markers = new ArrayList<MarkerData>();
+		
+		while(!c.isAfterLast()) {
+			markers.add(new MarkerData(c.getInt(c.getColumnIndex("marker_id")),
+				c.getString(c.getColumnIndex("marker_name")), c.getString(c
+						.getColumnIndex("marker_description")),
+				MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
+				c.getDouble(c.getColumnIndex("marker_lat")), c.getDouble(c
+						.getColumnIndex("marker_long"))));
+			c.moveToNext();
+		}
+		return markers;
 	}
 
 	/**

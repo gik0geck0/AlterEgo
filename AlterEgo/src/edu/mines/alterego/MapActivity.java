@@ -1,9 +1,12 @@
 package edu.mines.alterego;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -52,6 +56,9 @@ public class MapActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mapactivity);
 
+		Intent intent = getIntent();
+		int gameID = intent.getIntExtra(GameActivity.GAME_ID, -1);
+
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
 		map.setMapType(GoogleMap.MAP_TYPE_NONE);
@@ -80,31 +87,14 @@ public class MapActivity extends Activity {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// Log.i("AlterEgos::MapAct::onMapLongClick::onClick",
-								// "AlertDialog Created");
 								AlertDialog groupDialog = (AlertDialog) dialog;
 
 								markerGroup = (RadioGroup) groupDialog
 										.findViewById(R.id.add_marker_group);
-								// Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerGroup",
-								// " markerGroup " + markerGroup);
-								// Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerId::BEFORE::",
-								// " markerId Before " + markerId);
-								//
-								// // get selected radio button from radioGroup
 								markerId = markerGroup
 										.getCheckedRadioButtonId();
-								// Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerId::AFTER::",
-								// " markerId After " + markerId);
-
-								// find the radio button by returned id
 								markerButton = (RadioButton) groupDialog
 										.findViewById(markerId);
-								// Log.i("AlterEgos::MapAct::onMapLongClick::onClick::markerButton::",
-								// " markerButton " + markerButton);
-								// Toast.makeText(MapActivity.this,
-								// markerButton.getText(),
-								// Toast.LENGTH_SHORT).show();
 
 								switch (markerId) {
 								case R.id.add_marker_player:
@@ -141,8 +131,28 @@ public class MapActivity extends Activity {
 
 			}
 		});
-		
+
 		mDbHelper = new CharacterDBHelper(this);
+		Log.i("AlterEgo::MapAct::gameId", "gameId " + gameID);
+		ArrayList<MarkerData> markerList = mDbHelper.loadMarkers(gameID);
+		
+		for (MarkerData m : markerList) {
+			BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
+			if(m.marker_type == MARKERTYPE.PLAYER) {
+				icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+			} else if (m.marker_type == MARKERTYPE.TREASURE) {
+				icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_treasure);
+			} else {
+				
+			}
+			map.addMarker(new MarkerOptions()
+					.title(m.marker_name)
+					.snippet(m.marker_description)
+					.position(new LatLng(m.marker_lat,m.marker_long))
+					.icon(icon)
+					.draggable(true));
+		}
+
 	}
 
 	public void addPlayer(final LatLng position) {
@@ -220,12 +230,6 @@ public class MapActivity extends Activity {
 									.icon(BitmapDescriptorFactory
 											.defaultMarker(mColor))
 									.draggable(true));
-//							Log.i("AlterEgos::MapAct::mName","mName " + mName);
-//							Log.i("AlterEgos::MapAct::mDesc","mDesc " + mDesc);
-//							Log.i("AlterEgos::MapAct::latitude","lat " + position.latitude);
-//							Log.i("AlterEgos::MapAct::longitude","long " + position.longitude);
-//							Log.i("AlterEgos::MapAct::type","type " + MARKERTYPE.PLAYER);
-//						
 							mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
 									MARKERTYPE.PLAYER);

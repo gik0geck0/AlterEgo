@@ -43,6 +43,8 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 
 	public static int mGameId = -1;
 	public static int mCharId = -1;
+	
+	public final static String GAME_ID = "edu.mines.alterego.GAMEID";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -214,6 +216,7 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 
 	public void startMap(View view) {
 		Intent mapIntent = new Intent(this, MapActivity.class);
+		mapIntent.putExtra(GAME_ID, mGameId);
 		startActivity(mapIntent);
 	}
 
