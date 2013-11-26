@@ -2,13 +2,18 @@ package edu.mines.alterego;
 
 import java.util.Locale;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,7 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import edu.mines.alterego.RefreshInterface;
+import edu.mines.alterego.NetworkingService;
+
 /**
  * This activity holds a view-flipper to each of the different components of a
  * game. Right now, there are only 3 parts (staticly defined): Character,
@@ -78,6 +86,7 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
         CharacterDBHelper dbhelper = new CharacterDBHelper(this);
         mCharId = dbhelper.getCharacterIdForGame(mGameId);
 
+        spawnNetworking();
 	}
 
 	@Override
@@ -195,6 +204,19 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
     public void startMap(View view) {
         Intent mapIntent = new Intent( this, MapActivity.class);
         startActivity(mapIntent);
+    }
+
+    private void spawnNetworking() {
+        // Get Wireless info
+        WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager.MulticastLock multicastLock = wm.createMulticastLock("mydebuginfo");
+        multicastLock.acquire();
+        WifiInfo myWifiInfo = wm.getConnectionInfo();
+        int myIpAddr = myWifiInfo.getIpAddress();
+
+        Intent netServIntent = new Intent(this, NetworkingService.class);
+        netServIntent.putExtra("IP", myIpAddr);
+        startService(netServIntent);
     }
 
 }

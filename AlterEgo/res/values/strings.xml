@@ -99,5 +99,7 @@
     <!-- Enemy Marker Dialogue -->
     <string name="marker_enemy_hint">Enemy Type/Name</string>
     <string name="marker_enemy_snippet_hint">Enemy Description</string>
-    
+
+    <!-- Networking Strings -->
+    <string name="netservicename">Alter Ego Networking Service</string>
 </resources>
