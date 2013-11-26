@@ -12,6 +12,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.json.JSONObject;
+
 public class TCPReceiver {
 
     private String serverMessage;
@@ -23,13 +25,15 @@ public class TCPReceiver {
     MulticastSocket mSocket;
     //WifiManager mWifi;
     InetAddress groupAddr;
+    int myIp;
 
     /**
      *  Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TCPReceiver(OnMessageReceived listener, MulticastSocket sock) {
+    public TCPReceiver(OnMessageReceived listener, MulticastSocket sock, int myIp) {
         mMessageListener = listener;
         mSocket = sock;
+        this.myIp = myIp;
         //mWifi = wifi;
         try {
             groupAddr = InetAddress.getByName("228.5.6.7");
@@ -61,13 +65,33 @@ public class TCPReceiver {
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
-                    Log.e("TCP Client", "R: Waiting for incoming packets");
+                    Log.e("AlterEgo::TCPReceiver", "R: Waiting for incoming packets");
                     // Wait for incoming packets
                     byte[] buf = new byte[10000];
                     DatagramPacket recv = new DatagramPacket(buf, buf.length);
                     mSocket.receive(recv);
-                    serverMessage = new String(buf);
+                    String rawBuffer = new String(buf, 0, recv.getLength());
+                    Log.e("AlterEgo::TCPReceiver", "S: Received Message: '" + rawBuffer + "'");
 
+                    JSONObject asJson;
+
+                    try {
+                        asJson= new JSONObject(serverMessage);
+                    } catch (Exception e) {
+                        // String is not JSON. Ignore it
+                        asJson = null;
+                        serverMessage = null;
+                    }
+
+                    if (asJson != null && asJson.has("senderIP") && asJson.getInt("senderIP") != myIp) {
+                        if (asJson.isNull("body"))
+                            Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a body!");
+                        else {
+                            if (asJson.isNull("subject"))
+                                Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a subject!");
+                            serverMessage = asJson.getString("body");
+                        }
+                    }
                     if (serverMessage != null && mMessageListener != null) {
                         //call the method messageReceived from MyActivity class
                         mMessageListener.messageReceived(serverMessage);
@@ -77,7 +101,6 @@ public class TCPReceiver {
                 }
 
 
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
 
 
             } catch (Exception e) {

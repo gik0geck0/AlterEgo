@@ -12,6 +12,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.json.JSONObject;
+
 public class TCPSender {
 
     //public static final String SERVERIP = "192.168.1.82"; //your computer IP address
@@ -22,15 +24,16 @@ public class TCPSender {
     MulticastSocket mSocket;
     //WifiManager mWifi;
     InetAddress groupAddr;
+    int myIp;
 
-    byte[] mOutBuf;
     PriorityBlockingQueue<String> mInputQueue;
 
     /**
      *  Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TCPSender(MulticastSocket sock) {
+    public TCPSender(MulticastSocket sock, int myIp) {
         mSocket = sock;
+        this.myIp = myIp;
         try {
             groupAddr = InetAddress.getByName("228.5.6.7");
         } catch(Exception e) {
@@ -45,16 +48,8 @@ public class TCPSender {
     public void sendMessage(String message){
 
         if (mSocket != null) {
-            byte[] buf = message.getBytes();
-            //try {
-                mInputQueue.put(message);
+            mInputQueue.put(message);
 
-            /*
-            } catch (Exception e) {
-                Log.e("AlterEgo::TCPSender", "Bad news. An error ocurred while writing a message.");
-                e.printStackTrace();
-            }
-            */
             Log.d("AlterEgo::TCPSender", "Done.");
         }
     }
@@ -73,7 +68,6 @@ public class TCPSender {
             InetAddress groupAddr = InetAddress.getByName("228.5.6.7");
 
             try {
-                mOutBuf = new byte[1024];
                 mInputQueue = new PriorityBlockingQueue<String>();
 
                 //receive the message which the server sends back
@@ -81,15 +75,23 @@ public class TCPSender {
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
+
                     Log.d("AlterEgo::TCPSender", "Waiting for outgoing messages");
                     String message = mInputQueue.take();
 
-                    Log.d("AlterEgo::TCPSender", "Writing message: " + message);
-                    char[] buffer = message.toCharArray();
-                    CharBuffer cBuffer = ByteBuffer.wrap(mOutBuf).asCharBuffer();
-                    for(int i = 0; i < buffer.length; i++)
-                        cBuffer.put(buffer[i]);
-                    DatagramPacket send = new DatagramPacket(mOutBuf, mOutBuf.length, groupAddr, GROUPPORT);
+                    // Convert it into JSON
+                    JSONObject jsonObj = new JSONObject();
+                    jsonObj.put("senderIP", myIp);
+                    jsonObj.put("subject", "chat");
+                    jsonObj.put("body", message);
+
+                    // Throw it in the byte-buffer
+                    String jsonMessage = jsonObj.toString();
+                    Log.d("AlterEgo::TCPSender", "Writing message: " + jsonMessage);
+                    byte[] outBuf = jsonMessage.getBytes();
+
+                    // Send it
+                    DatagramPacket send = new DatagramPacket(outBuf, outBuf.length, groupAddr, GROUPPORT);
                     Log.d("AlterEgo::TCPSender", "Sending message...");
                     mSocket.send(send);
                     Log.d("AlterEgo::TCPSender", "Sent!");

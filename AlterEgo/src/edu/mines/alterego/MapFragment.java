@@ -3,6 +3,7 @@ package edu.mines.alterego;
 import android.app.Activity;
 import android.content.Context;
 
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class MapFragment extends Fragment implements TCPReceiver.OnMessageReceiv
     private MulticastSocket mSocket;
     public static final int GROUPPORT = 4444;
     InetAddress groupAddr;
+    private int myIpAddr;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +63,8 @@ public class MapFragment extends Fragment implements TCPReceiver.OnMessageReceiv
         WifiManager wm = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
         WifiManager.MulticastLock multicastLock = wm.createMulticastLock("mydebuginfo");
         multicastLock.acquire();
+        WifiInfo myWifiInfo = wm.getConnectionInfo();
+        myIpAddr = myWifiInfo.getIpAddress();
 
         // Inflate the layout for this fragment
         View mapView = inflater.inflate(R.layout.map_fragment,
@@ -136,7 +140,7 @@ public class MapFragment extends Fragment implements TCPReceiver.OnMessageReceiv
                     //this method calls the onProgressUpdate
                     publishProgress(message);
                 }
-            }, mSocket);
+            }, mSocket, myIpAddr);
             Log.d("AlterEgo::MapFragment", "Starting the receiving task");
             mTcpReceiver.run();
 
@@ -161,7 +165,7 @@ public class MapFragment extends Fragment implements TCPReceiver.OnMessageReceiv
         protected TCPSender doInBackground(String... message) {
 
             //we create a TCPClient object and
-            mTcpSender = new TCPSender(mSocket);
+            mTcpSender = new TCPSender(mSocket, myIpAddr);
             Log.d("AlterEgo::MapFragment", "Starting the sending task");
             mTcpSender.run();
 
