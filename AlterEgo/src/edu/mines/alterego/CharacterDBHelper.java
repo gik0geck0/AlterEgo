@@ -41,6 +41,20 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase database) {
 
+		database.execSQL("CREATE TABLE IF NOT EXISTS map ("
+				+ "map_id INTEGER PRIMARY KEY AUTOINCREMET"
+				+ "FOREIGN KEY(game_id) REFERENCES game(game_id)");
+
+		// marker_type 1 = player
+		// marker_type 2 = treasure
+		// marker_type 3 = enemy
+		database.execSQL("CREATE TABLE IF NOT EXISTS marker ("
+				+ "marker_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+				+ "marker_name TEXT, " + "marker_description TEXT, "
+				+ "marker_type INTEGER, " + "marker_lat FLOAT, "
+				+ "marker_long FLOAT, "
+				+ "FOREIGN KEY(map_id) REFERENCE map(map_id)");
+
 		database.execSQL("CREATE TABLE IF NOT EXISTS game ( "
 				+ "game_id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ "hosting INTEGER," + "name TEXT" + ")");
@@ -257,6 +271,72 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 			return cursor.getString(cursor.getColumnIndex("name"));
 		}
 
+	}
+	
+	/**
+	 * <p>
+	 * Finds associated game with map
+	 * </p>
+	 * 
+	 * @return map_id for the given gameid
+	 */
+	public String getGameIdForMap(int gameId) {
+		Cursor cursor = getReadableDatabase().rawQuery(
+				"SELECT map_id FROM maps WHERE game.game_id =? LIMIT 1",
+				new String[] { "" + gameId });
+		cursor.moveToFirst();
+		if (cursor.getCount() < 1) {
+			return "Game/Map Not Available";
+		} else {
+			return cursor.getString(cursor.getColumnIndex("map_id"));
+		}
+	}
+	
+	/**
+	 * 
+	 * <p>
+	 * Fill map database with an entry
+	 * </p>
+	 * 
+	 * 
+	 */
+	public GameData addMap(String name, int hosting) {
+		SQLiteDatabase database = getWritableDatabase();
+
+		ContentValues gamevals = new ContentValues();
+		gamevals.put("name", name);
+		gamevals.put("hosting", hosting);
+
+		long rowid = database.insert("game", null, gamevals);
+		String[] args = new String[] { "" + rowid };
+
+		Cursor c = database.rawQuery(
+				"SELECT game_id, name, hosting FROM game WHERE game.ROWID =?",
+				args);
+		c.moveToFirst();
+
+		return new GameData(c.getInt(c.getColumnIndex("game_id")),
+				c.getString(c.getColumnIndex("name")), c.getInt(c
+						.getColumnIndex("hosting")));
+	}
+	
+	/**
+	 * <p>
+	 * Finds associate map with markers
+	 * </p>
+	 * 
+	 * @return marker_id for the given map_id
+	 */
+	public String getMarkersForMap(int mapId) {
+		Cursor cursor = getReadableDatabase().rawQuery(
+				"SELECT * FROM marker WHERE map.map_id =?",
+				new String[] { "" +mapId });
+		cursor.moveToFirst();
+		if(cursor.getCount() < 1) {
+			return "Map/Marker Not Available";
+		} else {
+			return cursor.getString(cursor.getColumnIndex("marker_id"));
+		}
 	}
 
 	/**
