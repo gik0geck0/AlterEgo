@@ -12,9 +12,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class TCPClient {
+public class TCPSender {
 
-    private String serverMessage;
     //public static final String SERVERIP = "192.168.1.82"; //your computer IP address
     //public static final int SERVERPORT = 4444;
     public static final int GROUPPORT = 4444;
@@ -24,18 +23,14 @@ public class TCPClient {
     //WifiManager mWifi;
     InetAddress groupAddr;
 
-    // PrintWriter out;
-    BufferedReader in;
-
     byte[] mOutBuf;
     PriorityBlockingQueue<String> mInputQueue;
 
     /**
      *  Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TCPClient(OnMessageReceived listener /*, WifiManager wifi */ ) {
-        mMessageListener = listener;
-        //mWifi = wifi;
+    public TCPSender(MulticastSocket sock) {
+        mSocket = sock;
         try {
             groupAddr = InetAddress.getByName("228.5.6.7");
         } catch(Exception e) {
@@ -56,11 +51,11 @@ public class TCPClient {
 
             /*
             } catch (Exception e) {
-                Log.e("AlterEgo::TCPClient", "Bad news. An error ocurred while writing a message.");
+                Log.e("AlterEgo::TCPSender", "Bad news. An error ocurred while writing a message.");
                 e.printStackTrace();
             }
             */
-            Log.d("AlterEgo::TCPClient", "Done.");
+            Log.d("AlterEgo::TCPSender", "Done.");
         }
     }
 
@@ -77,12 +72,6 @@ public class TCPClient {
             //InetAddress serverAddr = InetAddress.getByName(SERVERIP);
             InetAddress groupAddr = InetAddress.getByName("228.5.6.7");
 
-            Log.e("TCP Client", "C: Connecting...");
-
-            //create a socket to make the connection with the server
-            mSocket = new MulticastSocket(GROUPPORT);
-            mSocket.joinGroup(groupAddr);
-
             try {
                 mOutBuf = new byte[1024];
                 mInputQueue = new PriorityBlockingQueue<String>();
@@ -92,36 +81,19 @@ public class TCPClient {
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
-                    Log.d("AlterEgo::TCPClient", "Waiting for outgoing messages");
+                    Log.d("AlterEgo::TCPSender", "Waiting for outgoing messages");
                     String message = mInputQueue.take();
 
-                    Log.d("AlterEgo::TCPClient", "Writing message: " + message);
+                    Log.d("AlterEgo::TCPSender", "Writing message: " + message);
                     char[] buffer = message.toCharArray();
                     CharBuffer cBuffer = ByteBuffer.wrap(mOutBuf).asCharBuffer();
                     for(int i = 0; i < buffer.length; i++)
                         cBuffer.put(buffer[i]);
                     DatagramPacket send = new DatagramPacket(mOutBuf, mOutBuf.length, groupAddr, GROUPPORT);
-                    Log.d("AlterEgo::TCPClient", "Sending message...");
+                    Log.d("AlterEgo::TCPSender", "Sending message...");
                     mSocket.send(send);
-                    Log.d("AlterEgo::TCPClient", "Sent!");
-
-                    // Wait for incoming packets
-                    byte[] buf = new byte[10000];
-                    DatagramPacket recv = new DatagramPacket(buf, buf.length);
-                    mSocket.receive(recv);
-                    serverMessage = new String(buf);
-
-                    if (serverMessage != null && mMessageListener != null) {
-                        //call the method messageReceived from MyActivity class
-                        mMessageListener.messageReceived(serverMessage);
-                    }
-                    serverMessage = null;
-
+                    Log.d("AlterEgo::TCPSender", "Sent!");
                 }
-
-
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
-
 
             } catch (Exception e) {
 

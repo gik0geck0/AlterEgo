@@ -16,11 +16,15 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.concurrent.Executor;
 
 import edu.mines.alterego.MyCustomAdapter;
-import edu.mines.alterego.TCPClient;
+import edu.mines.alterego.TCPReceiver;
+import edu.mines.alterego.TCPSender;
 
 /**
  * Description: This class defines the functionality for the map fragment.
@@ -29,12 +33,17 @@ import edu.mines.alterego.TCPClient;
  *
  */
 
-public class MapFragment extends Fragment implements TCPClient.OnMessageReceived {
+public class MapFragment extends Fragment implements TCPReceiver.OnMessageReceived {
 
     private ListView mList;
     private ArrayList<String> arrayList;
     private MyCustomAdapter mAdapter;
-    private TCPClient mTcpClient;
+    private TCPReceiver mTcpReceiver;
+    private TCPSender mTcpSender;
+
+    private MulticastSocket mSocket;
+    public static final int GROUPPORT = 4444;
+    InetAddress groupAddr;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,8 +76,19 @@ public class MapFragment extends Fragment implements TCPClient.OnMessageReceived
         mAdapter = new MyCustomAdapter(getActivity(), arrayList);
         mList.setAdapter(mAdapter);
 
-        // connect to the server
-        new connectTask().execute("");
+        try {
+            groupAddr = InetAddress.getByName("228.5.6.7");
+            mSocket = new MulticastSocket(GROUPPORT);
+            mSocket.joinGroup(groupAddr);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        Executor exec = new ThreadPerTaskExecutor();
+        // Kick off the receiver thread
+        new receivingTask().executeOnExecutor(exec, "");
+        // Kick off the sender thread
+        new sendingTask().executeOnExecutor(exec, "");
 
 
         send.setOnClickListener(new View.OnClickListener() {
@@ -81,9 +101,7 @@ public class MapFragment extends Fragment implements TCPClient.OnMessageReceived
                 arrayList.add("c: " + message);
 
                 //sends the message to the server
-                if (mTcpClient != null) {
-                    mTcpClient.sendMessage(message);
-                }
+                mTcpSender.sendMessage(message);
 
                 //refresh the list
                 mAdapter.notifyDataSetChanged();
@@ -99,21 +117,53 @@ public class MapFragment extends Fragment implements TCPClient.OnMessageReceived
         Log.d("AlterEgo::MapFragment::Msging", "Message received: " + message);
     }
 
-    public class connectTask extends AsyncTask<String,String,TCPClient> {
+    class ThreadPerTaskExecutor implements Executor {
+        public void execute(Runnable r) {
+            new Thread(r).start();
+        }
+    }
+
+    public class receivingTask extends AsyncTask<String,String,TCPReceiver> {
 
         @Override
-        protected TCPClient doInBackground(String... message) {
+        protected TCPReceiver doInBackground(String... message) {
 
             //we create a TCPClient object and
-            mTcpClient = new TCPClient(new TCPClient.OnMessageReceived() {
+            mTcpReceiver = new TCPReceiver(new TCPReceiver.OnMessageReceived() {
                 @Override
                 //here the messageReceived method is implemented
                 public void messageReceived(String message) {
                     //this method calls the onProgressUpdate
                     publishProgress(message);
                 }
-            });
-            mTcpClient.run();
+            }, mSocket);
+            Log.d("AlterEgo::MapFragment", "Starting the receiving task");
+            mTcpReceiver.run();
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+
+            //in the arrayList we add the messaged received from server
+            arrayList.add(values[0]);
+            // notify the adapter that the data set has changed. This means that new message received
+            // from server was added to the list
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public class sendingTask extends AsyncTask<String,String,TCPSender> {
+
+        @Override
+        protected TCPSender doInBackground(String... message) {
+
+            //we create a TCPClient object and
+            mTcpSender = new TCPSender(mSocket);
+            Log.d("AlterEgo::MapFragment", "Starting the sending task");
+            mTcpSender.run();
 
             return null;
         }
