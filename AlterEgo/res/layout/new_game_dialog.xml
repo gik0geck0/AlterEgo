@@ -3,15 +3,19 @@
     android:id="@+id/main_layout"
     android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content" 
+    android:layout_margin="10dp">
 
     <EditText
         android:id="@+id/game_name"
         android:inputType="text"
         android:hint="@string/game_name"
         android:lines="5"
-        android:layout_margin="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
+    <CheckBox
+        android:id="@+id/hosting"
+        android:text="@string/hosting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

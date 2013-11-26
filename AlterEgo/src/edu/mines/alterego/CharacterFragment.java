@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +74,7 @@ public class CharacterFragment extends Fragment {
                     LayoutInflater inflater = getActivity().getLayoutInflater();
 
                     charBuilder.setView(inflater.inflate(R.layout.new_char_dialog, null))
+                    	.setTitle("Create New Character")
                         .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {

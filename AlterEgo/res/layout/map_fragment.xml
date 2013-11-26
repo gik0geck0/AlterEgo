@@ -8,8 +8,9 @@
     <Button
         android:id="@+id/start_map_button"
         android:text="@string/start_map_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
         android:onClick="startMap" />
 
 

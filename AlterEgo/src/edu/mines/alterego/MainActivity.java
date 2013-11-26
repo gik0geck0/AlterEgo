@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -68,15 +69,11 @@ import android.widget.Toast;
 
 /**
  * 
- * @author mdeslis
- * GROUP POINT DISTRIBUTION, as discussed and agreed upon by the group
- *  
- * Matt: 40%
- * 	Proposal, Basic Skeleton (App version 0.1):Creating a Game, Creating a Char, Fragments, Dialogues; Helped with Debugging; Commenting
- * Maria: 30%
- * 	Inventory Add, Notes Add, Icon (all dpi sizes), General Code Clean up and Quality Assurance, Created Context Menus for Long Press and Implemented Long Press with Edit and Delete for Games, Dialogue for Edit, disabled Landscape, tested for Bugs
- * Eric: 30%
- * 	Database Helper, Created Stats Layout and Connector, Initial Load for Character Data, Commenting
+ * @author mdeslis GROUP POINT DISTRIBUTION, as discussed and agreed upon by the
+ *         group
+ * 
+ * 
+ *         Matt: 1/3 Maria: 1/3 Eric: 1/3
  * 
  */
 public class MainActivity extends Activity implements View.OnClickListener,
@@ -86,18 +83,18 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	ListView listView;
 	CharacterDBHelper mDbHelper;
 	Button newGameB;
-	
-	@SuppressLint("CutPasteId") @Override
+
+	// Host Game Checkbox
+	final CharSequence[] host = { "Host Game?" };
+
+	@SuppressLint("CutPasteId")
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		mDbHelper = new CharacterDBHelper(this);
 		ArrayList<GameData> gamePairList = mDbHelper.getGames();
-		/*
-		 * for( Pair<Integer, String> game : gamePairList) {
-		 * gameList.add(game.second); }
-		 */
 
 		mGameDbAdapter = new ArrayAdapter<GameData>(this,
 				android.R.layout.simple_list_item_1, gamePairList);
@@ -113,7 +110,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
-		registerForContextMenu(listView);		
+		registerForContextMenu(listView);
 	}
 
 	@Override
@@ -148,12 +145,14 @@ public class MainActivity extends Activity implements View.OnClickListener,
 			long id) {
 		GameData selectedGame = mGameDbAdapter.getItem(position);
 
-		Log.i("AlterEgos::MainAct::SelectGame", "The game with an id "
-				+ selectedGame.first + " and a name of " + selectedGame.second
-				+ " was selected.");
+		Log.i("AlterEgos::MainAct::SelectGame",
+				"The game with an id " + selectedGame.getGameId()
+						+ " and a name of " + selectedGame.getGameName()
+						+ " was selected.");
 
 		Intent launchGame = new Intent(view.getContext(), GameActivity.class);
-		launchGame.putExtra((String) getResources().getText(R.string.gameid), selectedGame.first);
+		launchGame.putExtra((String) getResources().getText(R.string.gameid),
+				selectedGame.getGameId());
 
 		MainActivity.this.startActivity(launchGame);
 	}
@@ -162,9 +161,9 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	public void newGameDialogue() {
 		AlertDialog.Builder newGameDialog = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
-
 		// Inflate the view
 		newGameDialog
+				.setTitle("Create New Game")
 				.setView(inflater.inflate(R.layout.new_game_dialog, null))
 				.setPositiveButton(R.string.create,
 						new DialogInterface.OnClickListener() {
@@ -181,11 +180,23 @@ public class MainActivity extends Activity implements View.OnClickListener,
 								Log.i("AlterEgos::MainAct::NewGame",
 										"Creating a game with the name "
 												+ gameName);
+
+								CheckBox hostingCheck = (CheckBox) thisDialog
+										.findViewById(R.id.hosting);
+								int hosting = hostingCheck.isChecked() ? 1 : 0;
+
 								// CharacterDBHelper mDbHelper = new
 								// CharacterDBHelper(this);
-								GameData newGame = mDbHelper.addGame(gameName);
-								mGameDbAdapter.add(newGame);
-								hideCreateNewGameButton();
+								if (gameName.equals("")) {
+									Toast createGame = Toast.makeText(MainActivity.this, "Required: Game Name", Toast.LENGTH_SHORT);
+									createGame.show();
+								} else {
+									GameData newGame = mDbHelper.addGame(gameName,
+											hosting);
+									mGameDbAdapter.add(newGame);
+									hideCreateNewGameButton();
+									attentionDialogue();
+								}
 							}
 						})
 				.setNegativeButton(R.string.cancel,
@@ -199,13 +210,14 @@ public class MainActivity extends Activity implements View.OnClickListener,
 
 		newGameDialog.create().show();
 	}
-	
+
 	public void editGameDialogue(final int game_id) {
 		AlertDialog.Builder editGameDialog = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
 
 		// Inflate the view
 		editGameDialog
+				.setTitle("Edit Game")
 				.setView(inflater.inflate(R.layout.edit_game_dialog, null))
 				.setPositiveButton(R.string.new_edit,
 						new DialogInterface.OnClickListener() {
@@ -213,13 +225,20 @@ public class MainActivity extends Activity implements View.OnClickListener,
 							public void onClick(DialogInterface dialog, int id) {
 								// Perceive this dialog as an AlertDialog
 								AlertDialog thisDialog = (AlertDialog) dialog;
-								 
-								EditText nameInput = (EditText) thisDialog.findViewById(R.id.new_game_name);
+
+								EditText nameInput = (EditText) thisDialog
+										.findViewById(R.id.new_game_name);
 								String name = nameInput.getText().toString();
-								
-								mDbHelper.updateGame(game_id, name);
-								mGameDbAdapter.clear();
-								mGameDbAdapter.addAll( mDbHelper.getGames() );
+								if (name.equals("")) {
+									Toast editGame = Toast.makeText(MainActivity.this, "Required: Game Name", Toast.LENGTH_SHORT);
+									editGame.show();
+								} else {
+									mDbHelper.updateGame(game_id, name);
+									mGameDbAdapter.clear();
+									mGameDbAdapter.addAll(mDbHelper.getGames());
+									Toast editGame = Toast.makeText(MainActivity.this, "Game Edited", Toast.LENGTH_SHORT);
+									editGame.show();
+								}
 							}
 						})
 				.setNegativeButton(R.string.new_cancel,
@@ -231,7 +250,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 							}
 						});
 
-		editGameDialog.create().show();	
+		editGameDialog.create().show();
 	}
 
 	public void hideCreateNewGameButton() {
@@ -254,23 +273,44 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		switch (item.getItemId()) {
-			case R.id.context_edit:
-				editGameDialogue(mGameDbAdapter.getItem(info.position).first);
-				
-				showToast("Game Edited");
+		case R.id.context_edit:
+			editGameDialogue(mGameDbAdapter.getItem(info.position).getGameId());
 			return true;
-			case R.id.context_delete:
-				mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position).first);
-				mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
-				showToast("Game Deleted");
-				return true;
-			default:
-				return super.onContextItemSelected(item);
+		case R.id.context_delete:
+			mDbHelper.deleteGame(mGameDbAdapter.getItem(info.position)
+					.getGameId());
+			mGameDbAdapter.remove(mGameDbAdapter.getItem(info.position));
+			showToast("Game Deleted");
+			return true;
+		default:
+			return super.onContextItemSelected(item);
 		}
 	}
 
+	public void attentionDialogue() {
+		LayoutInflater attLI = LayoutInflater.from(this);
+		final View aV = attLI.inflate(R.layout.dialog_use_settings, null);
+		AlertDialog.Builder useSettings = new AlertDialog.Builder(this);
+		useSettings.setView(aV);
+		useSettings.setTitle("Remember!");
+		useSettings.setCancelable(false);
+		useSettings.setNegativeButton("Got it!",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+
+					}
+				});
+
+		AlertDialog alert = useSettings.create();
+		alert.show();
+	}
+
 	public void showToast(String message) {
-		Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+		Toast toast = Toast.makeText(getApplicationContext(), message,
+				Toast.LENGTH_SHORT);
 		toast.show();
 	}
 }

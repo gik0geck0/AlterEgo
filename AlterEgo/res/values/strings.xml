@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Splash Screen -->
+    <string name="splash_screen_name">AlterEgo</string>
+    <string name="splash_screen_image">AlterEgo</string>
+    
     <!--  App Name -->
     <string name="app_name">AlterEgo</string>
 
@@ -45,6 +49,7 @@
     <string name="action_settings">Settings</string>
 
     <!-- Main Activity -->
+    <string name="list_header">Games</string>
     <string name="main_new_game">Create New Game</string>
     <string name="main_game_list_view">View Inventory</string>
 
@@ -55,13 +60,14 @@
 
     <!-- Game Activity Menu -->
     <string name="action_new_character">Create New Character</string>
-
+	<string name="settings_info">To make more games from now on, use the menu button!</string>
     <!-- New Game Dialogue -->
     <string name="game_name">Game Name</string>
+    <string name="hosting">Host Game?</string>
 
     <!-- Character Stats Dialog-->
-    <string name="char_stat_name_hint"> Stat Name </string>
-    <string name="char_stat_val_hint"> Stat Value </string>
+    <string name="char_stat_name_hint">Stat Name</string>
+    <string name="char_stat_val_hint">Stat Value</string>
 
     <!-- LongClick -->
     <string name="context_edit">Edit</string>
@@ -69,12 +75,29 @@
 
     <!-- Edit Dialogue -->
 
-    <!-- Dialogue Default Options -->
+    <!-- Dialogue Default Optionmarker_enter_titles -->
     <string name="new_game_name">Edit Game</string>
     <string name="new_cancel">Cancel</string>
     <string name="new_edit">Edit</string>
 
     <!-- Map Fragment Stuff -->
     <string name="start_map_button">Start Map</string>
-
+    
+    <!-- Marker Dialogue -->
+    <string name="add_marker_player">Player</string>
+    <string name="add_marker_treasure">Treasure</string>
+    <string name="add_marker_enemy">Enemy</string>
+        
+    <!-- Player Marker Dialogue -->
+    <string name="marker_player_hint">Player Name</string>
+    <string name="marker_player_snippet_hint">Player Descriptions</string>
+    
+    <!-- Treasure Marker Dialogue -->
+    <string name="marker_treasure_hint">Treasure Title</string>
+    <string name="marker_treasure_snippet_hint">Treasure Descriptions</string>
+    
+    <!-- Enemy Marker Dialogue -->
+    <string name="marker_enemy_hint">Enemy Type/Name</string>
+    <string name="marker_enemy_snippet_hint">Enemy Description</string>
+    
 </resources>
