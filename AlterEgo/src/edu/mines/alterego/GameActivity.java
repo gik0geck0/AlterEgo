@@ -134,6 +134,9 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
                 	//fragment.setArguments(args);
                 	break;
                 case 3:
+                    fragment = new ChatFragment();
+                    break;
+                case 4:
                     fragment = new MapFragment();
                     break;
                 default:
@@ -148,7 +151,7 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 4;
+			return 5;
 		}
 
 		@Override
@@ -162,6 +165,8 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 			case 2:
 				return getString(R.string.title_notes).toUpperCase(l);
             case 3:
+                return getString(R.string.title_chat).toUpperCase(l);
+            case 4:
                 return getString(R.string.title_map).toUpperCase(l);
 			}
 			return null;
@@ -216,7 +221,8 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 
         Intent netServIntent = new Intent(this, NetworkingService.class);
         netServIntent.putExtra("IP", myIpAddr);
+
+        Log.d("AlterEgo::GameActivity", "Starting the networking service");
         startService(netServIntent);
     }
-
 }

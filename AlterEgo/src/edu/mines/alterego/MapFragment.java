@@ -27,11 +27,7 @@ import edu.mines.alterego.MyCustomAdapter;
  *
  */
 
-public class MapFragment extends Fragment implements TCPReceiver.OnMessageReceived {
-
-    private ListView mList;
-    private ArrayList<String> arrayList;
-    private MyCustomAdapter mAdapter;
+public class MapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,41 +46,6 @@ public class MapFragment extends Fragment implements TCPReceiver.OnMessageReceiv
         View mapView = inflater.inflate(R.layout.map_fragment,
                 container, false);
 
-        arrayList = new ArrayList<String>();
-
-        final EditText editText = (EditText) mapView.findViewById(R.id.editText);
-        Button send = (Button) mapView.findViewById(R.id.send_button);
-
-        //relate the listView from java to the one created in xml
-        mList = (ListView) mapView.findViewById(R.id.list);
-        mAdapter = new MyCustomAdapter(getActivity(), arrayList);
-        mList.setAdapter(mAdapter);
-
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String message = editText.getText().toString();
-
-                //add the text in the arrayList
-                arrayList.add("c: " + message);
-
-                //sends the message to the server
-                // TODO: Send a broadcast intent for the service to pick up
-                // mTcpSender.sendMessage(message);
-
-                //refresh the list
-                mAdapter.notifyDataSetChanged();
-                editText.setText("");
-            }
-        });
-
         return mapView;
     }
-
-    @Override
-    public void messageReceived(String message) {
-        Log.d("AlterEgo::MapFragment::Msging", "Message received: " + message);
-    }
-
 }

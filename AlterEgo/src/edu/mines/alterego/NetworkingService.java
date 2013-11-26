@@ -1,15 +1,20 @@
 package edu.mines.alterego;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Binder;
 import android.os.IBinder;
 
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 import edu.mines.alterego.TCPReceiver;
@@ -24,12 +29,19 @@ public class NetworkingService extends Service {
     InetAddress groupAddr;
     private int myIpAddr;
 
-    public NetworkingService() {}
+    private final IBinder mBinder = new MyBinder();
+    private ArrayList<String> receiveStack;
+    private Context mServiceContext;
+
+    public NetworkingService() { mServiceContext = this; }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("AlterEgo::NetworkingService", "Starting the Networking Service! YAY!");
         Bundle bundle = intent.getExtras();
         myIpAddr = bundle.getInt("IP", 0);
+        receiveStack = new ArrayList<String>();
+
         if (myIpAddr == 0) {
             Log.e("AlterEgo::NetworkingService", "ERROR: Did not receive the host's IP address in the intent. This is required to properly send and receive/filter messages");
             return Service.START_NOT_STICKY;
@@ -49,13 +61,22 @@ public class NetworkingService extends Service {
         // Kick off the sender thread
         new sendingTask().executeOnExecutor(exec, "");
 
+        // Register self as a BroadcastReceiver for incoming messages
+        this.registerReceiver(mReceiver, new IntentFilter("edu.mines.alterego.outgoingmessage"));
+
         return Service.START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        // Register self as a BroadcastReceiver for incoming messages
+        this.unregisterReceiver(mReceiver);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         //TODO for communication return IBinder implementation
-        return null;
+        return mBinder;
     }
 
     class ThreadPerTaskExecutor implements Executor {
@@ -88,7 +109,20 @@ public class NetworkingService extends Service {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
 
-            // TODO: Send a broadcast intent stating values can be retrieved
+            for (String s : values) {
+                receiveStack.add(s);
+            }
+
+            // Limit the receiveStack to 100 elements
+            while(receiveStack.size() > 100) {
+                receiveStack.remove(0);
+            }
+
+            // Send a broadcast intent containing the new values
+            Intent intent = new Intent();
+            intent.putExtra("newvalues", values);
+            intent.setAction("edu.mines.alterego.incomingmessage");
+            mServiceContext.sendBroadcast(intent);
         }
     }
 
@@ -108,4 +142,20 @@ public class NetworkingService extends Service {
         // @Override protected void onProgressUpdate(String... values) { super.onProgressUpdate(values); }
     }
 
+    public class MyBinder extends Binder {
+        NetworkingService getService() {
+            return NetworkingService.this;
+        }
+    }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("AlterEgo::NetworkingService", "Received an outbound message!");
+            Bundle bundle = intent.getExtras();
+            String msg = bundle.getString("message");
+
+            mTcpSender.sendMessage(msg);
+        }
+    };
 }
