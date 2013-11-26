@@ -2,16 +2,15 @@ package edu.mines.alterego;
 
 import android.content.Context;
 import android.content.ContentValues;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
-
 import android.util.Log;
 
 import java.util.ArrayList;
 
 import edu.mines.alterego.GameData;
+import edu.mines.alterego.MapActivity.MARKERTYPE;
 
 /**
  * <h1>SQLite Database Adapter (helper as Google/Android calls it)</h1>
@@ -42,8 +41,10 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase database) {
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS map ("
-				+ "map_id INTEGER PRIMARY KEY AUTOINCREMET"
-				+ "FOREIGN KEY(game_id) REFERENCES game(game_id)");
+				+ "map_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+				+ "game_id INTEGER, "
+				+ "FOREIGN KEY(game_id) REFERENCES game(game_id)"
+				+ ")");
 
 		// marker_type 1 = player
 		// marker_type 2 = treasure
@@ -53,7 +54,9 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				+ "marker_name TEXT, " + "marker_description TEXT, "
 				+ "marker_type INTEGER, " + "marker_lat FLOAT, "
 				+ "marker_long FLOAT, "
-				+ "FOREIGN KEY(map_id) REFERENCE map(map_id)");
+				+ "map_id INTEGER, "
+				+ "FOREIGN KEY(map_id) REFERENCES map(map_id)"
+				+ ")");
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS game ( "
 				+ "game_id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -159,9 +162,66 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				args);
 		c.moveToFirst();
 
+		createMap(c.getInt(c.getColumnIndex("game_id")));
+
 		return new GameData(c.getInt(c.getColumnIndex("game_id")),
 				c.getString(c.getColumnIndex("name")), c.getInt(c
 						.getColumnIndex("hosting")));
+	}
+
+	/**
+	 * 
+	 * <p>
+	 * When game is created, fill map database with corresponding game
+	 * </p>
+	 * 
+	 */
+	public void createMap(int game_id) {
+		SQLiteDatabase database = getWritableDatabase();
+
+		ContentValues mapVals = new ContentValues();
+		mapVals.put("game_id", game_id);
+
+		database.insert("map", null, mapVals);
+	}
+
+	/**
+	 * 
+	 * <p>
+	 * Grab marker information when first created and save to the database.
+	 * Applies to players, treasures, enemies, etc. Thanks to enum in
+	 * MapActivity
+	 * </p>
+	 * 
+	 */
+	public MarkerData addDBMarker(String marker_name, String marker_description, double marker_lat,
+			double marker_long, MARKERTYPE marker_type) {
+		SQLiteDatabase database = getWritableDatabase();
+		
+		ContentValues markerVals = new ContentValues();
+		markerVals.put("marker_name", marker_name);
+		markerVals.put("marker_description", marker_description);
+		markerVals.put("marker_lat", marker_lat);
+		markerVals.put("marker_long", marker_long);
+		markerVals.put("marker_type", marker_type.getValue());
+		
+		long rowid = database.insert("marker", null, markerVals);
+		String[] args = new String[] { "" + rowid };
+		
+		Cursor c = database.rawQuery(
+				"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type"
+				+ " FROM marker"
+				+ " WHERE marker_id=?",
+				args);
+		c.moveToFirst();
+
+		
+		return new MarkerData(c.getInt(c.getColumnIndex("marker_id")),
+				c.getString(c.getColumnIndex("marker_name")), 
+				c.getString(c.getColumnIndex("marker_description")),
+				MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
+				c.getDouble(c.getColumnIndex("marker_lat")),
+				c.getDouble(c.getColumnIndex("marker_long")));
 	}
 
 	/**
@@ -272,7 +332,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		}
 
 	}
-	
+
 	/**
 	 * <p>
 	 * Finds associated game with map
@@ -291,35 +351,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 			return cursor.getString(cursor.getColumnIndex("map_id"));
 		}
 	}
-	
-	/**
-	 * 
-	 * <p>
-	 * Fill map database with an entry
-	 * </p>
-	 * 
-	 * 
-	 */
-	public GameData addMap(String name, int hosting) {
-		SQLiteDatabase database = getWritableDatabase();
 
-		ContentValues gamevals = new ContentValues();
-		gamevals.put("name", name);
-		gamevals.put("hosting", hosting);
-
-		long rowid = database.insert("game", null, gamevals);
-		String[] args = new String[] { "" + rowid };
-
-		Cursor c = database.rawQuery(
-				"SELECT game_id, name, hosting FROM game WHERE game.ROWID =?",
-				args);
-		c.moveToFirst();
-
-		return new GameData(c.getInt(c.getColumnIndex("game_id")),
-				c.getString(c.getColumnIndex("name")), c.getInt(c
-						.getColumnIndex("hosting")));
-	}
-	
 	/**
 	 * <p>
 	 * Finds associate map with markers
@@ -330,9 +362,9 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	public String getMarkersForMap(int mapId) {
 		Cursor cursor = getReadableDatabase().rawQuery(
 				"SELECT * FROM marker WHERE map.map_id =?",
-				new String[] { "" +mapId });
+				new String[] { "" + mapId });
 		cursor.moveToFirst();
-		if(cursor.getCount() < 1) {
+		if (cursor.getCount() < 1) {
 			return "Map/Marker Not Available";
 		} else {
 			return cursor.getString(cursor.getColumnIndex("marker_id"));
@@ -604,4 +636,5 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 						whereArgs);
 		return statCursor;
 	}
+
 }

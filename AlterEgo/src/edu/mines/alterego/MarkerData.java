@@ -1,10 +1,12 @@
 package edu.mines.alterego;
 
+import edu.mines.alterego.MapActivity.MARKERTYPE;
+
 class MarkerData {
     public int map_id;
     public String marker_name;
     public String marker_description;
-    public int marker_type;
+    public MARKERTYPE marker_type;
     public double marker_lat;
     public double marker_long;
 
@@ -23,7 +25,7 @@ class MarkerData {
      * @param long :: marker longitude
      * 
      */
-    MarkerData(int mapId, String name, String description, int type, double latitude, double longitude) {
+    MarkerData(int mapId, String name, String description, MARKERTYPE type, double latitude, double longitude) {
        map_id=mapId;
        marker_name=name;
        marker_description=description;
