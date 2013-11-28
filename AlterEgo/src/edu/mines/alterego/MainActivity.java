@@ -111,6 +111,10 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		// Create context menu
 		listView = (ListView) findViewById(R.id.main_game_list_view);
 		registerForContextMenu(listView);
+		
+		if (!gamePairList.isEmpty()) {
+			hideCreateNewGameButton();
+		}
 	}
 
 	@Override
