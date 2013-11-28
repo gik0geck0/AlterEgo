@@ -12,13 +12,4 @@
         android:contentDescription="@string/splash_screen_image"
         android:src="@drawable/splash_launcher" />
  
-    <TextView
-        android:id="@+id/splash_screen_name"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:gravity="center_horizontal"
-        android:layout_alignParentBottom="true"
-        android:text="@string/splash_screen_name" />
- 
 </RelativeLayout>
