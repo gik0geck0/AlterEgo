@@ -29,6 +29,11 @@
     <!-- Inventory -->
     <string name="inventory_list">View Inventory</string>
 	<string name="inv_button">Add Item</string>
+	
+	<!-- Inventory Dialog -->
+	<string name="item_name">Item Name</string>
+	<string name="item_description">Item Description</string>
+	
     <!-- Notes -->
     <string name="notes_list">View Notes</string>
     <string name="notes_add_notes">Add Note</string>
