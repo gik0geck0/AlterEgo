@@ -1,18 +1,12 @@
 package edu.mines.alterego;
 
-import android.net.wifi.WifiManager;
-import android.util.Log;
-
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import org.json.JSONObject;
+
+import android.util.Log;
 
 public class TCPReceiver {
 
@@ -53,11 +47,6 @@ public class TCPReceiver {
         mRun = true;
 
         try {
-            //here you must put your computer's IP address.
-            //InetAddress serverAddr = InetAddress.getByName(SERVERIP);
-            InetAddress groupAddr = InetAddress.getByName("228.5.6.7");
-
-
             //create a socket to make the connection with the server
 
             try {

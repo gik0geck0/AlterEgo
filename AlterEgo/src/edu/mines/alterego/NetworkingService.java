@@ -1,24 +1,19 @@
 package edu.mines.alterego;
 
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.util.concurrent.Executor;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Log;
-
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
-
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.util.ArrayList;
-import java.util.concurrent.Executor;
-
-import edu.mines.alterego.TCPReceiver;
-import edu.mines.alterego.TCPSender;
+import android.util.Log;
 
 public class NetworkingService extends Service {
     private TCPReceiver mTcpReceiver;

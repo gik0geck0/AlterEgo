@@ -1,17 +1,15 @@
 package edu.mines.alterego;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.util.Log;
-
-import java.util.ArrayList;
-
-import org.json.JSONObject;
 
 public class MyCustomAdapter extends BaseAdapter {
     private ArrayList<String> mListItems;

@@ -1,25 +1,17 @@
 package edu.mines.alterego;
 
-import android.net.wifi.WifiManager;
-import android.util.Log;
-
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class TCPSender {
 
-    //public static final String SERVERIP = "192.168.1.82"; //your computer IP address
-    //public static final int SERVERPORT = 4444;
     public static final int GROUPPORT = 4444;
-    private OnMessageReceived mMessageListener = null;
     private boolean mRun = false;
     MulticastSocket mSocket;
     //WifiManager mWifi;
