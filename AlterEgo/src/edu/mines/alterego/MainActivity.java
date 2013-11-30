@@ -141,6 +141,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 	public void onClick(View v) {
 		if (v == newGameB) {
 			newGameDialogue();
+			attentionDialogue();
 		}
 	}
 
@@ -199,7 +200,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 											hosting);
 									mGameDbAdapter.add(newGame);
 									hideCreateNewGameButton();
-									attentionDialogue();
 								}
 							}
 						})
