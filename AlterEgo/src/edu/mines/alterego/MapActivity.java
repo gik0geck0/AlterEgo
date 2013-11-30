@@ -57,8 +57,8 @@ public class MapActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mapactivity);
 
-		Intent intent = getIntent();
-		gameID = intent.getIntExtra(GameActivity.GAME_ID, -1);
+		// Intent intent = getIntent();
+		gameID = GameActivity.mGameId; //intent.getIntExtra(GameActivity.GAME_ID, -1);
 
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
