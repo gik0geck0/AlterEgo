@@ -26,13 +26,15 @@ public class TCPReceiver {
     //WifiManager mWifi;
     InetAddress groupAddr;
     int myIp;
+    CharacterDBHelper mDbHelper;
 
     /**
      *  Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TCPReceiver(OnMessageReceived listener, MulticastSocket sock, int myIp) {
+    public TCPReceiver(OnMessageReceived listener, MulticastSocket sock, int myIp, CharacterDBHelper dbh) {
         mMessageListener = listener;
         mSocket = sock;
+        mDbHelper = dbh;
         this.myIp = myIp;
         //mWifi = wifi;
         try {
@@ -83,13 +85,17 @@ public class TCPReceiver {
                         serverMessage = null;
                     }
 
-                    if (asJson != null && asJson.has("senderIP") && asJson.getInt("senderIP") != myIp) {
-                        if (asJson.isNull("body"))
+                    if (asJson != null && asJson.has("senderIP")) {
+                        if (asJson.isNull("body")) {
                             Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a body!");
-                        else {
+                        } else {
                             if (asJson.isNull("subject"))
                                 Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a subject!");
+
                             serverMessage = asJson.getString("body");
+                            asJson.put("receiveIp", myIp);
+                            // Insert the ENTIRE JSON string into the DB
+                            mDbHelper.insertMessage(GameActivity.mGameId, asJson.toString());
                         }
                     }
                     if (serverMessage != null && mMessageListener != null) {

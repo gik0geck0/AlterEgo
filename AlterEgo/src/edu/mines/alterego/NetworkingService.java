@@ -30,8 +30,9 @@ public class NetworkingService extends Service {
     private int myIpAddr;
 
     private final IBinder mBinder = new MyBinder();
-    private ArrayList<String> receiveStack;
+    // private ArrayList<String> receiveStack;
     private Context mServiceContext;
+    private CharacterDBHelper mDbHelper;
 
     public NetworkingService() { mServiceContext = this; }
 
@@ -40,7 +41,7 @@ public class NetworkingService extends Service {
         Log.d("AlterEgo::NetworkingService", "Starting the Networking Service! YAY!");
         Bundle bundle = intent.getExtras();
         myIpAddr = bundle.getInt("IP", 0);
-        receiveStack = new ArrayList<String>();
+        // receiveStack = new ArrayList<String>();
 
         if (myIpAddr == 0) {
             Log.e("AlterEgo::NetworkingService", "ERROR: Did not receive the host's IP address in the intent. This is required to properly send and receive/filter messages");
@@ -54,6 +55,8 @@ public class NetworkingService extends Service {
         } catch(Exception e) {
             e.printStackTrace();
         }
+
+        mDbHelper = new CharacterDBHelper(this);
 
         Executor exec = new ThreadPerTaskExecutor();
         // Kick off the receiver thread
@@ -98,7 +101,7 @@ public class NetworkingService extends Service {
                     //this method calls the onProgressUpdate
                     publishProgress(message);
                 }
-            }, mSocket, myIpAddr);
+            }, mSocket, myIpAddr, mDbHelper);
             Log.d("AlterEgo::MapFragment", "Starting the receiving task");
             mTcpReceiver.run();
 
@@ -109,6 +112,8 @@ public class NetworkingService extends Service {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
 
+            /*
+             * We don't care about that here anymore. It's in the DB
             for (String s : values) {
                 receiveStack.add(s);
             }
@@ -117,10 +122,12 @@ public class NetworkingService extends Service {
             while(receiveStack.size() > 100) {
                 receiveStack.remove(0);
             }
+            */
+
 
             // Send a broadcast intent containing the new values
             Intent intent = new Intent();
-            intent.putExtra("newvalues", values);
+            // intent.putExtra("newvalues", values);
             intent.setAction("edu.mines.alterego.incomingmessage");
             mServiceContext.sendBroadcast(intent);
         }

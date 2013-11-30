@@ -10,8 +10,10 @@ import android.database.Cursor;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import edu.mines.alterego.GameData;
+import edu.mines.alterego.MessageData;
 
 /**
  *  <h1>SQLite Database Adapter (helper as Google/Android calls it)</h1>
@@ -91,6 +93,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "subject TEXT, " +
                 "description TEXT, " +
                 "character_id INTEGER," +
+                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                ")");
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS messages ( "+
+                "message_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "json_message TEXT," +
+                "game_id INTEGER," +
+                "time INTEGER," +
                 "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
                 ")");
 
@@ -443,5 +453,60 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     	whereArgs[0] = Integer.toString(charId);
         Cursor statCursor = db.rawQuery("SELECT _id, stat_name, stat_value FROM character_stat WHERE character_id=?", whereArgs);
         return statCursor;
+    }
+
+    public ArrayList<MessageData> getAllMessages(int gameId) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	String[] whereArgs = new String[1];
+    	whereArgs[0] = Integer.toString(gameId);
+        Cursor c = db.rawQuery("SELECT message_id, json_message, timestamp, game_id FROM messages WHERE game_id=?", whereArgs);
+        c.moveToFirst();
+
+        ArrayList<MessageData> messages = new ArrayList<MessageData>();
+        while(!c.isAfterLast()) {
+        	messages.add(new MessageData(
+                        c.getInt(0),
+                        c.getString(1),
+                        c.getLong(2),
+                        c.getInt(3)
+                        ));
+        }
+        return messages;
+    }
+
+    public Cursor getAllMessagesCursor(int gameId) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	String[] whereArgs = new String[1];
+    	whereArgs[0] = Integer.toString(gameId);
+        Cursor c = db.rawQuery("SELECT message_id, json_message, timestamp, game_id FROM messages WHERE game_id=?", whereArgs);
+        c.moveToFirst();
+        return c;
+    }
+
+    public MessageData insertMessage(int gameId, String message) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues msgVals = new ContentValues();
+        msgVals.put("game_id", gameId);
+        msgVals.put("message", message);
+
+        // Place the current timestamp
+        msgVals.put("timestamp", now());
+
+        long rowid = db.insert("character_stat", null, msgVals);
+
+        String[] args = new String[]{ ""+rowid };
+        Cursor c = db.rawQuery("SELECT message_id, json_message, timestamp, game_id  FROM inventory_item WHERE inventory_item.ROWID =?", args);
+        c.moveToFirst();
+
+        return new MessageData(
+                        c.getInt(0),
+                        c.getString(1),
+                        c.getLong(2),
+                        c.getInt(3)
+                        );
+    }
+
+    public static long now() {
+        return (new Date()).getTime();
     }
 }

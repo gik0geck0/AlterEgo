@@ -2,6 +2,7 @@ package edu.mines.alterego;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -46,6 +47,19 @@ public class MapFragment extends Fragment {
         View mapView = inflater.inflate(R.layout.map_fragment,
                 container, false);
 
+        Button startMap = (Button) mapView.findViewById(R.id.start_map_button);
+        startMap.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startMap(v);
+            }
+        });
+
         return mapView;
+    }
+
+    public void startMap(View view) {
+        Intent mapIntent = new Intent(getActivity(), MapActivity.class);
+        getActivity().startActivity(mapIntent);
     }
 }

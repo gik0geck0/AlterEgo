@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ public class ChatFragment extends Fragment {
     private ArrayList<String> arrayList;
     private MyCustomAdapter mAdapter;
     private Context mContext;
+
+    private SimpleCursorAdapter mMessageAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,7 +67,11 @@ public class ChatFragment extends Fragment {
 
         //relate the listView from java to the one created in xml
         mList = (ListView) mapView.findViewById(R.id.list);
-        mAdapter = new MyCustomAdapter(getActivity(), arrayList);
+
+        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+        /* Manual adapter
+         */
+        mAdapter = new MyCustomAdapter(getActivity(), arrayList, dbHelper, GameActivity.mGameId);
         mList.setAdapter(mAdapter);
 
         send.setOnClickListener(new View.OnClickListener() {
@@ -74,7 +81,7 @@ public class ChatFragment extends Fragment {
                 String message = editText.getText().toString();
 
                 //add the text in the arrayList
-                arrayList.add("c: " + message);
+                // arrayList.add("c: " + message);
 
                 //sends the message to the server
                 // TODO: Send a broadcast intent for the service to pick up
@@ -88,6 +95,7 @@ public class ChatFragment extends Fragment {
 
                 //refresh the list
                 mAdapter.notifyDataSetChanged();
+                // mMessageAdapter;
                 editText.setText("");
             }
         });
@@ -112,12 +120,18 @@ public class ChatFragment extends Fragment {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            /*
             Bundle bundle = intent.getExtras();
             String[] newMsgs = bundle.getStringArray("newvalues");
 
             for (String s : newMsgs) {
                 Log.d("AlterEgo::MapFragment::Msging", "Message received: " + s);
             }
+            */
+
+            // The database has been updated with some new messages
+            Log.d("AlterEgo::MapFragment::Msging", "At least one new message was received");
+            mAdapter.refreshDB();
         }
     };
 }

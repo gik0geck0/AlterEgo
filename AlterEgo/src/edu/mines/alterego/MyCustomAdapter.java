@@ -1,6 +1,7 @@
 package edu.mines.alterego;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +10,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import org.json.JSONObject;
+
 public class MyCustomAdapter extends BaseAdapter {
     private ArrayList<String> mListItems;
     private LayoutInflater mLayoutInflater;
+    private CharacterDBHelper mDbHelper;
+    private int mGameId;
 
-    public MyCustomAdapter(Context context, ArrayList<String> arrayList){
-
+    public MyCustomAdapter(Context context, ArrayList<String> arrayList, CharacterDBHelper dbh, int gameid) {
+        mDbHelper = dbh;
         mListItems = arrayList;
+        mGameId = gameid;
 
         //get the layout inflater
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -64,5 +70,18 @@ public class MyCustomAdapter extends BaseAdapter {
         //this method must return the view corresponding to the data at the specified position.
         return view;
 
+    }
+
+    public void refreshDB() {
+        Cursor mCursor = mDbHelper.getAllMessagesCursor(mGameId);
+        mCursor.moveToPosition(mListItems.size());
+
+        while (!mCursor.isAfterLast()) {
+            MessageData md = new MessageData(
+                mCursor.getInt(0), mCursor.getString(1),
+                mCursor.getLong(2), mCursor.getInt(3));
+            mListItems.add(md.toString(MessageData.StringFormat.MESSAGE));
+            mCursor.moveToNext();
+        }
     }
 }
