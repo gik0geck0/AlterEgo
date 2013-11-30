@@ -1,9 +1,11 @@
 package edu.mines.alterego;
 
+import java.util.ArrayList;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,16 +16,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
-import edu.mines.alterego.CharacterDBHelper;
-
-
 /**
  * Description: This class defines the functionality for the inventory fragment.
- * It handles loading fragment data from the database and displaying it in the list view.
+ * It handles loading fragment data from the database and displaying it in the
+ * list view.
+ * 
  * @author Matt Buland, Maria Deslis, Eric Young
- *
+ * 
  */
 
 public class InventoryFragment extends Fragment {
@@ -37,9 +36,10 @@ public class InventoryFragment extends Fragment {
 			// Yes, this is annoying, but it'll make an error VERY obvious. In
 			// testing, I have never seen this toast/error message. But ya never
 			// know
-			Toast.makeText(getActivity(), "No character. Please make one!", Toast.LENGTH_SHORT)
-					.show();
-			Log.e("AlterEgo:InventoryFragment", "No valid character. The user needs to make one.");
+			Toast.makeText(getActivity(), "No character. Please make one!",
+					Toast.LENGTH_SHORT).show();
+			Log.e("AlterEgo:InventoryFragment",
+					"No valid character. The user needs to make one.");
 		}
 
 		// Inflate the layout for this fragment
@@ -49,7 +49,8 @@ public class InventoryFragment extends Fragment {
 				.findViewById(R.id.inventory_list);
 
 		CharacterDBHelper dbhelper = new CharacterDBHelper(getActivity());
-		ArrayList<InventoryItem> invItems = dbhelper.getInventoryItems(GameActivity.mCharId);
+		ArrayList<InventoryItem> invItems = dbhelper
+				.getInventoryItems(GameActivity.mCharId);
 
 		mInvAdapter = new ArrayAdapter<InventoryItem>(getActivity(),
 				android.R.layout.simple_list_item_1, invItems);
@@ -59,7 +60,7 @@ public class InventoryFragment extends Fragment {
 		Button newInv = (Button) inventoryView.findViewById(R.id.newinv_button);
 
 		if (GameActivity.mCharId == -1)
-            newInv.setEnabled(false);
+			newInv.setEnabled(false);
 
 		newInv.setOnClickListener(new Button.OnClickListener() {
 			@Override
@@ -93,7 +94,9 @@ public class InventoryFragment extends Fragment {
 										CharacterDBHelper dbHelper = new CharacterDBHelper(
 												getActivity());
 										InventoryItem newItem = dbHelper
-												.addInventoryItem(GameActivity.mCharId, name, desc);
+												.addInventoryItem(
+														GameActivity.mCharId,
+														name, desc);
 
 										mInvAdapter.add(newItem);
 									}
@@ -110,7 +113,6 @@ public class InventoryFragment extends Fragment {
 				invBuilder.create().show();
 			}
 		});
-
 		return inventoryView;
 	}
 }
