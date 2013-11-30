@@ -100,8 +100,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
                 "message_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "json_message TEXT," +
                 "game_id INTEGER," +
-                "time INTEGER," +
-                "FOREIGN KEY(character_id) REFERENCES character(character_id)" +
+                "timestamp INTEGER," +
+                "FOREIGN KEY(game_id) REFERENCES game(game_id)" +
                 ")");
 
     }
@@ -484,18 +484,20 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     }
 
     public MessageData insertMessage(int gameId, String message) {
+        Log.d("AlterEgo::Database::Message", "Inserting message: " + message);
+
         SQLiteDatabase db = getWritableDatabase();
         ContentValues msgVals = new ContentValues();
         msgVals.put("game_id", gameId);
-        msgVals.put("message", message);
+        msgVals.put("json_message", message);
 
         // Place the current timestamp
         msgVals.put("timestamp", now());
 
-        long rowid = db.insert("character_stat", null, msgVals);
+        long rowid = db.insert("messages", null, msgVals);
 
         String[] args = new String[]{ ""+rowid };
-        Cursor c = db.rawQuery("SELECT message_id, json_message, timestamp, game_id  FROM inventory_item WHERE inventory_item.ROWID =?", args);
+        Cursor c = db.rawQuery("SELECT message_id, json_message, timestamp, game_id  FROM messages WHERE messages.ROWID =?", args);
         c.moveToFirst();
 
         return new MessageData(

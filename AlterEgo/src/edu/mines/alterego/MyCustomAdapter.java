@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -73,6 +74,7 @@ public class MyCustomAdapter extends BaseAdapter {
     }
 
     public void refreshDB() {
+        Log.d("AlterEgo::MessageAdapter", "Refreshing the database");
         Cursor mCursor = mDbHelper.getAllMessagesCursor(mGameId);
         mCursor.moveToPosition(mListItems.size());
 
@@ -83,5 +85,8 @@ public class MyCustomAdapter extends BaseAdapter {
             mListItems.add(md.toString(MessageData.StringFormat.MESSAGE));
             mCursor.moveToNext();
         }
+
+        // Invalidate current set
+        notifyDataSetChanged();
     }
 }

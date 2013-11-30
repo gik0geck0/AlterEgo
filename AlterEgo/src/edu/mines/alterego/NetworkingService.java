@@ -98,6 +98,7 @@ public class NetworkingService extends Service {
                 @Override
                 //here the messageReceived method is implemented
                 public void messageReceived(String message) {
+                    Log.d("AlterEgo::NetworkingReceiveTask", "Publishing Progress!");
                     //this method calls the onProgressUpdate
                     publishProgress(message);
                 }
@@ -128,6 +129,7 @@ public class NetworkingService extends Service {
             // Send a broadcast intent containing the new values
             Intent intent = new Intent();
             // intent.putExtra("newvalues", values);
+            Log.d("AlterEgo::NetworkingService", "Notifying for an incoming message");
             intent.setAction("edu.mines.alterego.incomingmessage");
             mServiceContext.sendBroadcast(intent);
         }

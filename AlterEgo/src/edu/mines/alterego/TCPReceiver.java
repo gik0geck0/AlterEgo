@@ -78,29 +78,40 @@ public class TCPReceiver {
                     JSONObject asJson;
 
                     try {
-                        asJson= new JSONObject(serverMessage);
+                        asJson= new JSONObject(rawBuffer);
                     } catch (Exception e) {
                         // String is not JSON. Ignore it
+                        e.printStackTrace();
                         asJson = null;
                         serverMessage = null;
                     }
 
-                    if (asJson != null && asJson.has("senderIP")) {
-                        if (asJson.isNull("body")) {
-                            Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a body!");
-                        } else {
-                            if (asJson.isNull("subject"))
-                                Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a subject!");
+                    if (asJson != null) {
+                        if (asJson.has("senderIP")) {
+                            if (asJson.isNull("body")) {
+                                Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a body!");
+                            } else {
+                                if (asJson.isNull("subject"))
+                                    Log.e("AlterEgo::TCPReceiver", "JSON Message did not contain a subject!");
 
-                            serverMessage = asJson.getString("body");
-                            asJson.put("receiveIp", myIp);
-                            // Insert the ENTIRE JSON string into the DB
-                            mDbHelper.insertMessage(GameActivity.mGameId, asJson.toString());
+                                serverMessage = asJson.getString("body");
+                                asJson.put("receiverIP", myIp);
+                                // Insert the ENTIRE JSON string into the DB
+                                mDbHelper.insertMessage(GameActivity.mGameId, asJson.toString());
+                            }
+                        } else {
+                            Log.e("AlterEgo::TCPReceiver", "Received a JSON Message without a senderIP: " + rawBuffer);
                         }
+                    } else {
+                        Log.e("AlterEgo::TCPReceiver", "Received an invalid JSON Message: " + rawBuffer);
                     }
+
                     if (serverMessage != null && mMessageListener != null) {
                         //call the method messageReceived from MyActivity class
+                        Log.d("AlterEgo::TCPReceiver", "Notifying listener of a received message");
                         mMessageListener.messageReceived(serverMessage);
+                    } else {
+                        Log.e("AlterEgo::TCPReceiver", "Cannot notify messageListener. ServerMessage: " + serverMessage + " mMessageListener: " + mMessageListener);
                     }
                     serverMessage = null;
 
