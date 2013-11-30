@@ -205,6 +205,8 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	public MarkerData addDBMarker(String marker_name,
 			String marker_description, double marker_lat, double marker_long,
 			MARKERTYPE marker_type, int map_id, float color) {
+        // Log.d("AlterEgo::Database", "Adding marker " + marker_name + " at (" + marker_lat + "," + marker_long + ")");
+
 		SQLiteDatabase database = getWritableDatabase();
 
 		ContentValues markerVals = new ContentValues();
@@ -261,11 +263,11 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		Cursor c = database.rawQuery("SELECT * FROM marker INNER JOIN map on map.map_id = marker.map_id WHERE game_id=?", args);
 		//Cursor c = database.rawQuery("SELECT * FROM marker", null);
 		c.moveToFirst();
-		Log.i("AlterEgo::CharacterDBHelper", "loadMarkers: mapId: " + Integer.toString(mapId));
+		// Log.i("AlterEgo::CharacterDBHelper", "loadMarkers: mapId: " + Integer.toString(mapId));
 		ArrayList<MarkerData> markers = new ArrayList<MarkerData>();
 		
 		while(!c.isAfterLast()) {
-			Log.i("AlterEgo::CharacterDBHelper", "Inside while loop");
+			// Log.i("AlterEgo::CharacterDBHelper", "Inside while loop");
 			markers.add(new MarkerData(c.getInt(c.getColumnIndex("marker_id")),
 				c.getString(c.getColumnIndex("marker_name")), c.getString(c
 						.getColumnIndex("marker_description")),
@@ -484,8 +486,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				"SELECT * FROM inventory_item LIMIT 0", null);
 		if (cursor.getColumnIndex("name") < 0
 				|| cursor.getColumnIndex("description") < 0) {
-			Log.i("AlterEgo::CharacterDBHelper",
-					"The name and description columns didn't exist. Dropping the table, and resetting it");
+			// Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
 			SQLiteDatabase database = getWritableDatabase();
 			database.execSQL("DROP TABLE inventory_item");
 			database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "
@@ -532,7 +533,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 * @return A list of NotesData representing the character's notebook
 	 */
 	public ArrayList<NotesData> getNotesData(int characterId) {
-		Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId "
+		// Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId "
 				+ characterId);
 		// Verify that the name and description columns exist
 		// This is done here because
@@ -549,7 +550,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 						new String[] { "" + characterId });
 		ArrayList<NotesData> notesList = new ArrayList<NotesData>();
 		notesCursor.moveToFirst();
-		Log.i("AlterEgos::characterDBHelper::notesCursor", "notesCursor "
+		// Log.i("AlterEgos::characterDBHelper::notesCursor", "notesCursor "
 				+ notesCursor.getCount());
 		int nidCol = notesCursor.getColumnIndex("notes_data_id");
 		int nNameCol = notesCursor.getColumnIndex("notes_subject");
@@ -700,7 +701,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
     }
 
     public MessageData insertMessage(int gameId, String message) {
-        Log.d("AlterEgo::Database::Message", "Inserting message: " + message);
+        // Log.d("AlterEgo::Database::Message", "Inserting message: " + message);
 
         SQLiteDatabase db = getWritableDatabase();
         ContentValues msgVals = new ContentValues();
