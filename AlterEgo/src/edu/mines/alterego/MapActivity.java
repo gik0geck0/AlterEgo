@@ -141,17 +141,20 @@ public class MapActivity extends Activity {
 		Log.i("ALTEREGO::MAPACT::markerList", Integer.toString(markerList.size() ));
 		for (MarkerData m : markerList) {
 			BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
-			if(m.marker_type == MARKERTYPE.PLAYER) {
-				icon = BitmapDescriptorFactory.defaultMarker(m.marker_color);
-			} else if (m.marker_type == MARKERTYPE.TREASURE) {
-				icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_treasure);
-			} else {
-				icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_skull);
-			}
+            switch(m.getMarkerType()) {
+                case PLAYER:
+                    icon = BitmapDescriptorFactory.defaultMarker(m.getColor());
+                    break;
+                case TREASURE:
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_treasure);
+                    break;
+                default:
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_skull);
+            }
 			map.addMarker(new MarkerOptions()
-					.title(m.marker_name)
-					.snippet(m.marker_description)
-					.position(new LatLng(m.marker_lat,m.marker_long))
+					.title(m.getName())
+					.snippet(m.getDescription())
+					.position(new LatLng(m.getLat(), m.getLong()))
 					.icon(icon)
 					.draggable(true));
 		}

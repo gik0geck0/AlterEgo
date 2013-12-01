@@ -3,13 +3,14 @@ package edu.mines.alterego;
 import edu.mines.alterego.MapActivity.MARKERTYPE;
 
 class MarkerData {
-    public int map_id;
-    public String marker_name;
-    public String marker_description;
-    public MARKERTYPE marker_type;
-    public double marker_lat;
-    public double marker_long;
-    public float marker_color;
+    private int map_id;
+    private int marker_id;
+    private String marker_name;
+    private String marker_description;
+    private MARKERTYPE marker_type;
+    private double marker_lat;
+    private double marker_long;
+    private float marker_color;
 
     /**
      * <p>
@@ -26,8 +27,9 @@ class MarkerData {
      * @param long :: marker longitude
      * 
      */
-    MarkerData(int mapId, String name, String description, MARKERTYPE type, double latitude, double longitude, float color) {
+    MarkerData(int mapId, int markerId, String name, String description, MARKERTYPE type, double latitude, double longitude, float color) {
        map_id=mapId;
+       marker_id=markerId;
        marker_name=name;
        marker_description=description;
        marker_type=type;
@@ -36,5 +38,12 @@ class MarkerData {
        marker_color = color;
     }
 
-    
+    public int getMapId() { return map_id; }
+    public int getMarkerId() { return marker_id; }
+    public String getName() { return marker_name; }
+    public String getDescription() { return marker_description; }
+    public MARKERTYPE getMarkerType() { return marker_type; }
+    public double getLat() { return marker_lat; }
+    public double getLong() { return marker_long; }
+    public float getColor() { return marker_color; }
 }

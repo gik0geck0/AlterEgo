@@ -178,6 +178,25 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	}
 
 	/**
+	 * <p>
+	 * Modifies the game (identified by gameId) to have a new game
+	 * name/description.
+	 * </p>
+	 * 
+	 * @param gameId
+	 *            GameID identifying the game to be changed.
+	 * @param gameName
+	 *            New name for the game
+	 */
+	public void updateGame(int gameId, String gameName) {
+		SQLiteDatabase database = getWritableDatabase();
+		ContentValues cvs = new ContentValues();
+		cvs.put("name", gameName);
+		String[] args = { Integer.toString(gameId) };
+		database.update("game", cvs, "game_id=?", args);
+	}
+
+	/**
 	 * 
 	 * <p>
 	 * When game is created, fill map database with corresponding game
@@ -223,35 +242,109 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
 		Cursor c = database
 				.rawQuery(
-						"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type, marker_color"
+						"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type, marker_color, map_id"
+								+ " FROM marker" + " WHERE ROWID=?", args);
+		c.moveToFirst();
+
+        return new MarkerData(
+            c.getInt(c.getColumnIndex("map_id")),
+            c.getInt(c.getColumnIndex("marker_id")),
+            c.getString(c.getColumnIndex("marker_name")),
+            c.getString(c.getColumnIndex("marker_description")),
+            MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
+            c.getDouble(c.getColumnIndex("marker_lat")),
+            c.getDouble(c.getColumnIndex("marker_long")),
+            c.getFloat(c.getColumnIndex("marker_color"))
+            );
+	}
+
+    /**
+     * <p>
+     *      Update a marker in the database with a refreshed MarkerData object
+     * </p>
+     * @param updatedObj MarkerData object that contains modified attributes. This object will takeover as the object in the database
+     * @return The provided Marker upon success. NULL upon failure
+     */
+    public MarkerData updateDBMarker(MarkerData newObj) {
+		SQLiteDatabase database = getWritableDatabase();
+
+        MarkerData oldObj = getMarker(newObj.getMarkerId());
+
+		ContentValues markerVals = new ContentValues();
+
+        // Fill the markerVals with only updated entities
+        if (oldObj.getName().equals(newObj.getName())) {
+            markerVals.put("marker_name", newObj.getName());
+        }
+        if (oldObj.getDescription().equals(newObj.getDescription())) {
+            markerVals.put("marker_description", newObj.getDescription());
+        }
+        if (oldObj.getLat() != newObj.getLat()) {
+            markerVals.put("marker_lat", newObj.getLat());
+        }
+        if (oldObj.getLong() != newObj.getLong()) {
+            markerVals.put("marker_long", newObj.getLong());
+        }
+        if (oldObj.getMarkerType() != newObj.getMarkerType()) {
+            markerVals.put("marker_type", newObj.getMarkerType().getValue());
+        }
+        if (oldObj.getMapId() != newObj.getMapId()) {
+            markerVals.put("map_id", newObj.getMapId());
+        }
+        if (oldObj.getColor() != newObj.getColor()) {
+            markerVals.put("marker_color", newObj.getColor());
+        }
+
+        String[] args = { ""+newObj.getMarkerId() };
+		int rowsAffected = database.update("marker", markerVals, "marker_id=?", args);
+
+		Cursor c = database
+				.rawQuery(
+						"SELECT marker_id, marker_name, marker_description, marker_lat, marker_long, marker_type, marker_color, map_id"
 								+ " FROM marker" + " WHERE marker_id=?", args);
 		c.moveToFirst();
 
-		return new MarkerData(c.getInt(c.getColumnIndex("marker_id")),
-				c.getString(c.getColumnIndex("marker_name")), c.getString(c
-						.getColumnIndex("marker_description")),
-				MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
-				c.getDouble(c.getColumnIndex("marker_lat")), c.getDouble(c.getColumnIndex("marker_long")), c.getFloat(c.getColumnIndex("marker_color")));
-	}
+        if (rowsAffected > 1) {
+            Log.e("AlterEgo::Database::MarkerUpdate", "There are many rows with the same marker id. This is a critical error; The database is BONED.");
+        }
 
-	/**
-	 * <p>
-	 * Modifies the game (identified by gameId) to have a new game
-	 * name/description.
-	 * </p>
-	 * 
-	 * @param gameId
-	 *            GameID identifying the game to be changed.
-	 * @param gameName
-	 *            New name for the game
-	 */
-	public void updateGame(int gameId, String gameName) {
-		SQLiteDatabase database = getWritableDatabase();
-		ContentValues cvs = new ContentValues();
-		cvs.put("name", gameName);
-		String[] args = { Integer.toString(gameId) };
-		database.update("game", cvs, "game_id=?", args);
-	}
+        return new MarkerData(
+            c.getInt(c.getColumnIndex("map_id")),
+            c.getInt(c.getColumnIndex("marker_id")),
+            c.getString(c.getColumnIndex("marker_name")),
+            c.getString(c.getColumnIndex("marker_description")),
+            MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
+            c.getDouble(c.getColumnIndex("marker_lat")),
+            c.getDouble(c.getColumnIndex("marker_long")),
+            c.getFloat(c.getColumnIndex("marker_color"))
+            );
+    }
+
+    public MarkerData getMarker(int markerId) {
+		SQLiteDatabase database = getReadableDatabase();
+
+		String[] args = { Integer.toString(markerId) };
+		Cursor c = database.rawQuery("SELECT * FROM marker INNER JOIN map on map.map_id = marker.map_id WHERE marker_id=?", args);
+		//Cursor c = database.rawQuery("SELECT * FROM marker", null);
+		c.moveToFirst();
+		
+        MarkerData marker = null;
+
+        if (!c.isAfterLast()) {
+            marker = new MarkerData(
+                c.getInt(c.getColumnIndex("map_id")),
+                c.getInt(c.getColumnIndex("marker_id")),
+                c.getString(c.getColumnIndex("marker_name")),
+                c.getString(c.getColumnIndex("marker_description")),
+                MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
+                c.getDouble(c.getColumnIndex("marker_lat")),
+                c.getDouble(c.getColumnIndex("marker_long")),
+                c.getFloat(c.getColumnIndex("marker_color"))
+                );
+        }
+
+		return marker;
+    }
 
 	/**
 	 * 
@@ -268,12 +361,16 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		
 		while(!c.isAfterLast()) {
 			// Log.i("AlterEgo::CharacterDBHelper", "Inside while loop");
-			markers.add(new MarkerData(c.getInt(c.getColumnIndex("marker_id")),
-				c.getString(c.getColumnIndex("marker_name")), c.getString(c
-						.getColumnIndex("marker_description")),
+			markers.add(new MarkerData(
+                c.getInt(c.getColumnIndex("map_id")),
+                c.getInt(c.getColumnIndex("marker_id")),
+				c.getString(c.getColumnIndex("marker_name")),
+                c.getString(c.getColumnIndex("marker_description")),
 				MARKERTYPE.values()[c.getInt(c.getColumnIndex("marker_type"))],
-				c.getDouble(c.getColumnIndex("marker_lat")), c.getDouble(c
-						.getColumnIndex("marker_long")), c.getFloat(c.getColumnIndex("marker_color"))));
+				c.getDouble(c.getColumnIndex("marker_lat")),
+                c.getDouble(c.getColumnIndex("marker_long")),
+                c.getFloat(c.getColumnIndex("marker_color"))
+                ));
 			c.moveToNext();
 		}
 		return markers;
@@ -533,8 +630,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 * @return A list of NotesData representing the character's notebook
 	 */
 	public ArrayList<NotesData> getNotesData(int characterId) {
-		// Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId "
-				+ characterId);
+		// Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId " + characterId);
 		// Verify that the name and description columns exist
 		// This is done here because
 		Cursor notesCursor = getReadableDatabase()
@@ -550,8 +646,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 						new String[] { "" + characterId });
 		ArrayList<NotesData> notesList = new ArrayList<NotesData>();
 		notesCursor.moveToFirst();
-		// Log.i("AlterEgos::characterDBHelper::notesCursor", "notesCursor "
-				+ notesCursor.getCount());
+		// Log.i("AlterEgos::characterDBHelper::notesCursor", "notesCursor " + notesCursor.getCount());
 		int nidCol = notesCursor.getColumnIndex("notes_data_id");
 		int nNameCol = notesCursor.getColumnIndex("notes_subject");
 		int nDescCol = notesCursor.getColumnIndex("notes_description");
