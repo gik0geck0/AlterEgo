@@ -131,6 +131,11 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
             //args.putInt((String) getResources().getText(R.string.charid), mCharId);
             Log.i("AlterEgo::GameActivity::getItem", "Spawning a new fragment with game=" + mGameId + " and char=" + mCharId);
 
+            // Short-circuit if there's no character yet. CharacterFragment is the only possibility
+            if (mCharId < 0 && position > 0) {
+                return null;
+            }
+
             // Get a fragment to be used
             Fragment fragment;
             switch(position) {
@@ -165,6 +170,11 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
+
+            // If there's no valid character, show only the character fragment
+            if (mCharId < 0)
+                return 1;
+
 			return 5;
 		}
 
@@ -220,6 +230,7 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		mCharId = dbhelper.getCharacterIdForGame(mGameId);
 		Log.i("AlterEgo::GameAct::Refresh",
 				"Re-stating the character-ID. It was " + mCharId);
+        mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 
 	public void startMap(View view) {

@@ -28,6 +28,8 @@ import android.widget.Toast;
 public class InventoryFragment extends Fragment {
 	ArrayAdapter<InventoryItem> mInvAdapter;
 
+    // SimpleCursorAdapter mInvAdapter;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -49,12 +51,17 @@ public class InventoryFragment extends Fragment {
 				.findViewById(R.id.inventory_list);
 
 		CharacterDBHelper dbhelper = new CharacterDBHelper(getActivity());
+
+        /* Manual adapter
+        */
 		ArrayList<InventoryItem> invItems = dbhelper
 				.getInventoryItems(GameActivity.mCharId);
 
 		mInvAdapter = new ArrayAdapter<InventoryItem>(getActivity(),
 				android.R.layout.simple_list_item_1, invItems);
 		invListView.setAdapter(mInvAdapter);
+
+        /* Cursor Adapter */
 
 		// Bind the new-character button to it's appropriate action
 		Button newInv = (Button) inventoryView.findViewById(R.id.newinv_button);
