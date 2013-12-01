@@ -68,7 +68,9 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				+ "FOREIGN KEY(game_id) REFERENCES game(game_id) )");
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "
-				+ "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name TEXT,"
+                + "description TEXT,"
 				+ "character_id INTEGER,"
 				+ "FOREIGN KEY(character_id) REFERENCES character(character_id)"
 				+ ")");
@@ -85,14 +87,14 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				+ ")");
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS item_stat ( "
-				+ "item_stat_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ "inventory_item_id INTEGER,"
 				+ "stat_value INTEGER,"
 				+ "stat_name INTEGER,"
 				+ "description_usage_etc INTEGER,"
 				+ "category_id INTEGER,"
 				+ "FOREIGN KEY(category_id) REFERENCES category(category_id)"
-				+ "FOREIGN KEY(inventory_item_id) REFERENCES inventory_item(inventory_item_id)"
+				+ "FOREIGN KEY(inventory_item_id) REFERENCES inventory_item(_id)"
 				+ ")");
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS category ( "
@@ -577,29 +579,11 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 */
 	public ArrayList<InventoryItem> getInventoryItems(int characterId) {
 
-		// Verify that the name and description columns exist
-		// This is done here because
-		Cursor cursor = getReadableDatabase().rawQuery(
-				"SELECT * FROM inventory_item LIMIT 0", null);
-		if (cursor.getColumnIndex("name") < 0
-				|| cursor.getColumnIndex("description") < 0) {
-			// Log.i("AlterEgo::CharacterDBHelper", "The name and description columns didn't exist. Dropping the table, and resetting it");
-			SQLiteDatabase database = getWritableDatabase();
-			database.execSQL("DROP TABLE inventory_item");
-			database.execSQL("CREATE TABLE IF NOT EXISTS inventory_item ( "
-					+ "inventory_item_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "name TEXT, "
-					+ "description TEXT, "
-					+ "character_id INTEGER,"
-					+ "FOREIGN KEY(character_id) REFERENCES character(character_id)"
-					+ ")");
-		}
-
 		Cursor invCursor = getReadableDatabase()
 				.rawQuery(
 						"SELECT "
 								+ "character.character_id,"
-								+ "inventory_item.inventory_item_id,"
+								+ "inventory_item._id,"
 								+ "inventory_item.name AS 'item_name',"
 								+ "inventory_item.description AS 'item_description'"
 								+ "FROM character "
@@ -609,7 +593,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		ArrayList<InventoryItem> invList = new ArrayList<InventoryItem>();
 		invCursor.moveToFirst();
 
-		int iidCol = invCursor.getColumnIndex("inventory_item_id");
+		int iidCol = invCursor.getColumnIndex("_id");
 		int iNameCol = invCursor.getColumnIndex("item_name");
 		int iDescCol = invCursor.getColumnIndex("item_description");
 		while (!invCursor.isAfterLast()) {
@@ -618,6 +602,33 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 			invCursor.moveToNext();
 		}
 		return invList;
+	}
+
+	/**
+	 * <p>
+	 * Lookup all the inventory items that a character has.
+	 * </p>
+	 * 
+	 * @param characterId
+	 *            The ID for the character to search
+	 * @return A cursor to the character's inventory
+	 */
+	public Cursor getInventoryItemsCursor(int characterId) {
+
+		Cursor invCursor = getReadableDatabase()
+				.rawQuery(
+						"SELECT "
+								+ "character.character_id,"
+								+ "inventory_item._id,"
+								+ "inventory_item.name AS 'item_name',"
+								+ "inventory_item.description AS 'item_description'"
+								+ "FROM character "
+								+ "INNER JOIN inventory_item ON inventory_item.character_id = character.character_id "
+								+ "WHERE character.character_id = ?",
+						new String[] { "" + characterId });
+		invCursor.moveToFirst();
+
+		return invCursor;
 	}
 
 	/**
@@ -689,7 +700,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		c.moveToFirst();
 
 		return new InventoryItem(
-				c.getInt(c.getColumnIndex("inventory_item_id")), c.getString(c
+				c.getInt(c.getColumnIndex("_id")), c.getString(c
 						.getColumnIndex("name")), c.getString(c
 						.getColumnIndex("description")));
 	}

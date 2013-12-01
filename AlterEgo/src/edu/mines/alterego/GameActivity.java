@@ -59,15 +59,6 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.game_activity);
 
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
-
-		// Set up the ViewPager with the sections adapter.
-		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-
 		// Grab the gameId from the starting activity (should be MainActivity)
 		Intent i = getIntent();
 		Bundle extras = i.getExtras();
@@ -90,7 +81,6 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 			Log.e("AlterEgo::CharacterFragment", "Game ID is not valid...?");
 		}
 
-
 		// Grab game name for character
 		// Try to find a character for this game
 		CharacterDBHelper dbhelper = new CharacterDBHelper(this);
@@ -99,6 +89,15 @@ public class GameActivity extends FragmentActivity implements RefreshInterface {
 
 		// Try to find a character for this game
 		mCharId = dbhelper.getCharacterIdForGame(mGameId);
+
+		// Create the adapter that will return a fragment for each of the three
+		// primary sections of the app.
+		mSectionsPagerAdapter = new SectionsPagerAdapter(
+				getSupportFragmentManager());
+
+		// Set up the ViewPager with the sections adapter.
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
 
         spawnNetworking();
 	}

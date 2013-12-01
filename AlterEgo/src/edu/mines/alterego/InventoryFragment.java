@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 /**
@@ -26,9 +28,9 @@ import android.widget.Toast;
  */
 
 public class InventoryFragment extends Fragment {
-	ArrayAdapter<InventoryItem> mInvAdapter;
+	// ArrayAdapter<InventoryItem> mInvAdapter;
+	SimpleCursorAdapter mInvAdapter;
 
-    // SimpleCursorAdapter mInvAdapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,15 +55,25 @@ public class InventoryFragment extends Fragment {
 		CharacterDBHelper dbhelper = new CharacterDBHelper(getActivity());
 
         /* Manual adapter
-        */
 		ArrayList<InventoryItem> invItems = dbhelper
 				.getInventoryItems(GameActivity.mCharId);
 
 		mInvAdapter = new ArrayAdapter<InventoryItem>(getActivity(),
 				android.R.layout.simple_list_item_1, invItems);
-		invListView.setAdapter(mInvAdapter);
+        */
 
         /* Cursor Adapter */
+        Cursor invCursor = dbhelper.getInventoryItemsCursor(GameActivity.mCharId);
+        int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
+        mInvAdapter = new SimpleCursorAdapter(
+                this.getActivity(),
+                android.R.layout.simple_list_item_2,
+                invCursor,
+                new String[] {"item_name", "item_description"},
+                ctrlIds,
+                SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+		invListView.setAdapter(mInvAdapter);
 
 		// Bind the new-character button to it's appropriate action
 		Button newInv = (Button) inventoryView.findViewById(R.id.newinv_button);
@@ -105,7 +117,9 @@ public class InventoryFragment extends Fragment {
 														GameActivity.mCharId,
 														name, desc);
 
-										mInvAdapter.add(newItem);
+										// mInvAdapter.add(newItem);
+                                        Cursor c = dbHelper.getInventoryItemsCursor(GameActivity.mCharId);
+                                        mInvAdapter.changeCursor(c);
 									}
 								})
 						.setNegativeButton(R.string.cancel,
