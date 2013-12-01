@@ -24,6 +24,9 @@ public class MyCustomAdapter extends BaseAdapter {
 
         //get the layout inflater
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        // Check the database
+        refreshDB();
     }
 
     @Override
