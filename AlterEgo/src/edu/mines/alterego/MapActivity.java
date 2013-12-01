@@ -1,6 +1,7 @@
 package edu.mines.alterego;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,10 +22,11 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
-public class MapActivity extends Activity {
+public class MapActivity extends Activity implements GoogleMap.OnMarkerDragListener {
 
 	GoogleMap map;
 	Context context = this;
@@ -34,6 +36,11 @@ public class MapActivity extends Activity {
 	RadioButton markerButton;
 	int markerId = -1;
 	private int gameID = -1;
+
+    // Link between Markers used by the GoogleMap, and its MarkerData for the database
+    // Any time a Marker is moved, lookup its MarkerData, and update it in the database
+    // Any time a Marker is added to the Map, add it to the database, and put its corresponding MarkerData in here
+    private HashMap<Marker, MarkerData> markerDataStore = new HashMap<Marker, MarkerData>();
 
 	// enum for marker types
 	public enum MARKERTYPE {
@@ -63,6 +70,7 @@ public class MapActivity extends Activity {
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
 		map.setMapType(GoogleMap.MAP_TYPE_NONE);
+        map.setOnMarkerDragListener(this);
 
 		TileOverlayOptions opts = new TileOverlayOptions();
 		opts.tileProvider(new CustomMapTileProvider(getAssets()));
@@ -151,12 +159,15 @@ public class MapActivity extends Activity {
                 default:
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_skull);
             }
-			map.addMarker(new MarkerOptions()
+            Marker newMarker = map.addMarker(new MarkerOptions()
 					.title(m.getName())
 					.snippet(m.getDescription())
 					.position(new LatLng(m.getLat(), m.getLong()))
 					.icon(icon)
 					.draggable(true));
+
+            // Create a link to the DB Object in the hashmap
+            markerDataStore.put(newMarker, m);
 		}
 
 	}
@@ -229,16 +240,20 @@ public class MapActivity extends Activity {
 											Toast.LENGTH_SHORT);
 							name.show();
 						} else {
-							map.addMarker(new MarkerOptions()
+                            Marker newMarker = map.addMarker(new MarkerOptions()
 									.title(mName)
 									.snippet(mDesc)
 									.position(position)
 									.icon(BitmapDescriptorFactory
 											.defaultMarker(mColor))
 									.draggable(true));
-							mDbHelper.addDBMarker(mName, mDesc,
+							MarkerData md = mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
 									MARKERTYPE.PLAYER, gameID, mColor);
+
+                            // Create a link to the DB Object in the hashmap
+                            markerDataStore.put(newMarker, md);
+
 							count++;
 						}
 					}
@@ -288,16 +303,19 @@ public class MapActivity extends Activity {
 									Toast.LENGTH_SHORT);
 							name.show();
 						} else {
-							map.addMarker(new MarkerOptions()
+                            Marker newMarker = map.addMarker(new MarkerOptions()
 									.title(mName)
 									.snippet(mDesc)
 									.position(position)
 									.icon(BitmapDescriptorFactory
 											.fromResource(R.drawable.marker_treasure))
 									.draggable(true));
-							mDbHelper.addDBMarker(mName, mDesc,
+							MarkerData md = mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
 									MARKERTYPE.TREASURE, gameID, -1);
+
+                            // Create a link to the DB Object in the hashmap
+                            markerDataStore.put(newMarker, md);
 
 						}
 					}
@@ -345,16 +363,19 @@ public class MapActivity extends Activity {
 									Toast.LENGTH_SHORT);
 							name.show();
 						} else {
-							map.addMarker(new MarkerOptions()
+                            Marker newMarker = map.addMarker(new MarkerOptions()
 									.title(mName)
 									.snippet(mDesc)
 									.position(position)
 									.icon(BitmapDescriptorFactory
 											.fromResource(R.drawable.marker_skull))
 									.draggable(true));
-							mDbHelper.addDBMarker(mName, mDesc,
+							MarkerData md = mDbHelper.addDBMarker(mName, mDesc,
 									position.latitude, position.longitude,
 									MARKERTYPE.ENEMY, gameID, -1);
+
+                            // Create a link to the DB Object in the hashmap
+                            markerDataStore.put(newMarker, md);
 						}
 					}
 
@@ -373,4 +394,21 @@ public class MapActivity extends Activity {
 		AlertDialog alert = addEnemy.create();
 		alert.show();
 	}
+
+    // Called whenever a marker has finished moving
+    public void onMarkerDragEnd(Marker marker) {
+        // A marker has just been dragged to a new location
+        LatLng p = marker.getPosition();
+
+        // Depend on markerDataStore.get to return a REFERENCE
+        MarkerData md = markerDataStore.get(marker);
+        md.move(p);
+
+        // Notify the database of this change
+        mDbHelper.updateDBMarker(md);
+    }
+
+    // MarkerDrag Stubs
+    public void onMarkerDrag(Marker marker) {}
+    public void onMarkerDragStart(Marker marker) {}
 }

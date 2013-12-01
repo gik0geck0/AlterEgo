@@ -1,6 +1,7 @@
 package edu.mines.alterego;
 
 import edu.mines.alterego.MapActivity.MARKERTYPE;
+import com.google.android.gms.maps.model.LatLng;
 
 class MarkerData {
     private int map_id;
@@ -46,4 +47,14 @@ class MarkerData {
     public double getLat() { return marker_lat; }
     public double getLong() { return marker_long; }
     public float getColor() { return marker_color; }
+
+    /**
+     * <p>Move a marker to a new location</p>
+     *
+     * @param pos New position
+     */
+    public void move(LatLng pos) {
+        marker_lat = pos.latitude;
+        marker_long = pos.longitude;
+    }
 }
