@@ -1,7 +1,5 @@
 package edu.mines.alterego;
 
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -11,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -112,10 +109,8 @@ public class InventoryFragment extends Fragment {
 
 										CharacterDBHelper dbHelper = new CharacterDBHelper(
 												getActivity());
-										InventoryItem newItem = dbHelper
-												.addInventoryItem(
-														GameActivity.mCharId,
-														name, desc);
+										// InventoryItem newItem = 
+										dbHelper.addInventoryItem(GameActivity.mCharId, name, desc);
 
 										// mInvAdapter.add(newItem);
                                         Cursor c = dbHelper.getInventoryItemsCursor(GameActivity.mCharId);

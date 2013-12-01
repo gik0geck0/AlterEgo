@@ -1,7 +1,5 @@
 package edu.mines.alterego;
 
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -11,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -117,7 +114,8 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 										.getText().toString();
 
 								// Create a new note
-								NotesData newNote = mDbHelper.addNote(GameActivity.mCharId, noteSubject, noteDescription);
+								// NotesData newNote = 
+								mDbHelper.addNote(GameActivity.mCharId, noteSubject, noteDescription);
 
 								mNotesAdapter.changeCursor(mDbHelper.getNotesDataCursor(GameActivity.mCharId));
 							}
