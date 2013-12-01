@@ -27,7 +27,7 @@ import edu.mines.alterego.MapActivity.MARKERTYPE;
 public class CharacterDBHelper extends SQLiteOpenHelper {
 
 	private static final String DB_NAME = "alterego";
-	private static final int DB_VERSION = 3;
+	private static final int DB_VERSION = 4;
 
 	public CharacterDBHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -102,7 +102,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				+ "category_name TEXT" + ")");
 
 		database.execSQL("CREATE TABLE IF NOT EXISTS notes_data ( "
-				+ "notes_data_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ "subject TEXT, "
 				+ "description TEXT, "
 				+ "character_id INTEGER,"
@@ -421,7 +421,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				"SELECT * FROM notes_data WHERE notes_data.ROWID =?", args);
 		c.moveToFirst();
 
-		return new NotesData(c.getInt(c.getColumnIndex("notes_data_id")),
+		return new NotesData(c.getInt(c.getColumnIndex("_id")),
 				c.getString(c.getColumnIndex("subject")), c.getString(c
 						.getColumnIndex("description")));
 	}
@@ -644,21 +644,12 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		// Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId " + characterId);
 		// Verify that the name and description columns exist
 		// This is done here because
-		Cursor notesCursor = getReadableDatabase()
-				.rawQuery(
-						"SELECT "
-								+ "character.character_id,"
-								+ "notes_data.notes_data_id,"
-								+ "notes_data.subject AS 'notes_subject',"
-								+ "notes_data.description AS 'notes_description'"
-								+ "FROM character "
-								+ "INNER JOIN notes_data ON notes_data.character_id = character.character_id "
-								+ "WHERE character.character_id = ?",
-						new String[] { "" + characterId });
+		Cursor notesCursor = getNotesDataCursor(characterId);
+
 		ArrayList<NotesData> notesList = new ArrayList<NotesData>();
 		notesCursor.moveToFirst();
 		// Log.i("AlterEgos::characterDBHelper::notesCursor", "notesCursor " + notesCursor.getCount());
-		int nidCol = notesCursor.getColumnIndex("notes_data_id");
+		int nidCol = notesCursor.getColumnIndex("_id");
 		int nNameCol = notesCursor.getColumnIndex("notes_subject");
 		int nDescCol = notesCursor.getColumnIndex("notes_description");
 		while (!notesCursor.isAfterLast()) {
@@ -667,6 +658,35 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 			notesCursor.moveToNext();
 		}
 		return notesList;
+	}
+
+	/**
+	 * <p>
+	 * Lookup all the notes a character has taken.
+	 * </p>
+	 * 
+	 * @param characterId
+	 *            The ID for the character to search
+	 * @return A list of NotesData representing the character's notebook
+	 */
+	public Cursor getNotesDataCursor(int characterId) {
+		// Log.i("AlterEgos::CharacterDBHelper::characterId", "characterId " + characterId);
+		// Verify that the name and description columns exist
+		// This is done here because
+		Cursor notesCursor = getReadableDatabase()
+				.rawQuery(
+						"SELECT "
+								+ "character.character_id,"
+								+ "notes_data._id,"
+								+ "notes_data.subject AS 'notes_subject',"
+								+ "notes_data.description AS 'notes_description'"
+								+ "FROM character "
+								+ "INNER JOIN notes_data ON notes_data.character_id = character.character_id "
+								+ "WHERE character.character_id = ?",
+						new String[] { "" + characterId });
+		notesCursor.moveToFirst();
+
+		return notesCursor;
 	}
 
 	/**

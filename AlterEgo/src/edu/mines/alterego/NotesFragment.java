@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 /**
@@ -24,7 +26,7 @@ import android.widget.Toast;
  */
 
 public class NotesFragment extends Fragment implements View.OnClickListener {
-	ArrayAdapter<NotesData> mNotesAdapter;
+    SimpleCursorAdapter mNotesAdapter;
 	CharacterDBHelper mDbHelper;
 	Button addNoteB;
 
@@ -46,9 +48,25 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 
         // Lookup the character in the database
 		mDbHelper = new CharacterDBHelper(getActivity());
+
+        /* ArrayAdapter
 		ArrayList<NotesData> nItems = mDbHelper.getNotesData(GameActivity.mCharId);
 		mNotesAdapter = new ArrayAdapter<NotesData>(getActivity(),
 				android.R.layout.simple_list_item_1, nItems);
+        */
+
+        /* Cursor Adapter
+         */
+        Cursor notesCursor = mDbHelper.getNotesDataCursor(GameActivity.mCharId);
+        int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
+        mNotesAdapter = new SimpleCursorAdapter(
+                this.getActivity(),
+                android.R.layout.simple_list_item_2,
+                notesCursor,
+                new String[] {"notes_subject", "notes_description"},
+                ctrlIds,
+                SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
 		nView.setAdapter(mNotesAdapter);
 
 		// Create Add Notes Button
@@ -100,7 +118,8 @@ public class NotesFragment extends Fragment implements View.OnClickListener {
 
 								// Create a new note
 								NotesData newNote = mDbHelper.addNote(GameActivity.mCharId, noteSubject, noteDescription);
-								mNotesAdapter.add(newNote);
+
+								mNotesAdapter.changeCursor(mDbHelper.getNotesDataCursor(GameActivity.mCharId));
 							}
 						})
 				.setNegativeButton(R.string.cancel,
