@@ -80,7 +80,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		ListView.OnItemClickListener {
 
 	ArrayAdapter<GameData> mGameDbAdapter;
-	ListView listView;
 	CharacterDBHelper mDbHelper;
 	Button newGameB;
 
@@ -109,8 +108,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
 		newGameB.setOnClickListener(this);
 
 		// Create context menu
-		listView = (ListView) findViewById(R.id.main_game_list_view);
-		registerForContextMenu(listView);
+		registerForContextMenu(gameListView);
 		
 		if (!gamePairList.isEmpty()) {
 			hideCreateNewGameButton();

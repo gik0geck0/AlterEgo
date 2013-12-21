@@ -764,17 +764,38 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		whereArgs[0] = Integer.toString(charId);
 		Cursor statCursor = db
 				.rawQuery(
-						"SELECT stat_name, stat_value FROM character_stat WHERE character_id=?",
+						"SELECT stat_name, stat_value, _id FROM character_stat WHERE character_id=?",
 						whereArgs);
 		statCursor.moveToFirst();
 		ArrayList<CharacterStat> stats = new ArrayList<CharacterStat>();
 		while (!statCursor.isAfterLast()) {
 			String statName = statCursor.getString(0);
 			int statVal = statCursor.getInt(1);
-			CharacterStat stat = new CharacterStat(charId, statVal, statName, 0);
+            int statId = statCursor.getInt(2);
+			CharacterStat stat = new CharacterStat(charId, statId, statVal, statName, 0);
 			stats.add(stat);
 		}
 		return stats;
+	}
+
+	/**
+	 * <p>
+	 * Lookup all the stats for a given character
+	 * </p>
+	 * 
+	 * @param charId
+	 *            ID for the character to be analyzed
+	 * @return Cursor pointing to the character stats
+	 */
+	public Cursor getStatsForCharacterCursor(int charId) {
+		SQLiteDatabase db = getReadableDatabase();
+		String[] whereArgs = new String[1];
+		whereArgs[0] = Integer.toString(charId);
+		Cursor statCursor = db
+				.rawQuery(
+						"SELECT * FROM character_stat WHERE character_id=?",
+						whereArgs);
+        return statCursor;
 	}
 
 	/**

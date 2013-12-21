@@ -9,6 +9,7 @@ package edu.mines.alterego;
 public class CharacterStat {
 
     private int characterId;
+    private int statId;
     private int statValue;
     private String statName;
     private int category;
@@ -20,8 +21,9 @@ public class CharacterStat {
      * @param statN The name for the current stat
      * @param cat The category for the current stat
      */
-    CharacterStat(int charId, int statVal, String statN, int cat) {
+    CharacterStat(int charId, int statId, int statVal, String statN, int cat) {
         characterId = charId;
+        this.statId = statId;
         statValue = statVal;
         statName = statN;
     }
@@ -39,5 +41,8 @@ public class CharacterStat {
 	public int getCategory() {
 		return category;
 	}
-
+    
+    public int getStatId() {
+        return statId;
+    }
 }

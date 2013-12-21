@@ -1,20 +1,32 @@
 package edu.mines.alterego;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /**
  * Description: This file defines the fragment showing characters and stats
@@ -28,8 +40,11 @@ public class CharacterFragment extends Fragment {
     CharacterData mChar;
     RefreshInterface mActRefresher;
     View mainView;
-    private SimpleCursorAdapter mCharStatAdapterC;
+    ArrayList<CharacterStat> mArrayList;
+    // // private SimpleCursorAdapter mCharStatAdapterC;
+    private ModelAdapter<CharacterStat> mCharStatAdapterC;
     private Cursor statsCursor;
+    CharacterDBHelper mDbHelper;
 
     CharacterFragment(RefreshInterface refresher) {
         super();
@@ -45,9 +60,9 @@ public class CharacterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+        mDbHelper = new CharacterDBHelper(getActivity());
         if (GameActivity.mCharId < 0) {
-            GameActivity.mCharId = dbHelper.getCharacterIdForGame(GameActivity.mGameId);
+            GameActivity.mCharId = mDbHelper.getCharacterIdForGame(GameActivity.mGameId);
         }
 
         // Inflate the layout for this fragment
@@ -56,7 +71,7 @@ public class CharacterFragment extends Fragment {
 
 
         if (GameActivity.mCharId >= 0) {
-            mChar = dbHelper.getCharacter(GameActivity.mCharId);
+            mChar = mDbHelper.getCharacter(GameActivity.mCharId);
             showCharacter();
         } else {
             // Make the no-char layout visible
@@ -65,6 +80,7 @@ public class CharacterFragment extends Fragment {
 
             // Bind the new-character button to it's appropriate action
             Button newChar = (Button) characterView.findViewById(R.id.nochar_button);
+
             newChar.setOnClickListener( new Button.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -74,7 +90,7 @@ public class CharacterFragment extends Fragment {
                     LayoutInflater inflater = getActivity().getLayoutInflater();
 
                     charBuilder.setView(inflater.inflate(R.layout.new_char_dialog, null))
-                    	.setTitle("Create New Character")
+                        .setTitle("Create New Character")
                         .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
@@ -86,8 +102,7 @@ public class CharacterFragment extends Fragment {
                                 String name = nameInput.getText().toString();
                                 String desc = descInput.getText().toString();
 
-                                CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                                CharacterData newChar = dbHelper.addCharacter(GameActivity.mGameId, name, desc);
+                                CharacterData newChar = mDbHelper.addCharacter(GameActivity.mGameId, name, desc);
 
                                 mChar = newChar;
                                 GameActivity.mCharId = newChar.id;
@@ -130,14 +145,23 @@ public class CharacterFragment extends Fragment {
         cDesc.setText(mChar.description);
 
         // Show all the character's attributes/skills/complications
-        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+        CharacterDBHelper mDbHelper = new CharacterDBHelper(getActivity());
         int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
-        statsCursor = dbHelper.getStatsForCharCursor(mChar.id);
-        mCharStatAdapterC = new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        statsCursor = mDbHelper.getStatsForCharCursor(mChar.id);
+
+        // Initialize the ModelAdapter
+        CursorFetcher cfetcher = new CursorFetcher() {
+            public Cursor fetch() { return mDbHelper.getStatsForCharacterCursor(mChar.id); }
+        };
+        mArrayList = new ArrayList<CharacterStat>();
+        mCharStatAdapterC = new ModelAdapter<CharacterStat>(getActivity(), mArrayList, cfetcher);
+        // new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         ListView statView = (ListView) mainView.findViewById(R.id.char_stats);
         statView.setAdapter(mCharStatAdapterC);
 
+        // Create context menu (Long-press)
+        registerForContextMenu(statView);
 
         Button newStat = (Button) mainView.findViewById(R.id.new_stat_button);
         newStat.setOnClickListener( new Button.OnClickListener() {
@@ -161,9 +185,9 @@ public class CharacterFragment extends Fragment {
                             String name = nameInput.getText().toString();
                             String val = descInput.getText().toString();
 
-                            CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                            dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
-                            mCharStatAdapterC.changeCursor(dbHelper.getStatsForCharCursor(mChar.id));
+                            mDbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
+                            mCharStatAdapterC.refreshDB();
+                            // .changeCursor(mDbHelper.getStatsForCharCursor(mChar.id));
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -174,6 +198,37 @@ public class CharacterFragment extends Fragment {
                 statBuilder.create().show();
             }
         });
+    }
+
+    // Long Press Menu
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.main_game_list_view) {
+            MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.context_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.context_edit:
+                // Create Edit-item context menu
+                DialogFactory.makeDialog(getActivity(), DialogFactory.DialogType.EDIT, DialogFactory.ModelType.GAME, GameActivity.mGameId, mCharStatAdapterC.getItem(info.position).getStatId());
+
+                return true;
+            case R.id.context_delete:
+
+                mDbHelper.deleteCharStat(mCharStatAdapterC.getItem(info.position).getStatId());
+                mGameDbAdapter.remove(mCharStatAdapterC.getItem(info.position));
+                showToast("CharacterStat Deleted");
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
 }
