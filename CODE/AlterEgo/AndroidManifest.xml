@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="edu.mines.alterego"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="18" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme.Default" >
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDeRpWjL4RFCxGy_Mk1i7GDZ4dQIwhDQXE" />
+        <!--
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+            -->
+        <!-- Splash screen -->
+        <activity
+            android:name="edu.mines.alterego.SplashScreen"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Black.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Main Activity -->
+        <activity
+            android:name="edu.mines.alterego.MainActivity"
+            android:label="@string/app_name" 
+            android:configChanges="orientation|screenSize|keyboardHidden">
+        </activity>
+
+        <!-- Game Activity -->
+        <activity
+            android:name="edu.mines.alterego.GameActivity"
+            android:label="@string/app_name" 
+            android:configChanges="orientation|screenSize|keyboardHidden">
+        </activity>
+
+        <!-- Map Activity -->
+        <activity
+            android:name="edu.mines.alterego.MapActivity"
+            android:label="@string/app_name" 
+            android:configChanges="orientation|screenSize|keyboardHidden">
+        </activity> <category android:name="android.intent.category.LAUNCHER" />
+        <uses-library android:name="com.google.android.maps" />
+
+        <service
+            android:name="NetworkingService"
+            android:label="@string/netservicename"
+            >
+        </service>
+    </application>
+
+    <!-- Google Maps Permission requirements -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!-- The following two permissions are not required to use
+         Google Maps Android API v2, but are recommended.
+    Ignored for Alter Ego
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <!-- OpenGL ES 2.0 Rendering -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+
+</manifest>

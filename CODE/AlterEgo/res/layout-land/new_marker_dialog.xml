@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_marker_group"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RadioButton
+        android:id="@+id/add_marker_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_marker_player" />
+
+    <RadioButton
+        android:id="@+id/add_marker_treasure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_marker_treasure" />
+
+    <RadioButton
+        android:id="@+id/add_marker_enemy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_marker_enemy" />
+
+</RadioGroup>
