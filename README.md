@@ -1,5 +1,5 @@
-Alter Ego
-=============
+#Alter Ego
+## Creators: Matt Buland | Maria Deslis | Eric Young
 
 Alter Ego is an RPG-managing application. It enables the user to have multiple
 games, each with a character, stats/skills, inventory, and notes. As of release
