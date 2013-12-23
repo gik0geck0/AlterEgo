@@ -36,7 +36,7 @@ import java.util.ArrayList;
  *
  */
 
-public class CharacterFragment extends Fragment {
+public class CharacterFragment extends Fragment implements RefreshInterface {
 
     // Local data object to hold the character name and description
     CharacterData mChar;
@@ -175,7 +175,16 @@ public class CharacterFragment extends Fragment {
          @Override
             public void onClick(View v) {
                 // Spawn the create-character dialog
+                DialogFactory.makeDialog(
+                        getActivity(),
+                        DialogFactory.DialogType.NEW,
+                        DialogFactory.ModelType.CHARSTAT,
+                        mDbHelper,
+                        mChar.id,
+                        0,
+                        CharacterFragment.this);
 
+                /*
                 AlertDialog.Builder statBuilder = new AlertDialog.Builder(v.getContext());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
 
@@ -202,6 +211,7 @@ public class CharacterFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int id) { dialog.dismiss(); }
                     });
                 statBuilder.create().show();
+                */
             }
         });
     }
@@ -223,14 +233,20 @@ public class CharacterFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.context_edit:
                 // Create Edit-item context menu
-                // DialogFactory.makeDialog(getActivity(), DialogFactory.DialogType.EDIT, DialogFactory.ModelType.GAME, GameActivity.mGameId, mCharStatAdapterC.getItem(info.position).getStatId());
+                DialogFactory.makeDialog(
+                        getActivity(),
+                        DialogFactory.DialogType.EDIT,
+                        DialogFactory.ModelType.CHARSTAT,
+                        mDbHelper,
+                        mChar.id,
+                        (mCharStatAdapterC.getItem(info.position).getStatId()),
+                        this);
 
                 return true;
             case R.id.context_delete:
 
                 mDbHelper.deleteCharStat(mCharStatAdapterC.getItem(info.position).getStatId());
                 mCharStatAdapterC.refreshDB();
-                // mGameDbAdapter.remove(mCharStatAdapterC.getItem(info.position));
                 showToast("CharacterStat Deleted");
                 return true;
             default:
@@ -243,4 +259,8 @@ public class CharacterFragment extends Fragment {
 				Toast.LENGTH_SHORT);
 		toast.show();
 	}
+
+    public void refresh() {
+        mCharStatAdapterC.refreshDB();
+    }
 }
