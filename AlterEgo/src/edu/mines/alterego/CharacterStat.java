@@ -1,5 +1,7 @@
 package edu.mines.alterego;
 
+import android.database.Cursor;
+
 /**
  * Description: This class was originally designed to be an abstraction layer for character stats
  * This class is currently unused but is retained for future use.
@@ -28,6 +30,13 @@ public class CharacterStat {
         statName = statN;
     }
 
+    /**
+     * @param cursor Cursor that's currently pointing to a row that will be used to populate this object
+     */
+    CharacterStat(Cursor cursor) {
+        CharacterDBHelper.createCharacterStatFromCursor(cursor);
+    }
+
     @Override
     public String toString() {
         return statName + " " + Integer.toString(statValue);
@@ -41,7 +50,7 @@ public class CharacterStat {
 	public int getCategory() {
 		return category;
 	}
-    
+
     public int getStatId() {
         return statId;
     }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -24,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -40,11 +42,10 @@ public class CharacterFragment extends Fragment {
     CharacterData mChar;
     RefreshInterface mActRefresher;
     View mainView;
-    ArrayList<CharacterStat> mArrayList;
     // // private SimpleCursorAdapter mCharStatAdapterC;
     private ModelAdapter<CharacterStat> mCharStatAdapterC;
     private Cursor statsCursor;
-    CharacterDBHelper mDbHelper;
+    private CharacterDBHelper mDbHelper;
 
     CharacterFragment(RefreshInterface refresher) {
         super();
@@ -145,7 +146,6 @@ public class CharacterFragment extends Fragment {
         cDesc.setText(mChar.description);
 
         // Show all the character's attributes/skills/complications
-        CharacterDBHelper mDbHelper = new CharacterDBHelper(getActivity());
         int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
         statsCursor = mDbHelper.getStatsForCharCursor(mChar.id);
 
@@ -153,11 +153,17 @@ public class CharacterFragment extends Fragment {
         CursorFetcher cfetcher = new CursorFetcher() {
             public Cursor fetch() { return mDbHelper.getStatsForCharacterCursor(mChar.id); }
         };
-        mArrayList = new ArrayList<CharacterStat>();
-        mCharStatAdapterC = new ModelAdapter<CharacterStat>(getActivity(), mArrayList, cfetcher);
-        // new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        ModelInitializer<CharacterStat> initer = new ModelInitializer<CharacterStat>() {
+            public CharacterStat initialize(Cursor c) {
+                CharacterStat cs = CharacterDBHelper.createCharacterStatFromCursor(c);
+                Log.d("AlterEgo::CharStatInitializer", "Created an object for " + cs);
+                return cs;
+            }
+        };
 
         ListView statView = (ListView) mainView.findViewById(R.id.char_stats);
+        mCharStatAdapterC = new ModelAdapter<CharacterStat>(getActivity(), cfetcher, initer);
+        // new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
         statView.setAdapter(mCharStatAdapterC);
 
         // Create context menu (Long-press)
@@ -217,13 +223,14 @@ public class CharacterFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.context_edit:
                 // Create Edit-item context menu
-                DialogFactory.makeDialog(getActivity(), DialogFactory.DialogType.EDIT, DialogFactory.ModelType.GAME, GameActivity.mGameId, mCharStatAdapterC.getItem(info.position).getStatId());
+                // DialogFactory.makeDialog(getActivity(), DialogFactory.DialogType.EDIT, DialogFactory.ModelType.GAME, GameActivity.mGameId, mCharStatAdapterC.getItem(info.position).getStatId());
 
                 return true;
             case R.id.context_delete:
 
                 mDbHelper.deleteCharStat(mCharStatAdapterC.getItem(info.position).getStatId());
-                mGameDbAdapter.remove(mCharStatAdapterC.getItem(info.position));
+                mCharStatAdapterC.refreshDB();
+                // mGameDbAdapter.remove(mCharStatAdapterC.getItem(info.position));
                 showToast("CharacterStat Deleted");
                 return true;
             default:
@@ -231,4 +238,9 @@ public class CharacterFragment extends Fragment {
         }
     }
 
+	public void showToast(String message) {
+		Toast toast = Toast.makeText(getActivity(), message,
+				Toast.LENGTH_SHORT);
+		toast.show();
+	}
 }

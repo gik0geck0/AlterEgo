@@ -1,15 +1,20 @@
 package edu.mines.alterego;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -27,9 +32,9 @@ class DialogFactory {
     };
 
     // There will ALWAYS need to be a gameId, and there MAY be a special ID. This could be something like Character ID, Character Stat ID, Inventory Item ID, etc...
-    public static void makeDialog(Context c, DialogType dialogtype, ModelType modeltype, CharacterDBHelper dbh, int gameId, int maybeSpecialId) {
-        AlertDialog.Builder newDialog = new AlertDialog.Builder(c);
-        LayoutInflater inflater = getLayoutInflater();
+    public static void makeDialog(Activity act, DialogType dialogtype, ModelType modeltype, CharacterDBHelper dbh, int gameId, int maybeSpecialId) {
+        AlertDialog.Builder newDialog = new AlertDialog.Builder(act);
+        LayoutInflater inflater = act.getLayoutInflater();
         // All dialogs will do nothing on cancel
         newDialog.setNegativeButton(R.string.cancel,
                     new DialogInterface.OnClickListener() {
@@ -38,23 +43,24 @@ class DialogFactory {
                             // Cancel: Just close the dialog
                             dialog.dismiss(); } });
 
+        String title = "";
         switch (dialogtype) {
             case NEW:
-                String title = "Create New";
+                title = "Create New";
                 switch (modeltype) {
                     case CHARSTAT:
                         title += " Character Stat";
-                        newdialog.setTitle(title);
-                        populateEditDialogFromCursor(newdialog, dbh.getStatsForCharacterCursor(maybeSpecialId));
+                        newDialog.setTitle(title);
+                        populateEditDialogFromCursor(newDialog, dbh.getStatsForCharacterCursor(maybeSpecialId));
                         break;
                     case GAME:
                         title += " Game";
-                        newdialog.settitle(title);
+                        newDialog.setTitle(title);
                         break;
                 }
                 break;
             case EDIT:
-                String title = "Edit";
+                title = "Edit";
         }
     }
 
@@ -63,6 +69,10 @@ class DialogFactory {
         for (String s : c.getColumnNames()) {
             if (!s.matches("_id$")) {
                 // This column is not an ID-column. Must be the name of an essential element
+                String shownName = CharacterDBHelper.getNameOfColumn(s);
+
+                // Create a label with shownName
+                // Create an edit-text that will be used to edit the column
             }
         }
     }
@@ -75,6 +85,7 @@ class DialogFactory {
      *  Edit / Delete option only. Context dialog
      */
 
+    /*
     // Opens up dialogue for user to input new game
     public void newGameDialogue() {
         AlertDialog.Builder newGameDialog = new AlertDialog.Builder(this);
@@ -115,7 +126,7 @@ class DialogFactory {
                                     hideCreateNewGameButton();
                                 }
                             }
-                        })
+                        });
 
         newGameDialog.create().show();
     }
@@ -161,5 +172,6 @@ class DialogFactory {
 
         editGameDialog.create().show();
     }
+    */
 
 }

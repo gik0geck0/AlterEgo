@@ -33,6 +33,28 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		super(context, DB_NAME, null, DB_VERSION);
 	}
 
+    /**
+     *  Converts the name of a column into a name that can be shown onscreen.
+     *  @param colname Snake-case column name
+     *  @return Spaced Capitalized phrase
+     */
+    public static String getNameOfColumn(String colname) {
+        // Make words defined by _ split
+        String[] words =  colname.split("_");
+        String name = "";
+        for (int i=0; i < words.length; i++) {
+            // Capitalize the first letter of each word
+            words[i] = Character.toUpperCase(words[i].charAt(0)) + words[i].substring(1);
+
+            // Join it to the name with spaces. This does words.join(' '), which isn't a Java function
+            name += words[i];
+            if (i < words.length-1)
+                name += " ";
+        }
+
+        return name;
+    }
+
 	/**
 	 * For an SQLiteOpenHelper, the onCreate method is called if and only if the
 	 * database-name in question does not already exist. Theoretically, this
@@ -749,6 +771,20 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		db.insert("character_stat", null, statVals);
 	}
 
+    /**
+     * <p>
+     * Remove a specific character stat
+     * </p>
+     *
+     * @param charStatId ID that references the character stat
+     */
+	public void deleteCharStat(int charStatId) {
+		SQLiteDatabase database = getWritableDatabase();
+
+		String[] args = new String[] { Integer.toString(charStatId) };
+		database.delete("character_stat", "_id=?", args);
+	}
+
 	/**
 	 * <p>
 	 * Lookup all the stats for a given character
@@ -764,19 +800,23 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		whereArgs[0] = Integer.toString(charId);
 		Cursor statCursor = db
 				.rawQuery(
-						"SELECT stat_name, stat_value, _id FROM character_stat WHERE character_id=?",
+						"SELECT stat_name, stat_value, _id, character_id FROM character_stat WHERE character_id=?",
 						whereArgs);
 		statCursor.moveToFirst();
 		ArrayList<CharacterStat> stats = new ArrayList<CharacterStat>();
 		while (!statCursor.isAfterLast()) {
-			String statName = statCursor.getString(0);
-			int statVal = statCursor.getInt(1);
-            int statId = statCursor.getInt(2);
-			CharacterStat stat = new CharacterStat(charId, statId, statVal, statName, 0);
-			stats.add(stat);
+			stats.add(createCharacterStatFromCursor(statCursor));
 		}
 		return stats;
 	}
+
+    public static CharacterStat createCharacterStatFromCursor(Cursor statCursor) {
+        String statName = statCursor.getString(statCursor.getColumnIndex("stat_name"));
+        int statVal = statCursor.getInt(statCursor.getColumnIndex("stat_value"));
+        int statId = statCursor.getInt(statCursor.getColumnIndex("_id"));
+        int charId = statCursor.getInt(statCursor.getColumnIndex("character_id"));
+        return new CharacterStat(charId, statId, statVal, statName, 0);
+    }
 
 	/**
 	 * <p>

@@ -13,12 +13,14 @@ import android.widget.TextView;
 
 public class ModelAdapter<T> extends BaseAdapter {
     private ArrayList<T> mListItems;
-    private LayoutInflater mLayoutInflater;
     private CursorFetcher mCFetcher;
+    private LayoutInflater mLayoutInflater;
+    private ModelInitializer<T> mInitializer;
 
-    public ModelAdapter(Context context, ArrayList<T> arrayList, CursorFetcher cfetcher) {
-        mListItems = arrayList;
+    ModelAdapter(Context context, CursorFetcher cfetcher, ModelInitializer<T> initer) {
+        mListItems = new ArrayList<T>();
         mCFetcher = cfetcher;
+        mInitializer = initer;
 
         //get the layout inflater
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -36,7 +38,7 @@ public class ModelAdapter<T> extends BaseAdapter {
     @Override
     //get the data of an item from a specific position
     //i represents the position of the item in the list
-    public Object getItem(int i) {
+    public T getItem(int i) {
         return null;
     }
 
@@ -56,7 +58,7 @@ public class ModelAdapter<T> extends BaseAdapter {
         }
 
         //get the string item from the position "position" from array list to put it on the TextView
-        String stringItem = mListItems.get(position);
+        String stringItem = mListItems.get(position).toString();
         if (stringItem != null) {
 
             TextView itemName = (TextView) view.findViewById(R.id.list_item_text_view);
@@ -73,18 +75,23 @@ public class ModelAdapter<T> extends BaseAdapter {
     }
 
     public void refreshDB() {
-        Log.d("AlterEgo::MessageAdapter", "Refreshing the database");
+        Log.d("AlterEgo::ModelAdapter", "Refreshing the database");
         Cursor mCursor = mCFetcher.fetch();
         mCursor.moveToPosition(mListItems.size());
 
         while (!mCursor.isAfterLast()) {
+            T dto = mInitializer.initialize(mCursor);
+            /*
             MessageData md = new MessageData(
                 mCursor.getInt(0), mCursor.getString(1),
                 mCursor.getLong(2), mCursor.getInt(3));
-            mListItems.add(md.toString(MessageData.StringFormat.MESSAGE));
+            */
+            // mListItems.add(md.toString(MessageData.StringFormat.MESSAGE));
+            mListItems.add(dto);
             mCursor.moveToNext();
         }
 
+        Log.d("AlterEgo::ModelAdapter", "Notifying Data Set Changing");
         // Invalidate current set
         notifyDataSetChanged();
     }
