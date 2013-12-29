@@ -221,10 +221,10 @@ public class CharacterFragment extends Fragment implements RefreshInterface {
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.getId() == R.id.main_game_list_view) {
+        // if (v.getId() == R.id.main_game_list_view) {
             MenuInflater inflater = getActivity().getMenuInflater();
             inflater.inflate(R.menu.context_menu, menu);
-        }
+        // }
     }
 
     @Override
@@ -245,9 +245,18 @@ public class CharacterFragment extends Fragment implements RefreshInterface {
                 return true;
             case R.id.context_delete:
 
-                mDbHelper.deleteCharStat(mCharStatAdapterC.getItem(info.position).getStatId());
-                mCharStatAdapterC.refreshDB();
-                showToast("CharacterStat Deleted");
+                /*
+                Log.d("AlterEgo::CharacterFragment", "mDbHelper: " + mDbHelper);
+                Log.d("AlterEgo::CharacterFragment", "mStatAdapter: " + mCharStatAdapterC);
+                Log.d("AlterEgo::CharacterFragment", "info: " + info);
+                Log.d("AlterEgo::CharacterFragment", "AdapterItem: " + mCharStatAdapterC.getItem(info.position));
+                */
+                Log.d("AlterEgo::CharacterFragment", "Deleting CharacterStat");
+                mDbHelper.deleteCharStat(
+                        mCharStatAdapterC.getItem(
+                            info.position)
+                        .getStatId());
+                refresh();
                 return true;
             default:
                 return super.onContextItemSelected(item);

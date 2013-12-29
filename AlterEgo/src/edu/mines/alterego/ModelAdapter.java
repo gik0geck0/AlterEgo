@@ -39,7 +39,7 @@ public class ModelAdapter<T> extends BaseAdapter {
     //get the data of an item from a specific position
     //i represents the position of the item in the list
     public T getItem(int i) {
-        return null;
+        return mListItems.get(i);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class ModelAdapter<T> extends BaseAdapter {
     @Override
 
     public View getView(int position, View view, ViewGroup viewGroup) {
+        Log.d("AlterEgo::ModelAdapter", "Getting the Adapter View at position " + position);
 
         //check to see if the reused view is null or not, if is not null then reuse it
         if (view == null) {
@@ -77,7 +78,13 @@ public class ModelAdapter<T> extends BaseAdapter {
     public void refreshDB() {
         Log.d("AlterEgo::ModelAdapter", "Refreshing the database");
         Cursor mCursor = mCFetcher.fetch();
-        mCursor.moveToPosition(mListItems.size());
+
+        if (mListItems.size() > mCursor.getCount()) {
+            mListItems.clear();
+            mCursor.moveToFirst();
+        } else {
+            mCursor.moveToPosition(mListItems.size());
+        }
 
         while (!mCursor.isAfterLast()) {
             T dto = mInitializer.initialize(mCursor);

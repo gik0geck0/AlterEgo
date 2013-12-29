@@ -146,6 +146,7 @@ class DialogFactory {
                     // Turn it into ColName -> NewValue
                     HashMap<String, Object> valMap = new HashMap<String, Object>();
                     boolean valid = false;
+                    c.moveToFirst();
                     for (String key : editableColumns.keySet()) {
                         if (editableColumns.get(key).getText().toString().equals("")) {
                             Toast createGame = Toast.makeText(context, "Required: " + key, Toast.LENGTH_SHORT);
