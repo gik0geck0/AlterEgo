@@ -759,16 +759,41 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 * @param statVal
 	 *            Numeric value for the stat
 	 */
-	public void insertCharStat(int charId, int statVal, String statName,
-			int category) {
+	public void insertCharStat(int charId, int statVal, String statName, String desc, int category) {
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues statVals = new ContentValues();
 		statVals.put("character_id", charId);
 		statVals.put("stat_value", statVal);
 		statVals.put("stat_name", statName);
 		statVals.put("category_id", category);
+        statVals.put("descripton_usage_etc", desc);
 
 		db.insert("character_stat", null, statVals);
+	}
+
+	/**
+	 * <p>
+	 * Update statistic for a character. Ex: charId = 1, statVal = 9, statName
+	 * = 'Charisma', category = 0 This will at the Charisma value of 9 to the
+	 * character
+	 * </p>
+	 * 
+	 * @param charID
+	 *            ID for the character to be 'buffed'
+	 * @param statVal
+	 *            Numeric value for the stat
+	 */
+	public void updateCharStat(int statId, int statVal, String statName,
+			String desc, int category) {
+		SQLiteDatabase db = getWritableDatabase();
+		ContentValues statVals = new ContentValues();
+		statVals.put("stat_value", statVal);
+		statVals.put("stat_name", statName);
+        statVals.put("description_usage_etc", desc);
+		statVals.put("category_id", category);
+
+        String[] args = { Integer.toString(statId) };
+		db.update("character_stat", statVals, "_id=?", args);
 	}
 
     /**

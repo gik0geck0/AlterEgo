@@ -183,35 +183,6 @@ public class CharacterFragment extends Fragment implements RefreshInterface {
                         mChar.id,
                         0,
                         CharacterFragment.this);
-
-                /*
-                AlertDialog.Builder statBuilder = new AlertDialog.Builder(v.getContext());
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-
-                statBuilder.setView(inflater.inflate(R.layout.new_stat_dialog, null))
-                    .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            AlertDialog thisDialog = (AlertDialog) dialog;
-
-                            EditText nameInput = (EditText) thisDialog.findViewById(R.id.char_stat_name);
-                            EditText descInput = (EditText) thisDialog.findViewById(R.id.char_stat_val);
-
-                            String name = nameInput.getText().toString();
-                            String val = descInput.getText().toString();
-
-                            mDbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
-                            mCharStatAdapterC.refreshDB();
-                            // .changeCursor(mDbHelper.getStatsForCharCursor(mChar.id));
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        // Negative button just closes the dialog
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) { dialog.dismiss(); }
-                    });
-                statBuilder.create().show();
-                */
             }
         });
     }

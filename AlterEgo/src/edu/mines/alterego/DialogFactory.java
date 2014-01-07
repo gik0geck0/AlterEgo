@@ -70,8 +70,8 @@ class DialogFactory {
                         newDialog.setTitle(title);
                         DBUpdater dbup = new DBUpdater() {public void update(HashMap<String, Object> valMap) {
                             // TODO: There's currently no category selection. When that's added, the last part of this will need to change
-                            dbh.insertCharStat(gameCharId, (Integer) valMap.get("stat_value"), (String) valMap.get("stat_name"), 0); }};
-                        populateEditDialogFromCursor(newDialog, act, dbh.getStatsForCharacterCursor(gameCharId), diagLayout, dbup, refresher);
+                            dbh.insertCharStat(gameCharId, (Integer) valMap.get("stat_value"), (String) valMap.get("stat_name"), (String) valMap.get("description_usage_etc"), 0); }};
+                        populateEditDialogFromCursor(newDialog, act, dbh.getStatsForCharacterCursor(gameCharId), diagLayout, dbup, refresher, dialogtype);
                         break;
                     case GAME:
                         title += " Game";
@@ -81,6 +81,22 @@ class DialogFactory {
                 break;
             case EDIT:
                 title = "Edit";
+                switch (modeltype) {
+                    case CHARSTAT:
+                        Log.d("AlterEgo::CharacterFragment", "Opening Edit Character Stat dialog");
+                        title += " Character Stat";
+                        newDialog.setTitle(title);
+                        DBUpdater dbup = new DBUpdater() {public void update(HashMap<String, Object> valMap) {
+                            // TODO: There's currently no category selection. When that's added, the last part of this will need to change
+                            dbh.updateCharStat(gameCharId, (Integer) valMap.get("stat_value"), (String) valMap.get("stat_name"), (String) valMap.get("description_usage_etc"), 0); }};
+                        populateEditDialogFromCursor(newDialog, act, dbh.getStatsForCharacterCursor(gameCharId), diagLayout, dbup, refresher, dialogtype);
+                        break;
+                    case GAME:
+                        title += " Game";
+                        newDialog.setTitle(title);
+                        break;
+                }
+                break;
         }
         newDialog.setView(diagLayout);
 
@@ -88,15 +104,29 @@ class DialogFactory {
         newDialog.create().show();
     }
 
+    /**
+     * <p>
+     * Populate the dialog with an editable interface for the contents of the cursor.
+     * </p>
+     * @param builder DialogBuilder that's being built
+     * @param context App/Activity context
+     * @param c Cursor that points to the current values in the database. The columns of this cursor that don't end in '_id' are used to make EditTexts
+     * @param diagLayout LinearLayout to populate with the buttons and edit texts
+     * @param dbup Updates the database using a column-value map
+     * @param refresher Notifies listviews/adapters that the database has changed
+     * @param dt EDIT vs NEW
+     */
     public static void populateEditDialogFromCursor(
             AlertDialog.Builder builder,
             final Context context,
             final Cursor c,
             LinearLayout diagLayout,
             final DBUpdater dbup,
-            final RefreshInterface refresher) {
+            final RefreshInterface refresher,
+            final DialogType dt) {
         // ColumnName -> EditText
         final HashMap<String, EditText> editableColumns = new HashMap<String, EditText>();
+        c.moveToFirst();
 
         // We have a blind cursor, and a dialog to populate with edit-fields
         for (String s : c.getColumnNames()) {
@@ -114,7 +144,6 @@ class DialogFactory {
                 labelparams.gravity=Gravity.LEFT;
                 lbl.setLayoutParams(labelparams);
 
-
                 EditText editBox = new EditText(context);
 
                 LinearLayout.LayoutParams editparams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -122,6 +151,7 @@ class DialogFactory {
                 editparams.gravity=Gravity.RIGHT;
                 editBox.setLayoutParams(editparams);
                 // TODO: Set a type for the editBox
+                editBox.setText(c.getString(c.getColumnIndex(s)), TextView.BufferType.EDITABLE);
 
                 // Place a reference to the edit-text in the map
                 editableColumns.put(s, editBox);
@@ -148,27 +178,29 @@ class DialogFactory {
                     boolean valid = false;
                     c.moveToFirst();
                     for (String key : editableColumns.keySet()) {
-                        if (editableColumns.get(key).getText().toString().equals("")) {
+                        String newVal = editableColumns.get(key).getText().toString();
+                        if (dt == DialogType.NEW && editableColumns.get(key).getText().toString().equals("")) {
                             Toast createGame = Toast.makeText(context, "Required: " + key, Toast.LENGTH_SHORT);
                             createGame.show();
-                        } else {
-                            valid = true;
-                            int idx = c.getColumnIndex(key);
-                            Log.d("AlterEgo::DialogFactory", "What is the type of " + key + "? Index " + idx);
-                            Log.d("AlterEgo::DialogFactory", "Type is " + c.getType(idx));
-                            switch(c.getType(c.getColumnIndex(key))) {
-                                case Cursor.FIELD_TYPE_STRING:
-                                    valMap.put(key, editableColumns.get(key).getText().toString());
-                                    break;
-                                case Cursor.FIELD_TYPE_INTEGER:
-                                    // TODO: Long vs Int vs Bool : Assume the user never enters longs?
-                                    // TODO: Bool will somehow need to come from a checkbox
-                                    valMap.put(key, Integer.parseInt(editableColumns.get(key).getText().toString()));
-                                    break;
-                                default:
-                                    Log.e("AlterEgo::DialogFactory", "Unsupported column type for dynamic edits: " + c.getType(c.getColumnIndex(key)));
-                                    break;
-                            }
+                            break;
+                        }
+
+                        valid = true;
+                        int idx = c.getColumnIndex(key);
+                        Log.d("AlterEgo::DialogFactory", "What is the type of " + key + "? Index " + idx);
+                        Log.d("AlterEgo::DialogFactory", "Type is " + c.getType(idx));
+                        switch(c.getType(c.getColumnIndex(key))) {
+                            case Cursor.FIELD_TYPE_STRING:
+                                valMap.put(key, editableColumns.get(key).getText().toString());
+                                break;
+                            case Cursor.FIELD_TYPE_INTEGER:
+                                // TODO: Long vs Int vs Bool : Assume the user never enters longs?
+                                // TODO: Bool will somehow need to come from a checkbox
+                                valMap.put(key, Integer.parseInt(editableColumns.get(key).getText().toString()));
+                                break;
+                            default:
+                                Log.e("AlterEgo::DialogFactory", "Unsupported column type for dynamic edits: " + c.getType(c.getColumnIndex(key)));
+                                break;
                         }
                     }
 
