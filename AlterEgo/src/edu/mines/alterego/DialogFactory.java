@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.InputType;
 
 import android.util.Log;
 import android.view.Gravity;
@@ -150,7 +151,14 @@ class DialogFactory {
                 editparams.weight = 1.0f;
                 editparams.gravity=Gravity.RIGHT;
                 editBox.setLayoutParams(editparams);
-                // TODO: Set a type for the editBox
+                // TODO: How do we know if it's boolean?
+                switch(c.getType(c.getColumnIndex(s))) {
+                    case Cursor.FIELD_TYPE_STRING:
+                        break;
+                    case Cursor.FIELD_TYPE_INTEGER:
+                        editBox.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+                        break;
+                }
                 editBox.setText(c.getString(c.getColumnIndex(s)), TextView.BufferType.EDITABLE);
 
                 // Place a reference to the edit-text in the map
