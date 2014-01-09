@@ -766,7 +766,7 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		statVals.put("stat_value", statVal);
 		statVals.put("stat_name", statName);
 		statVals.put("category_id", category);
-        statVals.put("descripton_usage_etc", desc);
+        statVals.put("description_usage_etc", desc);
 
 		db.insert("character_stat", null, statVals);
 	}
@@ -860,28 +860,29 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 				.rawQuery(
 						"SELECT * FROM character_stat WHERE character_id=?",
 						whereArgs);
+        statCursor.moveToFirst();
         return statCursor;
 	}
 
 	/**
 	 * <p>
-	 * Cursor-version of getStatsForCharacter: Lookup all the stats for a given
-	 * character, and return a Cursor for the results
+	 * Lookup one specific stat for a given character
 	 * </p>
 	 * 
 	 * @param charId
 	 *            ID for the character to be analyzed
-	 * @return Cursor to the character's stats
+	 * @return Cursor pointing to the character stats
 	 */
-	public Cursor getStatsForCharCursor(int charId) {
+	public Cursor getSpecificStatForCharacterCursor(int charId, int statId) {
 		SQLiteDatabase db = getReadableDatabase();
-		String[] whereArgs = new String[1];
+		String[] whereArgs = new String[2];
 		whereArgs[0] = Integer.toString(charId);
-		Cursor statCursor = db
-				.rawQuery(
-						"SELECT _id, stat_name, stat_value FROM character_stat WHERE character_id=?",
-						whereArgs);
-		return statCursor;
+		whereArgs[1] = Integer.toString(statId);
+		Cursor statCursor = db.rawQuery(
+            "SELECT * FROM character_stat WHERE character_id=? and _id=?",
+            whereArgs);
+        statCursor.moveToFirst();
+        return statCursor;
 	}
 
     public ArrayList<MessageData> getAllMessages(int gameId) {
@@ -939,5 +940,45 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
     public static long now() {
         return (new Date()).getTime();
+    }
+
+    public static int getType(String column, Cursor c) {
+        int type;
+        if (
+            column.equals("hosting")
+            ) {
+            // Boolean
+            type = 5;
+        } else if (
+            column.equals("timestamp") ||
+            column.equals("stat_value") ||
+            column.equals("marker_type")
+            ) {
+            // int
+            type = Cursor.FIELD_TYPE_INTEGER;
+        } else if (
+            column.equals("category_name") ||
+            column.equals("subject") ||
+            column.equals("json_message") ||
+            column.equals("stat_name") ||
+            column.equals("description_usage_etc") ||
+            column.equals("marker_name") ||
+            column.equals("name") ||
+            column.equals("description") ||
+            column.equals("marker_description")
+            ) {
+            // string
+            type = Cursor.FIELD_TYPE_STRING;
+        } else if (
+            column.equals("marker_color") ||
+            column.equals("marker_lat") ||
+            column.equals("marker_long")
+            ) {
+            type = Cursor.FIELD_TYPE_FLOAT;
+        } else {
+            type = Cursor.FIELD_TYPE_NULL;
+        }
+        Log.d("AlterEgo::DB::TypeLookup", "Type of " + column + " is " + type);
+        return type;
     }
 }
