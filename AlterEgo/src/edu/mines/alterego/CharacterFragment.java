@@ -147,7 +147,7 @@ public class CharacterFragment extends Fragment implements RefreshInterface {
 
         // Show all the character's attributes/skills/complications
         int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
-        statsCursor = mDbHelper.getStatsForCharCursor(mChar.id);
+        statsCursor = mDbHelper.getStatsForCharacterCursor(mChar.id);
 
         // Initialize the ModelAdapter
         CursorFetcher cfetcher = new CursorFetcher() {

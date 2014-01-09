@@ -79,7 +79,9 @@ public class ModelAdapter<T> extends BaseAdapter {
         Log.d("AlterEgo::ModelAdapter", "Refreshing the database");
         Cursor mCursor = mCFetcher.fetch();
 
-        if (mListItems.size() > mCursor.getCount()) {
+        // This part assumes that items will only be added or deleted or edited, with no combinations of such.
+        // This assumption allows us to skip currently existing ones if items are added, and only doing a complete refresh on edits or deletes
+        if (mListItems.size() <= mCursor.getCount()) {
             mListItems.clear();
             mCursor.moveToFirst();
         } else {

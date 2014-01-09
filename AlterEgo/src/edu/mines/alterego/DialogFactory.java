@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,8 +45,9 @@ class DialogFactory {
             ModelType modeltype,
             final CharacterDBHelper dbh,
             final int gameCharId,
-            int maybeSpecialId,
+            final int maybeSpecialId,
             RefreshInterface refresher) {
+        Log.i("AlterEgo::DialogFactor", "Creating an " + dialogtype + " for ID " + gameCharId + "-" + maybeSpecialId);
         AlertDialog.Builder newDialog = new AlertDialog.Builder(act);
         LayoutInflater inflater = act.getLayoutInflater();
 
@@ -72,7 +74,7 @@ class DialogFactory {
                         DBUpdater dbup = new DBUpdater() {public void update(HashMap<String, Object> valMap) {
                             // TODO: There's currently no category selection. When that's added, the last part of this will need to change
                             dbh.insertCharStat(gameCharId, (Integer) valMap.get("stat_value"), (String) valMap.get("stat_name"), (String) valMap.get("description_usage_etc"), 0); }};
-                        populateEditDialogFromCursor(newDialog, act, dbh.getStatsForCharacterCursor(gameCharId), diagLayout, dbup, refresher, dialogtype);
+                        populateEditDialogFromCursor(newDialog, act, dbh.getStatsForCharacterCursor(gameCharId), diagLayout, dbup, refresher, dialogtype, dbh);
                         break;
                     case GAME:
                         title += " Game";
@@ -89,8 +91,9 @@ class DialogFactory {
                         newDialog.setTitle(title);
                         DBUpdater dbup = new DBUpdater() {public void update(HashMap<String, Object> valMap) {
                             // TODO: There's currently no category selection. When that's added, the last part of this will need to change
-                            dbh.updateCharStat(gameCharId, (Integer) valMap.get("stat_value"), (String) valMap.get("stat_name"), (String) valMap.get("description_usage_etc"), 0); }};
-                        populateEditDialogFromCursor(newDialog, act, dbh.getStatsForCharacterCursor(gameCharId), diagLayout, dbup, refresher, dialogtype);
+                            dbh.updateCharStat(maybeSpecialId, (Integer) valMap.get("stat_value"), (String) valMap.get("stat_name"), (String) valMap.get("description_usage_etc"), 0); }};
+                        // maybeSpecialId must be the statistic
+                        populateEditDialogFromCursor(newDialog, act, dbh.getSpecificStatForCharacterCursor(gameCharId, maybeSpecialId), diagLayout, dbup, refresher, dialogtype, dbh);
                         break;
                     case GAME:
                         title += " Game";
@@ -111,7 +114,9 @@ class DialogFactory {
      * </p>
      * @param builder DialogBuilder that's being built
      * @param context App/Activity context
-     * @param c Cursor that points to the current values in the database. The columns of this cursor that don't end in '_id' are used to make EditTexts
+     * @param c Cursor that points to the current values in the database. The columns
+     *          of this cursor that don't end in '_id' are used to make EditTexts. 
+     *          Cursor MUST be already pointing to the correct row.
      * @param diagLayout LinearLayout to populate with the buttons and edit texts
      * @param dbup Updates the database using a column-value map
      * @param refresher Notifies listviews/adapters that the database has changed
@@ -124,10 +129,11 @@ class DialogFactory {
             LinearLayout diagLayout,
             final DBUpdater dbup,
             final RefreshInterface refresher,
-            final DialogType dt) {
+            final DialogType dt,
+            CharacterDBHelper dbh) {
         // ColumnName -> EditText
-        final HashMap<String, EditText> editableColumns = new HashMap<String, EditText>();
-        c.moveToFirst();
+        final HashMap<String, Object> editableColumns = new HashMap<String, Object>();
+        // c.moveToFirst();
 
         // We have a blind cursor, and a dialog to populate with edit-fields
         for (String s : c.getColumnNames()) {
@@ -145,29 +151,51 @@ class DialogFactory {
                 labelparams.gravity=Gravity.LEFT;
                 lbl.setLayoutParams(labelparams);
 
-                EditText editBox = new EditText(context);
 
                 LinearLayout.LayoutParams editparams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 editparams.weight = 1.0f;
                 editparams.gravity=Gravity.RIGHT;
-                editBox.setLayoutParams(editparams);
-                // TODO: How do we know if it's boolean?
-                switch(c.getType(c.getColumnIndex(s))) {
-                    case Cursor.FIELD_TYPE_STRING:
-                        break;
-                    case Cursor.FIELD_TYPE_INTEGER:
-                        editBox.setRawInputType(InputType.TYPE_CLASS_NUMBER);
-                        break;
-                }
-                editBox.setText(c.getString(c.getColumnIndex(s)), TextView.BufferType.EDITABLE);
-
-                // Place a reference to the edit-text in the map
-                editableColumns.put(s, editBox);
 
                 LinearLayout horizLayout = new LinearLayout(context);
                 horizLayout.setOrientation(LinearLayout.HORIZONTAL);
                 horizLayout.addView(lbl);
-                horizLayout.addView(editBox);
+
+                int type = CharacterDBHelper.getType(s, c);
+                if (type == 5) {
+                    // Make a checkbox
+                    CheckBox cb = new CheckBox(context);
+                    if (c.getInt(c.getColumnIndex(s)) == 1)
+                        cb.setChecked(true);
+                    else
+                        cb.setChecked(false);
+                    cb.setLayoutParams(editparams);
+                    horizLayout.addView(cb);
+                    editableColumns.put(s, cb);
+                } else {
+                    EditText editBox = new EditText(context);
+                    editBox.setLayoutParams(editparams);
+                    horizLayout.addView(editBox);
+
+                    switch(type) {
+                        case Cursor.FIELD_TYPE_FLOAT:
+                        case Cursor.FIELD_TYPE_INTEGER:
+                            editBox.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+                            break;
+                        default:
+                            // Assume String
+                            editBox.setRawInputType(InputType.TYPE_CLASS_TEXT);
+                            break;
+                    }
+
+                    // Only set the text if we're editing a pre-existing value
+                    if (dt == DialogType.EDIT) {
+                        editBox.setText(c.getString(c.getColumnIndex(s)), TextView.BufferType.EDITABLE);
+                    }
+
+                    // Place a reference to the edit-text in the map
+                    editableColumns.put(s, editBox);
+                }
+
 
                 diagLayout.addView(horizLayout);
             }
@@ -186,8 +214,8 @@ class DialogFactory {
                     boolean valid = false;
                     c.moveToFirst();
                     for (String key : editableColumns.keySet()) {
-                        String newVal = editableColumns.get(key).getText().toString();
-                        if (dt == DialogType.NEW && editableColumns.get(key).getText().toString().equals("")) {
+                        String newVal = ((EditText) editableColumns.get(key)).getText().toString();
+                        if (dt == DialogType.NEW && newVal.equals("")) {
                             Toast createGame = Toast.makeText(context, "Required: " + key, Toast.LENGTH_SHORT);
                             createGame.show();
                             break;
@@ -195,16 +223,20 @@ class DialogFactory {
 
                         valid = true;
                         int idx = c.getColumnIndex(key);
-                        Log.d("AlterEgo::DialogFactory", "What is the type of " + key + "? Index " + idx);
-                        Log.d("AlterEgo::DialogFactory", "Type is " + c.getType(idx));
-                        switch(c.getType(c.getColumnIndex(key))) {
+                        switch(CharacterDBHelper.getType(key, c)) {
                             case Cursor.FIELD_TYPE_STRING:
-                                valMap.put(key, editableColumns.get(key).getText().toString());
+                                valMap.put(key, ((EditText) editableColumns.get(key)).getText().toString());
                                 break;
                             case Cursor.FIELD_TYPE_INTEGER:
-                                // TODO: Long vs Int vs Bool : Assume the user never enters longs?
-                                // TODO: Bool will somehow need to come from a checkbox
-                                valMap.put(key, Integer.parseInt(editableColumns.get(key).getText().toString()));
+                                // TODO: Long vs Int: Assume the user never enters longs?
+                                valMap.put(key, Integer.parseInt(((EditText) editableColumns.get(key)).getText().toString()));
+                                break;
+                            case Cursor.FIELD_TYPE_FLOAT:
+                                valMap.put(key, Float.parseFloat(((EditText) editableColumns.get(key)).getText().toString()));
+                                break;
+                            case 5:
+                                // Bool will need to come from a checkbox
+                                valMap.put(key, (Boolean) ((CheckBox) editableColumns.get(key)).isChecked());
                                 break;
                             default:
                                 Log.e("AlterEgo::DialogFactory", "Unsupported column type for dynamic edits: " + c.getType(c.getColumnIndex(key)));
