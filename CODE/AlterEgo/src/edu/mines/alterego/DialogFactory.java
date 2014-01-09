@@ -201,7 +201,7 @@ class DialogFactory {
             }
         }
 
-        builder.setPositiveButton(R.string.create,
+        builder.setPositiveButton((dt == DialogType.EDIT) ? R.string.edit : R.string.create,
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
