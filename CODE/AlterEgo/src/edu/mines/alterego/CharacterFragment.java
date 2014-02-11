@@ -1,20 +1,34 @@
 package edu.mines.alterego;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
+
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /**
  * Description: This file defines the fragment showing characters and stats
@@ -22,14 +36,16 @@ import android.widget.TextView;
  *
  */
 
-public class CharacterFragment extends Fragment {
+public class CharacterFragment extends Fragment implements RefreshInterface {
 
     // Local data object to hold the character name and description
     CharacterData mChar;
     RefreshInterface mActRefresher;
     View mainView;
-    private SimpleCursorAdapter mCharStatAdapterC;
+    // // private SimpleCursorAdapter mCharStatAdapterC;
+    private ModelAdapter<CharacterStat> mCharStatAdapterC;
     private Cursor statsCursor;
+    private CharacterDBHelper mDbHelper;
 
     CharacterFragment(RefreshInterface refresher) {
         super();
@@ -45,9 +61,9 @@ public class CharacterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
+        mDbHelper = new CharacterDBHelper(getActivity());
         if (GameActivity.mCharId < 0) {
-            GameActivity.mCharId = dbHelper.getCharacterIdForGame(GameActivity.mGameId);
+            GameActivity.mCharId = mDbHelper.getCharacterIdForGame(GameActivity.mGameId);
         }
 
         // Inflate the layout for this fragment
@@ -56,7 +72,7 @@ public class CharacterFragment extends Fragment {
 
 
         if (GameActivity.mCharId >= 0) {
-            mChar = dbHelper.getCharacter(GameActivity.mCharId);
+            mChar = mDbHelper.getCharacter(GameActivity.mCharId);
             showCharacter();
         } else {
             // Make the no-char layout visible
@@ -65,6 +81,7 @@ public class CharacterFragment extends Fragment {
 
             // Bind the new-character button to it's appropriate action
             Button newChar = (Button) characterView.findViewById(R.id.nochar_button);
+
             newChar.setOnClickListener( new Button.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -74,7 +91,7 @@ public class CharacterFragment extends Fragment {
                     LayoutInflater inflater = getActivity().getLayoutInflater();
 
                     charBuilder.setView(inflater.inflate(R.layout.new_char_dialog, null))
-                    	.setTitle("Create New Character")
+                        .setTitle("Create New Character")
                         .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
@@ -86,8 +103,7 @@ public class CharacterFragment extends Fragment {
                                 String name = nameInput.getText().toString();
                                 String desc = descInput.getText().toString();
 
-                                CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                                CharacterData newChar = dbHelper.addCharacter(GameActivity.mGameId, name, desc);
+                                CharacterData newChar = mDbHelper.addCharacter(GameActivity.mGameId, name, desc);
 
                                 mChar = newChar;
                                 GameActivity.mCharId = newChar.id;
@@ -130,14 +146,28 @@ public class CharacterFragment extends Fragment {
         cDesc.setText(mChar.description);
 
         // Show all the character's attributes/skills/complications
-        CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
         int[] ctrlIds = new int[] {android.R.id.text1, android.R.id.text2};
-        statsCursor = dbHelper.getStatsForCharCursor(mChar.id);
-        mCharStatAdapterC = new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        statsCursor = mDbHelper.getStatsForCharacterCursor(mChar.id);
+
+        // Initialize the ModelAdapter
+        CursorFetcher cfetcher = new CursorFetcher() {
+            public Cursor fetch() { return mDbHelper.getStatsForCharacterCursor(mChar.id); }
+        };
+        ModelInitializer<CharacterStat> initer = new ModelInitializer<CharacterStat>() {
+            public CharacterStat initialize(Cursor c) {
+                CharacterStat cs = CharacterDBHelper.createCharacterStatFromCursor(c);
+                Log.d("AlterEgo::CharStatInitializer", "Created an object for " + cs);
+                return cs;
+            }
+        };
 
         ListView statView = (ListView) mainView.findViewById(R.id.char_stats);
+        mCharStatAdapterC = new ModelAdapter<CharacterStat>(getActivity(), cfetcher, initer);
+        // new SimpleCursorAdapter(this.getActivity(), android.R.layout.simple_list_item_2 , statsCursor, new String[] {"stat_name", "stat_value"} , ctrlIds, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
         statView.setAdapter(mCharStatAdapterC);
 
+        // Create context menu (Long-press)
+        registerForContextMenu(statView);
 
         Button newStat = (Button) mainView.findViewById(R.id.new_stat_button);
         newStat.setOnClickListener( new Button.OnClickListener() {
@@ -145,35 +175,72 @@ public class CharacterFragment extends Fragment {
          @Override
             public void onClick(View v) {
                 // Spawn the create-character dialog
-
-                AlertDialog.Builder statBuilder = new AlertDialog.Builder(v.getContext());
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-
-                statBuilder.setView(inflater.inflate(R.layout.new_stat_dialog, null))
-                    .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            AlertDialog thisDialog = (AlertDialog) dialog;
-
-                            EditText nameInput = (EditText) thisDialog.findViewById(R.id.char_stat_name);
-                            EditText descInput = (EditText) thisDialog.findViewById(R.id.char_stat_val);
-
-                            String name = nameInput.getText().toString();
-                            String val = descInput.getText().toString();
-
-                            CharacterDBHelper dbHelper = new CharacterDBHelper(getActivity());
-                            dbHelper.insertCharStat(mChar.id, Integer.parseInt(val) , name, 0);
-                            mCharStatAdapterC.changeCursor(dbHelper.getStatsForCharCursor(mChar.id));
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        // Negative button just closes the dialog
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) { dialog.dismiss(); }
-                    });
-                statBuilder.create().show();
+                DialogFactory.makeDialog(
+                        getActivity(),
+                        DialogFactory.DialogType.NEW,
+                        DialogFactory.ModelType.CHARSTAT,
+                        mDbHelper,
+                        mChar.id,
+                        0,
+                        CharacterFragment.this);
             }
         });
     }
 
+    // Long Press Menu
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        // if (v.getId() == R.id.main_game_list_view) {
+            MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.context_menu, menu);
+        // }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.context_edit:
+                // Create Edit-item context menu
+                DialogFactory.makeDialog(
+                        getActivity(),
+                        DialogFactory.DialogType.EDIT,
+                        DialogFactory.ModelType.CHARSTAT,
+                        mDbHelper,
+                        mChar.id,
+                        (mCharStatAdapterC.getItem(info.position).getStatId()),
+                        this);
+
+                return true;
+            case R.id.context_delete:
+
+                /*
+                Log.d("AlterEgo::CharacterFragment", "mDbHelper: " + mDbHelper);
+                Log.d("AlterEgo::CharacterFragment", "mStatAdapter: " + mCharStatAdapterC);
+                Log.d("AlterEgo::CharacterFragment", "info: " + info);
+                Log.d("AlterEgo::CharacterFragment", "AdapterItem: " + mCharStatAdapterC.getItem(info.position));
+                */
+                Log.d("AlterEgo::CharacterFragment", "Deleting CharacterStat");
+                mDbHelper.deleteCharStat(
+                        mCharStatAdapterC.getItem(
+                            info.position)
+                        .getStatId());
+                refresh();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+	public void showToast(String message) {
+		Toast toast = Toast.makeText(getActivity(), message,
+				Toast.LENGTH_SHORT);
+		toast.show();
+	}
+
+    public void refresh() {
+        mCharStatAdapterC.refreshDB();
+    }
 }

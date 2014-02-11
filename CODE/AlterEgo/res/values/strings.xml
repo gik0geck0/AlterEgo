@@ -51,6 +51,9 @@
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
 
+    <!-- Model Dialog Positive Button -->
+    <string name="edit">Change</string>
+
     <!-- Default Menu -->
     <string name="action_settings">Settings</string>
 

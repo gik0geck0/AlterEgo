@@ -33,6 +33,28 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		super(context, DB_NAME, null, DB_VERSION);
 	}
 
+    /**
+     *  Converts the name of a column into a name that can be shown onscreen.
+     *  @param colname Snake-case column name
+     *  @return Spaced Capitalized phrase
+     */
+    public static String getNameOfColumn(String colname) {
+        // Make words defined by _ split
+        String[] words =  colname.split("_");
+        String name = "";
+        for (int i=0; i < words.length; i++) {
+            // Capitalize the first letter of each word
+            words[i] = Character.toUpperCase(words[i].charAt(0)) + words[i].substring(1);
+
+            // Join it to the name with spaces. This does words.join(' '), which isn't a Java function
+            name += words[i];
+            if (i < words.length-1)
+                name += " ";
+        }
+
+        return name;
+    }
+
 	/**
 	 * For an SQLiteOpenHelper, the onCreate method is called if and only if the
 	 * database-name in question does not already exist. Theoretically, this
@@ -737,16 +759,55 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 	 * @param statVal
 	 *            Numeric value for the stat
 	 */
-	public void insertCharStat(int charId, int statVal, String statName,
-			int category) {
+	public void insertCharStat(int charId, int statVal, String statName, String desc, int category) {
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues statVals = new ContentValues();
 		statVals.put("character_id", charId);
 		statVals.put("stat_value", statVal);
 		statVals.put("stat_name", statName);
 		statVals.put("category_id", category);
+        statVals.put("description_usage_etc", desc);
 
 		db.insert("character_stat", null, statVals);
+	}
+
+	/**
+	 * <p>
+	 * Update statistic for a character. Ex: charId = 1, statVal = 9, statName
+	 * = 'Charisma', category = 0 This will at the Charisma value of 9 to the
+	 * character
+	 * </p>
+	 * 
+	 * @param charID
+	 *            ID for the character to be 'buffed'
+	 * @param statVal
+	 *            Numeric value for the stat
+	 */
+	public void updateCharStat(int statId, int statVal, String statName,
+			String desc, int category) {
+		SQLiteDatabase db = getWritableDatabase();
+		ContentValues statVals = new ContentValues();
+		statVals.put("stat_value", statVal);
+		statVals.put("stat_name", statName);
+        statVals.put("description_usage_etc", desc);
+		statVals.put("category_id", category);
+
+        String[] args = { Integer.toString(statId) };
+		db.update("character_stat", statVals, "_id=?", args);
+	}
+
+    /**
+     * <p>
+     * Remove a specific character stat
+     * </p>
+     *
+     * @param charStatId ID that references the character stat
+     */
+	public void deleteCharStat(int charStatId) {
+		SQLiteDatabase database = getWritableDatabase();
+
+		String[] args = new String[] { Integer.toString(charStatId) };
+		database.delete("character_stat", "_id=?", args);
 	}
 
 	/**
@@ -764,38 +825,64 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 		whereArgs[0] = Integer.toString(charId);
 		Cursor statCursor = db
 				.rawQuery(
-						"SELECT stat_name, stat_value FROM character_stat WHERE character_id=?",
+						"SELECT stat_name, stat_value, _id, character_id FROM character_stat WHERE character_id=?",
 						whereArgs);
 		statCursor.moveToFirst();
 		ArrayList<CharacterStat> stats = new ArrayList<CharacterStat>();
 		while (!statCursor.isAfterLast()) {
-			String statName = statCursor.getString(0);
-			int statVal = statCursor.getInt(1);
-			CharacterStat stat = new CharacterStat(charId, statVal, statName, 0);
-			stats.add(stat);
+			stats.add(createCharacterStatFromCursor(statCursor));
 		}
 		return stats;
 	}
 
+    public static CharacterStat createCharacterStatFromCursor(Cursor statCursor) {
+        String statName = statCursor.getString(statCursor.getColumnIndex("stat_name"));
+        int statVal = statCursor.getInt(statCursor.getColumnIndex("stat_value"));
+        int statId = statCursor.getInt(statCursor.getColumnIndex("_id"));
+        int charId = statCursor.getInt(statCursor.getColumnIndex("character_id"));
+        return new CharacterStat(charId, statId, statVal, statName, 0);
+    }
+
 	/**
 	 * <p>
-	 * Cursor-version of getStatsForCharacter: Lookup all the stats for a given
-	 * character, and return a Cursor for the results
+	 * Lookup all the stats for a given character
 	 * </p>
 	 * 
 	 * @param charId
 	 *            ID for the character to be analyzed
-	 * @return Cursor to the character's stats
+	 * @return Cursor pointing to the character stats
 	 */
-	public Cursor getStatsForCharCursor(int charId) {
+	public Cursor getStatsForCharacterCursor(int charId) {
 		SQLiteDatabase db = getReadableDatabase();
 		String[] whereArgs = new String[1];
 		whereArgs[0] = Integer.toString(charId);
 		Cursor statCursor = db
 				.rawQuery(
-						"SELECT _id, stat_name, stat_value FROM character_stat WHERE character_id=?",
+						"SELECT * FROM character_stat WHERE character_id=?",
 						whereArgs);
-		return statCursor;
+        statCursor.moveToFirst();
+        return statCursor;
+	}
+
+	/**
+	 * <p>
+	 * Lookup one specific stat for a given character
+	 * </p>
+	 * 
+	 * @param charId
+	 *            ID for the character to be analyzed
+	 * @return Cursor pointing to the character stats
+	 */
+	public Cursor getSpecificStatForCharacterCursor(int charId, int statId) {
+		SQLiteDatabase db = getReadableDatabase();
+		String[] whereArgs = new String[2];
+		whereArgs[0] = Integer.toString(charId);
+		whereArgs[1] = Integer.toString(statId);
+		Cursor statCursor = db.rawQuery(
+            "SELECT * FROM character_stat WHERE character_id=? and _id=?",
+            whereArgs);
+        statCursor.moveToFirst();
+        return statCursor;
 	}
 
     public ArrayList<MessageData> getAllMessages(int gameId) {
@@ -853,5 +940,45 @@ public class CharacterDBHelper extends SQLiteOpenHelper {
 
     public static long now() {
         return (new Date()).getTime();
+    }
+
+    public static int getType(String column, Cursor c) {
+        int type;
+        if (
+            column.equals("hosting")
+            ) {
+            // Boolean
+            type = 5;
+        } else if (
+            column.equals("timestamp") ||
+            column.equals("stat_value") ||
+            column.equals("marker_type")
+            ) {
+            // int
+            type = Cursor.FIELD_TYPE_INTEGER;
+        } else if (
+            column.equals("category_name") ||
+            column.equals("subject") ||
+            column.equals("json_message") ||
+            column.equals("stat_name") ||
+            column.equals("description_usage_etc") ||
+            column.equals("marker_name") ||
+            column.equals("name") ||
+            column.equals("description") ||
+            column.equals("marker_description")
+            ) {
+            // string
+            type = Cursor.FIELD_TYPE_STRING;
+        } else if (
+            column.equals("marker_color") ||
+            column.equals("marker_lat") ||
+            column.equals("marker_long")
+            ) {
+            type = Cursor.FIELD_TYPE_FLOAT;
+        } else {
+            type = Cursor.FIELD_TYPE_NULL;
+        }
+        Log.d("AlterEgo::DB::TypeLookup", "Type of " + column + " is " + type);
+        return type;
     }
 }
